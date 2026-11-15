@@ -65,6 +65,21 @@ input[type=date].inp{color-scheme:dark}
 .sc-liste{max-height:30vh;overflow-y:auto;margin-top:12px;display:grid;gap:6px;font-size:14px}
 .sc-item{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:var(--encre)}
 .sc-bas{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px}
+.fil-zone{position:relative;margin-top:18px}
+.fil-mois{position:absolute;left:0;width:60px;font-size:11px;letter-spacing:.1em;color:var(--brume);font-weight:600}
+.fil-mois::after{content:"";position:absolute;left:64px;top:7px;width:var(--larg);border-top:1px solid var(--trait-d)}
+.fil-axe{position:absolute;left:66px;top:0;bottom:0;border-left:1px solid var(--trait)}
+.fil-jour{position:absolute;left:58px;width:18px;height:18px;border-radius:50%;background:var(--or);box-shadow:0 0 0 5px rgba(227,182,92,.18)}
+.fil-seg{position:absolute;text-align:left;border-radius:10px;background:var(--encre);border:1px solid var(--trait-d);border-left:3px solid var(--ivoire-d);padding:8px 10px;overflow:hidden;display:flex;gap:9px}
+.fil-seg:hover{border-color:var(--trait);background:var(--encre-c)}
+.fil-seg.en-cours{border-left-color:var(--or)}
+.fil-seg .couv{--w:30px;width:30px;align-self:flex-start}
+.fil-seg b{font-family:var(--serif);font-weight:400;font-size:14.5px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fil-seg small{display:block;font-size:11.5px;color:var(--brume);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.astuce[hidden]{display:none}
+.astuce{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--brume)}
+.porte{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--trait-d)}
+.porte:first-of-type{border-top:0}
 .pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
 main{flex:1;min-width:0;position:relative;overflow:hidden}
 .vue{position:absolute;inset:0;overflow-y:auto;display:none}
@@ -215,6 +230,7 @@ h2{font-size:20px}
   <nav class="rail" aria-label="Navigation">
     <div class="logo" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M8 10h32a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="#F3EBDD"/><path d="M24 14.5l2.3 4.9 5.2.6-3.9 3.6 1.1 5.2-4.7-2.7-4.7 2.7 1.1-5.2-3.9-3.6 5.2-.6z" fill="#E3B65C"/></svg><span>Phylactère</span></div>
     <button class="nav-b" data-vue="ciel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="7" r="1.6" fill="currentColor"/><circle cx="12" cy="4" r="1.6" fill="currentColor"/><circle cx="18" cy="10" r="1.6" fill="currentColor"/><circle cx="9" cy="17" r="1.6" fill="currentColor"/><circle cx="19" cy="19" r="1.2" fill="currentColor"/><path d="M5 7l7-3 6 6-9 7-4-10" stroke-opacity=".55"/></svg>Ciel</button>
+    <button class="nav-b" data-vue="fil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18"/><circle cx="12" cy="6" r="2" fill="currentColor"/><path d="M14 10h6v4h-6zM4 15h6v4H4z"/></svg>Fil</button>
     <button class="nav-b" data-vue="chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h3v14H4zM9 5h3v14H9zM14.2 5.6l2.9-.8 3.6 13.5-2.9.8z"/></svg>Chercher</button>
     <button class="nav-b nav-plus" id="nav-ajouter" aria-label="Ajouter un livre"><span class="plus-or">+</span>Ajouter</button>
     <button class="nav-b" data-vue="carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z"/><path d="M6 19a2 2 0 0 1 2-2h11M10 8h5M10 11h3"/></svg>Carnet</button>
@@ -224,12 +240,13 @@ h2{font-size:20px}
     <section class="vue" id="vue-vide"></section>
     <section class="vue" id="vue-ciel">
       <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
-      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button></div></div>
+      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button><div><span class="astuce" id="ciel-astuce">✦ Appui long sur le ciel pour l’éclairer</span></div></div></div>
       <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
       <div class="ciel-outils"><button class="rond" id="zoom-plus" aria-label="Zoomer">+</button><button class="rond" id="zoom-moins" aria-label="Dézoomer">−</button><button class="rond" id="recadrer" aria-label="Recadrer le ciel">◎</button></div>
       <div class="bulle-etoile" id="bulle-etoile"></div>
       <div class="terre" id="terre"></div>
     </section>
+    <section class="vue" id="vue-fil"><div class="page" id="fil" style="max-width:none"></div></section>
     <section class="vue" id="vue-chercher"><div class="page" id="chercher"></div></section>
     <section class="vue" id="vue-carnet"><div class="page" id="carnet"></div></section>
     <section class="vue" id="vue-reglages"><div class="page" id="reglages"></div></section>
@@ -260,6 +277,37 @@ const ATLAS = {
   "Nouvelles":[0.75,-1.95],"Poésie":[-0.6,-2.7],"Théâtre":[0.95,-3.3],"Arts & musique":[-1.95,-2.05],"Sciences":[-3.0,-2.5],
   "Roman historique":[0.35,1.85],"Histoire":[-0.95,2.8],"Biographie & mémoires":[1.45,3.05],"Voyage & aventure":[2.25,2.1],"Société & politique":[-2.0,3.7],"Nature & écologie":[0.25,4.0],"Cuisine":[1.85,4.25]
 };
+/* Portes d'entrée des thèmes jamais lus : 4 classiques accessibles par thème (même principe que PortesDEntree.kt) */
+const PORTES = {
+  "Roman": [["Madame Bovary","Gustave Flaubert","Le rêve contre la vie ordinaire, dans une prose ciselée."],["L’Étranger","Albert Camus","Un homme face à l’absurde, en phrases nues."],["Cent ans de solitude","Gabriel García Márquez","Une famille, un village, et le réalisme magique."],["Le Grand Meaulnes","Alain-Fournier","La quête d’un domaine perdu et de l’adolescence."]],
+  "Roman historique": [["Mémoires d’Hadrien","Marguerite Yourcenar","Un empereur romain médite sur sa vie et sa mort."],["Le Nom de la rose","Umberto Eco","Enquête et savoir interdit dans une abbaye médiévale."],["Les Piliers de la terre","Ken Follett","La construction d’une cathédrale sur quarante ans."],["Les Trois Mousquetaires","Alexandre Dumas","Le roman de cape et d’épée par excellence."]],
+  "Policier & thriller": [["Le Chien des Baskerville","Arthur Conan Doyle","Sherlock Holmes face à une légende de la lande."],["Ils étaient dix","Agatha Christie","Dix invités sur une île, et personne d’autre."],["Le Silence des agneaux","Thomas Harris","Le thriller psychologique moderne, avec Hannibal Lecter."],["Les Rivières pourpres","Jean-Christophe Grangé","Des crimes rituels dans une ville universitaire des Alpes."]],
+  "Science-fiction": [["Fondation","Isaac Asimov","Prévoir la chute d’un empire galactique par les mathématiques."],["Dune","Frank Herbert","Écologie, religion et pouvoir sur une planète de sable."],["1984","George Orwell","La surveillance totale et la vérité réécrite."],["Les androïdes rêvent-ils de moutons électriques ?","Philip K. Dick","Qu’est-ce qui distingue l’humain de la machine ?"]],
+  "Fantasy": [["Bilbo le Hobbit","J.R.R. Tolkien","L’entrée la plus douce en Terre du Milieu."],["Le Sorcier de Terremer","Ursula K. Le Guin","Un apprenti mage et le pouvoir des vrais noms."],["Le Nom du vent","Patrick Rothfuss","Un héros raconte lui-même sa légende."],["La Huitième Couleur","Terry Pratchett","Le Disque-monde, entre parodie et sagesse."]],
+  "Fantastique & horreur": [["Dracula","Bram Stoker","Le roman fondateur du vampire, en lettres et journaux."],["Frankenstein","Mary Shelley","Le créateur et sa créature, première science-fiction."],["Le Horla","Guy de Maupassant","La folie qui gagne, vue de l’intérieur."],["Shining","Stephen King","Un hôtel isolé en hiver, et un père qui vacille."]],
+  "Nouvelles": [["Fictions","Jorge Luis Borges","Labyrinthes, bibliothèques infinies et miroirs."],["Le K","Dino Buzzati","Le fantastique discret au cœur du quotidien."],["Nouvelles orientales","Marguerite Yourcenar","Légendes des Balkans à la Chine, réécrites."],["Le Joueur d’échecs","Stefan Zweig","Une partie sur un paquebot, et la folie de l’isolement."]],
+  "Poésie": [["Les Fleurs du mal","Charles Baudelaire","Spleen et idéal : la poésie moderne commence ici."],["Alcools","Guillaume Apollinaire","Le pont Mirabeau, Zone, la mélancolie en vers libres."],["Paroles","Jacques Prévert","La poésie de la rue, simple et tendre."],["Les Contemplations","Victor Hugo","Le deuil, la mémoire et l’infini."]],
+  "Théâtre": [["Cyrano de Bergerac","Edmond Rostand","Panache, amour et alexandrins éblouissants."],["Antigone","Jean Anouilh","Dire non, jusqu’au bout."],["En attendant Godot","Samuel Beckett","Deux hommes attendent, et c’est toute la condition humaine."],["Le Misanthrope","Molière","Peut-on vivre sans jamais mentir ?"]],
+  "Bande dessinée": [["Maus","Art Spiegelman","La Shoah racontée par un fils à partir des mots de son père."],["Persepolis","Marjane Satrapi","Une enfance en Iran pendant la révolution."],["Blacksad","Juan Díaz Canales, Juanjo Guarnido","Polar noir aux personnages animaux, dessin virtuose."],["L’Arabe du futur","Riad Sattouf","Une enfance entre la France, la Libye et la Syrie."]],
+  "Manga": [["Quartier lointain","Jirô Taniguchi","Un homme revit son adolescence, avec sa mémoire d’adulte."],["Akira","Katsuhiro Otomo","Tokyo après l’apocalypse, le manga qui a tout changé."],["Monster","Naoki Urasawa","Un chirurgien poursuit le monstre qu’il a sauvé."],["Nausicaä de la Vallée du Vent","Hayao Miyazaki","Écologie et guerre dans un monde empoisonné."]],
+  "Littérature jeunesse": [["Le Petit Prince","Antoine de Saint-Exupéry","On ne voit bien qu’avec le cœur."],["Les Royaumes du Nord","Philip Pullman","Le premier tome de « À la croisée des mondes »."],["Matilda","Roald Dahl","Une petite fille qui lit tout et tient tête aux adultes."],["Harry Potter à l’école des sorciers","J.K. Rowling","L’entrée dans Poudlard."]],
+  "Philosophie": [["Lettre à Ménécée","Épicure","Le bonheur en quelques pages."],["Pensées pour moi-même","Marc Aurèle","Le carnet stoïcien d’un empereur."],["Le Mythe de Sisyphe","Albert Camus","Vivre sans appel, et imaginer Sisyphe heureux."],["Ainsi parlait Zarathoustra","Friedrich Nietzsche","La philosophie en poème prophétique."]],
+  "Spiritualité & ésotérisme": [["Siddhartha","Hermann Hesse","Une quête d’éveil au temps du Bouddha."],["Tao-tö-king","Lao-tseu","La voie et sa vertu, en 81 courts poèmes."],["Le Prophète","Khalil Gibran","L’amour, le travail, la mort, en paraboles."],["L’Alchimiste","Paulo Coelho","Suivre sa légende personnelle."]],
+  "Religion & mythologie": [["L’Épopée de Gilgamesh","Anonyme","Le plus ancien récit connu : l’amitié et la mort."],["Les Métamorphoses","Ovide","Toute la mythologie gréco-romaine en transformations."],["Le Héros aux mille et un visages","Joseph Campbell","Le schéma commun à tous les mythes."],["Le Mahabharata","Jean-Claude Carrière","La grande épopée indienne, adaptée en français."]],
+  "Psychologie": [["Découvrir un sens à sa vie","Viktor E. Frankl","Ce que les camps ont appris à un psychiatre."],["L’Homme qui prenait sa femme pour un chapeau","Oliver Sacks","Des cas neurologiques racontés comme des nouvelles."],["Système 1 / Système 2","Daniel Kahneman","Les deux vitesses de la pensée."],["Psychanalyse des contes de fées","Bruno Bettelheim","Ce que les contes disent à l’inconscient."]],
+  "Sciences": [["Une brève histoire du temps","Stephen Hawking","Du big bang aux trous noirs."],["Cosmos","Carl Sagan","L’univers et notre place, avec émerveillement."],["L’Origine des espèces","Charles Darwin","Le livre qui a changé la biologie."],["Le Gène égoïste","Richard Dawkins","L’évolution vue du côté des gènes."]],
+  "Histoire": [["Sapiens","Yuval Noah Harari","Une brève histoire de l’humanité."],["Les Croisades vues par les Arabes","Amin Maalouf","L’autre côté des croisades."],["De l’inégalité parmi les sociétés","Jared Diamond","Pourquoi l’histoire a pris des chemins si différents."],["Montaillou, village occitan","Emmanuel Le Roy Ladurie","La vie d’un village cathare, au plus près."]],
+  "Société & politique": [["De la démocratie en Amérique","Alexis de Tocqueville","Promesses et dangers de l’égalité."],["Le Deuxième Sexe","Simone de Beauvoir","On ne naît pas femme : on le devient."],["Discours de la servitude volontaire","Étienne de La Boétie","Pourquoi obéit-on ?"],["Retour à Reims","Didier Eribon","Classe sociale et transfuge, en récit personnel."]],
+  "Essai": [["Essais","Montaigne","Se prendre soi-même pour sujet : l’origine du genre."],["Une chambre à soi","Virginia Woolf","Ce qu’il faut pour écrire."],["Tristes Tropiques","Claude Lévi-Strauss","Voyage et ethnologie, entre récit et pensée."],["L’Homme révolté","Albert Camus","La révolte, ses grandeurs et ses dérives."]],
+  "Biographie & mémoires": [["Le Monde d’hier","Stefan Zweig","L’Europe d’avant les guerres, par un témoin."],["Si c’est un homme","Primo Levi","Le témoignage d’Auschwitz."],["Les Mots","Jean-Paul Sartre","Une enfance parmi les livres."],["Mémoires d’outre-tombe","Chateaubriand","Une vie entre deux siècles."]],
+  "Arts & musique": [["Histoire de l’art","Ernst Gombrich","Toute l’histoire de l’art, claire et vivante."],["Lettres à son frère Théo","Vincent van Gogh","Un peintre parle de son travail, au jour le jour."],["Du spirituel dans l’art","Wassily Kandinsky","Le manifeste de l’abstraction."],["Just Kids","Patti Smith","New York, l’art et une amitié avec Mapplethorpe."]],
+  "Nature & écologie": [["Walden ou la vie dans les bois","Henry David Thoreau","Deux ans dans une cabane au bord d’un étang."],["Printemps silencieux","Rachel Carson","Le livre qui a lancé l’écologie moderne."],["L’Homme qui plantait des arbres","Jean Giono","Un berger fait renaître une vallée."],["La Vie secrète des arbres","Peter Wohlleben","Comment les arbres communiquent et s’entraident."]],
+  "Voyage & aventure": [["L’Usage du monde","Nicolas Bouvier","De Genève à l’Afghanistan, le voyage comme art de vivre."],["Sur la route","Jack Kerouac","L’Amérique traversée en tous sens."],["Le Tour du monde en quatre-vingts jours","Jules Verne","Le pari et la course."],["Dans les forêts de Sibérie","Sylvain Tesson","Six mois seul dans une cabane au bord du Baïkal."]],
+  "Développement personnel": [["Les Quatre Accords toltèques","Don Miguel Ruiz","Quatre règles simples pour vivre plus librement."],["Le Pouvoir du moment présent","Eckhart Tolle","Sortir du mental pour habiter l’instant."],["L’Art de la simplicité","Dominique Loreau","Moins posséder pour mieux vivre."],["Les 7 habitudes de ceux qui réalisent tout ce qu’ils entreprennent","Stephen R. Covey","Un classique de l’efficacité personnelle."]],
+  "Humour": [["Le Guide du voyageur galactique","Douglas Adams","La réponse est 42."],["Trois hommes dans un bateau","Jerome K. Jerome","Une croisière sur la Tamise qui tourne mal, avec un chien."],["La Conjuration des imbéciles","John Kennedy Toole","Ignatius Reilly contre le monde moderne."],["Exercices de style","Raymond Queneau","Une même anecdote racontée de 99 façons."]],
+  "Cuisine": [["Physiologie du goût","Jean Anthelme Brillat-Savarin","Le plaisir de table devenu philosophie."],["Je sais cuisiner","Ginette Mathiot","Le livre de cuisine familiale de référence."],["Le Guide culinaire","Auguste Escoffier","La bible de la cuisine française classique."],["Jérusalem","Yotam Ottolenghi, Sami Tamimi","Les saveurs d’une ville, entre est et ouest."]]
+};
+
 const U = 150;              // taille d'une case de l'atlas (px du monde)
 
 /* ---------------- Utilitaires ---------------- */
@@ -421,6 +469,7 @@ function montrerVue(nom){
   document.querySelectorAll('.nav-b').forEach(b => b.setAttribute('aria-current', String(b.dataset.vue === nom)));
   if (nom === 'ciel') Ciel.activer();
   if (nom === 'chercher') Chercher.rendre();
+  if (nom === 'fil') Fil.rendre();
   if (nom === 'carnet') Carnet.rendre();
   if (nom === 'reglages') Reglages.rendre();
   if (nom === 'vide') rendreVide();
@@ -431,7 +480,7 @@ function router(){
   const m = /^fiche-(\d+)$/.exec(h);
   if (m) { if (!document.querySelector('.vue.active')) montrerVue('ciel'); Fiche.ouvrir(+m[1], false); return; }
   Fiche.fermer(false);
-  montrerVue(['ciel','chercher','carnet','reglages'].includes(h) ? h : 'ciel');
+  montrerVue(['ciel','fil','chercher','carnet','reglages'].includes(h) ? h : 'ciel');
 }
 addEventListener('hashchange', router);
 
@@ -468,13 +517,14 @@ async function lancerImport(f){
 /* =========================================================
    Le ciel
    ========================================================= */
+try { if (+(localStorage.getItem('phylactere-lampe') || 0) >= 3) document.getElementById('ciel-astuce').hidden = true; } catch (e) {}
 const Ciel = (() => {
   const cv = $('#ciel'); const ctx = cv.getContext('2d');
   let L = 0, H = 0, dpr = 1;
   let vue = { x:0, y:0, z:1 };          // écran = (monde - x) * z + centre
-  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null;
+  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null, lampe = null, minuterieLampe = null;
   let vueAvantAllumage = null, bouge = false;
-  const C = { nuit:'#0B0E1A', ivoire:'243,235,221', or:'227,182,92', bleu:'135,146,188', brume:'154,163,191' };
+  const C = { nuit:'11,14,26', nuitHex:'#0B0E1A', ivoire:'243,235,221', or:'227,182,92', bleu:'135,146,188', brume:'154,163,191' };
 
   function invalider(){ modele = null; allume = null; choisie = null; fermerBulle(); sale = true; }
 
@@ -584,7 +634,7 @@ const Ciel = (() => {
   function dessiner(t){
     if (!modele) { construire(); cadrer(modele.consts); }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = C.nuit; ctx.fillRect(0, 0, L, H);
+    ctx.fillStyle = C.nuitHex; ctx.fillRect(0, 0, L, H);
     const z = vue.z, occupe = [];
     labels = [];
     const annee = new Date().getFullYear();
@@ -698,12 +748,50 @@ const Ciel = (() => {
       occupe.push(rect); labels.push({ rect, eteint: t.theme });
       ctx.fillStyle = estTerre ? `rgba(${C.or},.95)` : `rgba(${C.brume},.3)`; ctx.fillText(t.theme, x - w / 2, y);
     }
+    // lampe de poche : éclaire les constellations et les titres sous le doigt
+    if (lampe) {
+      const fade = lampe.fin ? Math.max(0, 1 - Math.max(0, t - lampe.fin - 1500) / 400) : 1;
+      if (fade <= 0) lampe = null;
+      else {
+        const R = 100, lx = lampe.x, ly = lampe.y;
+        const g = ctx.createRadialGradient(lx, ly, 0, lx, ly, R); g.addColorStop(0, `rgba(${C.ivoire},${.10 * fade})`); g.addColorStop(1, `rgba(${C.ivoire},0)`);
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lx, ly, R, 0, 7); ctx.fill();
+        ctx.beginPath(); ctx.arc(lx, ly, R, 0, 7); ctx.strokeStyle = `rgba(${C.or},${.35 * fade})`; ctx.lineWidth = 1; ctx.stroke();
+        const dans = (x, y) => Math.hypot(x - lx, y - ly) < R;
+        for (const k of modele.consts) {
+          if (!k.etoiles.some(e => dans(...(e._s || ecran(e.wx, e.wy))))) continue;
+          ctx.strokeStyle = `rgba(${C.ivoire},${.6 * fade})`; ctx.lineWidth = 1.1;
+          for (const [i, j] of k.aretes) { const A = ecran(k.etoiles[i].wx, k.etoiles[i].wy), B = ecran(k.etoiles[j].wx, k.etoiles[j].wy); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); }
+          ctx.font = 'italic 500 16px Fraunces, Georgia, serif'; const w = ctx.measureText(k.theme).width;
+          const [cx, cy] = ecran(k.c[0], k.c[1]); let ny = cy - k.rc * vue.z - 12;
+          if (Math.abs(ny - ly) < 48 && Math.abs(cx - lx) < w / 2 + 40) ny = ly - 60;   // le doigt cache le nom : on le remonte
+          const nx = Math.max(6, Math.min(L - w - 6, cx - w / 2)); ny = Math.max(84, ny);
+          ctx.fillStyle = `rgba(${C.nuit},${.8 * fade})`; ctx.fillRect(nx - 4, ny - 15, w + 8, 20);
+          ctx.fillStyle = `rgba(${C.ivoire},${.95 * fade})`; ctx.fillText(k.theme, nx, ny);
+        }
+        ctx.font = '500 12px Manrope, system-ui, sans-serif';
+        // titres des étoiles éclairées, les plus proches du doigt d'abord, sans chevauchement
+        const prises = [], proches = modele.etoiles.map(e => { const s2 = e._s || ecran(e.wx, e.wy); return { e, x: s2[0], y: s2[1], d: Math.hypot(s2[0] - lx, s2[1] - ly) }; }).filter(o => o.d < R).sort((a, b) => a.d - b.d);
+        for (const o of proches) {
+          const tt = titreCourt(o.e.l), w = ctx.measureText(tt).width;
+          for (let [px, py] of [[o.x + 8, o.y + 4], [o.x - 8 - w, o.y + 4], [o.x - w / 2, o.y - 9], [o.x - w / 2, o.y + 17]]) {
+            px = Math.max(4, Math.min(L - w - 4, px));
+            const r = [px - 2, py - 11, px + w + 2, py + 3];
+            if (prises.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1])) continue;
+            prises.push(r); ctx.fillStyle = `rgba(${C.nuit},${.7 * fade})`; ctx.fillRect(r[0], r[1], r[2] - r[0], r[3] - r[1]);
+            ctx.fillStyle = `rgba(${C.ivoire},${.92 * fade})`; ctx.fillText(tt, px, py); break;
+          }
+        }
+        ctx.font = 'italic 400 14px Fraunces, Georgia, serif';
+        for (const tt of modele.eteints) { const [x, y] = ecran(tt.wx, tt.wy); if (!dans(x, y)) continue; const w = ctx.measureText(tt.theme).width; ctx.fillStyle = `rgba(${C.brume},${.6 * fade})`; ctx.fillText(tt.theme, x - w / 2, y); }
+      }
+    }
   }
 
   function boucle(t){
     if (vueCourante === 'ciel' && M.racine) {
       if (anim) { anim(t); sale = true; }
-      if (allume || (modele && modele.scintille && !reduitMouvement)) sale = true;
+      if (allume || lampe || (modele && modele.scintille && !reduitMouvement)) sale = true;
       if (sale) { sale = false; dessiner(t); }
     }
     requestAnimationFrame(boucle);
@@ -751,20 +839,40 @@ const Ciel = (() => {
   function ouvrirTerre(theme){
     eteindre(); choisie = null; fermerBulle(); terre = theme; sale = true;
     const t = $('#terre');
-    t.innerHTML = `<div class="carte" style="box-shadow:0 12px 40px rgba(0,0,0,.5)"><div class="sur" style="color:var(--or)">Terre inconnue</div><h3 style="font-size:20px;margin:6px 0">${esc(theme)}</h3><p class="doux" style="margin:0 0 12px;font-size:14px;line-height:1.5">Tu n’as encore rien lu ici. Les portes d’entrée (et l’ajout « À lire ») arrivent avec l’édition, au prochain lot.</p><button class="btn petit" id="terre-fermer">Fermer</button></div>`;
+    const deja = new Set(M.lectures.map(l => norm(l.titre).replace(ARTICLES, '')));
+    const portes = (PORTES[theme] || []).filter(([ti]) => !deja.has(norm(ti).replace(ARTICLES, '')));
+    t.innerHTML = `<div class="carte" style="box-shadow:0 12px 40px rgba(0,0,0,.5);max-height:62vh;overflow-y:auto"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="sur" style="color:var(--or)">Terre inconnue</div><h3 style="font-size:20px;margin:6px 0">${esc(theme)}</h3></div><button class="mini-x" id="terre-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
+      <p class="doux" style="margin:0 0 8px;font-size:14px;line-height:1.5">Tu n’as encore rien lu ici. ${portes.length ? 'Quelques portes d’entrée :' : 'Toutes les portes proposées sont déjà dans ta bibliothèque.'}</p>
+      ${portes.map(([ti, au, ph], i) => `<div class="porte"><div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:16px">${esc(ti)}</div><div class="doux" style="font-size:12.5px">${esc(au)}</div><div style="font-size:13px;color:var(--ivoire-d);margin-top:3px;line-height:1.4">${esc(ph)}</div></div><button class="btn petit" data-porte="${i}">+ À lire</button></div>`).join('')}</div>`;
     t.classList.add('ouverte'); $('#terre-fermer').onclick = () => { fermerTerre(); sale = true; };
+    t.querySelectorAll('[data-porte]').forEach(b => b.onclick = async () => {
+      if (b.disabled) return; b.disabled = true;
+      const [ti, au] = portes[+b.dataset.porte];
+      await Edition.ajouterSimple({ titre: ti, auteur: au, theme, statut: 'A_LIRE' });
+      b.textContent = '✓ À lire'; b.classList.add('or'); toast(`« ${ti} » rejoint ton ciel (${theme})`);
+    });
   }
 
   const pointeurs = new Map(); let geste = null, deplace = 0;
   cv.addEventListener('pointerdown', e => {
     cv.setPointerCapture(e.pointerId); pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); deplace = 0;
-    if (pointeurs.size === 1) geste = { type:'glisse', dep:[e.offsetX, e.offsetY], vue:{ ...vue } };
+    clearTimeout(minuterieLampe);
+    if (pointeurs.size === 1) {
+      geste = { type:'glisse', dep:[e.offsetX, e.offsetY], vue:{ ...vue } };
+      minuterieLampe = setTimeout(() => {
+        if (pointeurs.size !== 1 || deplace > 4 || geste?.type !== 'glisse') return;
+        const [p] = [...pointeurs.values()]; geste = { type:'lampe' }; lampe = { x: p[0], y: p[1], fin: 0 }; sale = true;
+        try { navigator.vibrate && navigator.vibrate(30); } catch (er) {}
+        try { const n = +(localStorage.getItem('phylactere-lampe') || 0) + 1; localStorage.setItem('phylactere-lampe', n); if (n >= 3) $('#ciel-astuce').hidden = true; } catch (er) {}
+      }, 450);
+    }
     if (pointeurs.size === 2) { const [a, b] = [...pointeurs.values()]; geste = { type:'pince', d: Math.hypot(a[0] - b[0], a[1] - b[1]), m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], vue:{ ...vue } }; }
     cv.classList.add('tire');
   });
   cv.addEventListener('pointermove', e => {
     if (!pointeurs.has(e.pointerId)) { const v = viser(e.offsetX, e.offsetY); cv.style.cursor = v ? 'pointer' : 'grab'; return; }
     pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); anim = null;
+    if (geste?.type === 'lampe') { lampe = { x: e.offsetX, y: e.offsetY, fin: 0 }; sale = true; return; }
     if (geste?.type === 'glisse' && pointeurs.size === 1) {
       const dx = e.offsetX - geste.dep[0], dy = e.offsetY - geste.dep[1]; deplace = Math.max(deplace, Math.hypot(dx, dy));
       if (deplace > 4) { vue = { ...geste.vue, x: geste.vue.x - dx / vue.z, y: geste.vue.y - dy / vue.z }; bouge = true; sale = true; }
@@ -776,11 +884,14 @@ const Ciel = (() => {
     }
   });
   const fin = e => {
+    clearTimeout(minuterieLampe);
+    if (geste?.type === 'lampe') { if (lampe) lampe.fin = performance.now(); pointeurs.delete(e.pointerId); cv.classList.remove('tire'); geste = null; return; }
     const etaitSeul = pointeurs.size === 1 && geste?.type === 'glisse';
     pointeurs.delete(e.pointerId); cv.classList.remove('tire');
     if (etaitSeul && deplace <= 4 && e.type === 'pointerup') clic(e.offsetX, e.offsetY);
     if (pointeurs.size === 1) { const [p] = [...pointeurs.values()]; geste = { type:'glisse', dep:p, vue:{ ...vue } }; deplace = 99; } else if (!pointeurs.size) geste = null;
   };
+  cv.addEventListener('contextmenu', e => e.preventDefault());
   cv.addEventListener('pointerup', fin); cv.addEventListener('pointercancel', fin);
   let dernierClic = 0;
   function clic(x, y){
@@ -1044,6 +1155,56 @@ const Fiche = (() => {
 })();
 
 /* =========================================================
+   Fil du temps (même calcul que FilCalcul.kt) : aujourd'hui en haut, le passé vers le bas
+   ========================================================= */
+const Fil = {
+  rendre(){
+    const el = $('#fil'), J = 864e5, maintenant = Date.now(), annee = new Date().getFullYear();
+    const court = ms => { const d = new Date(ms); return `${d.getDate()} ${MOIS[d.getMonth()]}${d.getFullYear() !== annee ? ' ' + d.getFullYear() : ''}`; };
+    const jours = (a, b) => Math.round((b - a) / J);
+    const livres = M.lectures.filter(l => !l._manques.length);
+    const iv = [];
+    for (const l of livres) {
+      const enCours = l.statut === 'EN_COURS';
+      const fin = enCours ? maintenant : (l.dateFin ?? l.dateDebut);
+      if (fin == null) continue;
+      iv.push({ l, debut: Math.min(l.dateDebut ?? fin, fin), fin, enCours });
+    }
+    const sansDates = livres.length - iv.length;
+    const termines = livres.filter(l => l.statut === 'LU' && l.dateFin);
+    const durees = livres.filter(l => l.statut === 'LU' && l.dateDebut && l.dateFin).map(l => Math.max(1, jours(l.dateDebut, l.dateFin)));
+    const stats = [`${termines.filter(l => new Date(l.dateFin).getFullYear() === annee).length} terminé${termines.length > 1 ? 's' : ''} cette année`, `${livres.filter(l => l.statut === 'EN_COURS').length} en cours`];
+    if (durees.length) stats.push(`${Math.round(durees.reduce((a, b) => a + b, 0) / durees.length)} jours par livre en moyenne`);
+    let h = `<h1>Fil du temps</h1><p class="doux" style="margin:6px 0 0">${stats.join(' · ')}</p>`;
+    if (sansDates) h += `<p class="doux" style="font-size:13px;margin:6px 0 0">${sansDates} lecture${sansDates > 1 ? 's' : ''} sans date ne figure${sansDates > 1 ? 'nt' : ''} pas sur le fil.</p>`;
+    if (!iv.length) { el.innerHTML = h + '<p class="doux" style="margin-top:30px">Aucune lecture datée pour l’instant.</p>'; return; }
+    const HAUT = 30, MIN = 78, ESP = 8, LARG = innerWidth < 600 ? 150 : 190, GAUCHE = innerWidth < 600 ? 74 : 84;
+    const ancien = Math.min(...iv.map(x => x.debut)), etendue = Math.max(1, jours(ancien, maintenant));
+    const pj = etendue <= 120 ? 5 : etendue <= 400 ? 3.5 : 2;
+    const y = ms => HAUT + (maintenant - ms) / J * pj;
+    const voies = [], segs = [];
+    for (const x of iv.sort((a, b) => y(a.fin) - y(b.fin) || a.l.id - b.l.id)) {
+      const haut = y(x.fin), duree = jours(x.debut, x.fin), hauteur = Math.max(MIN, duree * pj);
+      let v = voies.findIndex(f => f + ESP <= haut); if (v < 0) { voies.push(haut + hauteur); v = voies.length - 1; } else voies[v] = haut + hauteur;
+      const l = x.l, pc = l.pagesTotal && l.pageActuelle != null ? ` · ${Math.min(100, Math.round(l.pageActuelle * 100 / l.pagesTotal))} %` : '';
+      const dates = x.enCours ? (l.dateDebut ? 'depuis le ' + court(l.dateDebut) : 'en cours') : l.dateDebut && l.dateFin ? `${court(l.dateDebut)} → ${court(l.dateFin)}` : l.dateFin ? 'terminé le ' + court(l.dateFin) : 'commencé le ' + court(x.debut);
+      const etat = x.enCours ? `En cours · ${Math.max(1, duree)} j${pc}` : l.dateDebut && l.dateFin ? `${Math.max(1, duree)} jour${duree > 1 ? 's' : ''}` : STATUTS[l.statut];
+      segs.push({ l, haut, hauteur, v, dates, etat, enCours: x.enCours });
+    }
+    const total = Math.max(...segs.map(s => s.haut + s.hauteur)) + 40, larg = GAUCHE + voies.length * (LARG + 10);
+    let mois = '', d = new Date(new Date().getFullYear(), new Date().getMonth(), 1); const lim = new Date(new Date(ancien).getFullYear(), new Date(ancien).getMonth(), 1);
+    const premier = d.getTime();
+    while (d >= lim) { const nom = MOIS[d.getMonth()].replace('.', '').toUpperCase(); mois += `<div class="fil-mois" style="top:${y(d.getTime()) - 7}px">${nom}${d.getMonth() === 0 || d.getTime() === premier ? ' ' + d.getFullYear() : ''}</div>`; d = new Date(d.getFullYear(), d.getMonth() - 1, 1); }
+    h += `<div style="overflow-x:auto;padding-bottom:20px"><div class="fil-zone" style="height:${total}px;min-width:${larg}px;--larg:${larg - 64}px">${mois}<div class="fil-axe"></div>
+      <div class="fil-jour" style="top:${HAUT - 9}px" title="Aujourd’hui"></div><div style="position:absolute;left:${GAUCHE}px;top:${HAUT - 24}px;font-size:11px;color:var(--or);font-weight:600;letter-spacing:.1em">AUJOURD’HUI</div>
+      ${segs.map(s => `<button class="fil-seg${s.enCours ? ' en-cours' : ''}" data-livre="${s.l.id}" style="left:${GAUCHE + s.v * (LARG + 10)}px;top:${s.haut}px;width:${LARG}px;height:${s.hauteur}px">${couverture(s.l, 30)}<div style="min-width:0"><b style="${s.hauteur < 96 ? '-webkit-line-clamp:1' : ''}">${esc(titreCourt(s.l))}</b><small>${esc(s.dates)}</small><small style="color:${s.enCours ? 'var(--or)' : ''}">${esc(s.etat)}</small></div></button>`).join('')}
+    </div></div>`;
+    el.innerHTML = h;
+    el.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => Fiche.ouvrir(+b.dataset.livre));
+  }
+};
+
+/* =========================================================
    Carnet (citations)
    ========================================================= */
 const Carnet = {
@@ -1115,6 +1276,7 @@ const Edition = (() => {
     Ciel.invalider();
     if (vueCourante === 'chercher') Chercher.resultats();
     if (vueCourante === 'carnet') Carnet.rendre();
+    if (vueCourante === 'fil') Fil.rendre();
     if (vueCourante === 'reglages') Reglages.rendre();
   }
   const nonExporte = () => !!(M.racine && M.racine.modifieLe && (!M.racine.exporteLe || M.racine.modifieLe > M.racine.exporteLe));
@@ -1436,7 +1598,8 @@ const Edition = (() => {
   }
 
   $('#nav-ajouter').addEventListener('click', () => nouveau());
-  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn };
+  async function ajouterSimple(o){ const l = { ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }; M.lectures.push(l); await enregistrer(); return l; }
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple };
 })();
 
 /* =========================================================
