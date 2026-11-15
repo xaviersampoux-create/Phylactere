@@ -107,6 +107,7 @@ h2{font-size:20px}
 .ciel-tete{position:absolute;left:0;right:0;top:0;padding:16px 20px;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:linear-gradient(var(--nuit) 30%,transparent)}
 .ciel-tete>*{pointer-events:auto}
 .ciel-tete h1{font-size:24px}
+.banniere[hidden]{display:none}
 .banniere{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;border:1px solid rgba(227,182,92,.5);color:var(--or);font-size:12.5px;font-weight:600}
 .ciel-outils{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
 .rond{width:42px;height:42px;border-radius:50%;background:var(--encre);border:1px solid var(--trait);display:grid;place-items:center;font-size:18px;color:var(--ivoire-d)}
@@ -1143,14 +1144,48 @@ const Edition = (() => {
       couvertureUrl: b.cover ? (b.cover.medium || b.cover.large) : null, resume: '',
       theme: (b.subjects || []).map(x => themeDepuis(x.name)).find(Boolean) || null, source: 'Open Library' };
   }
+  /* BnF : catalogue général, API SRU, Dublin Core (même lecture que l'appli) */
+  function auteurBnf(c){
+    const role = (c.includes('. ') ? c.slice(c.lastIndexOf('. ') + 2) : '').toLowerCase();
+    if (['traduct','préfac','postfac','éditeur','directeur','commentateur','annotateur','colori','lettr','photograph','collaborat'].some(x => role.includes(x))) return null;
+    const nom = c.split(' (')[0].split('. ')[0].trim().replace(/\.$/, '');
+    const m = nom.split(', '); return (m.length >= 2 ? m[1] + ' ' + m[0] : nom).trim() || null;
+  }
+  const GENERIQUES = ['romans, nouvelles','roman','ouvrages pour la jeunesse','jeunesse','bandes dessinées','bande dessinée','mangas','récits personnels','biographies','littérature','siècle','ouvrages de vulgarisation','essais','anthologies','théâtre','poésie','fiction','documents','manuels','textes','critique et interprétation','ouvrages illustrés','albums','contes','nouvelles','correspondance','dictionnaires'];
+  function motsDepuisSujets(sujets){
+    const vus = new Set(), res = [];
+    for (let s of sujets) {
+      s = s.split(' -- ')[0].trim().replace(/[.\s]+$/, '');
+      if (s.length < 3 || s.length > 40 || /\d/.test(s) || GENERIQUES.some(g => s.toLowerCase().includes(g))) continue;
+      if ((s.match(/\p{Lu}/gu) || []).length < 2) s = s.charAt(0).toLowerCase() + s.slice(1);
+      if (!vus.has(s.toLowerCase())) { vus.add(s.toLowerCase()); res.push(s); }
+    }
+    return res.slice(0, 6);
+  }
+  async function bnf(isbn){
+    const cql = `bib.fuzzyISBN all "${isbn}"`;
+    const r = await fetch('https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=' + encodeURIComponent(cql) + '&recordSchema=dublincore&maximumRecords=1');
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    const doc = new DOMParser().parseFromString(await r.text(), 'application/xml');
+    const rec = doc.getElementsByTagName('srw:record')[0]; if (!rec) return null;
+    const tous = n => [...rec.getElementsByTagName(n)].map(e => e.textContent.trim()).filter(Boolean);
+    const titreBrut = tous('dc:title')[0]; if (!titreBrut) return null;
+    const createurs = tous('dc:creator'), sujets = tous('dc:subject'), types = tous('dc:type'), formats = tous('dc:format');
+    const auteurs = [...new Set(createurs.map(auteurBnf).filter(Boolean))].slice(0, 2);
+    const estBd = [...sujets, ...types].some(x => /bandes? dessinée/i.test(x)) || createurs.join(' ').toLowerCase().includes('scénariste');
+    const pages = formats.map(f => (/(\d{2,4})\s*p\./.exec(f) || [])[1]).find(Boolean);
+    return { titre: titreBrut.split(' / ')[0].trim().replace(/[.\s]+$/, ''), sousTitre: null, auteur: auteurs.join(', '), pagesTotal: pages ? +pages : null,
+      couvertureUrl: null, resume: '', theme: estBd ? 'Bande dessinée' : null, estBd, motsCles: motsDepuisSujets(sujets), source: 'BnF' };
+  }
   async function chercherIsbn(isbn){
-    let res = null, bloque = 0, essais = 0;
-    for (const f of [googleBooks, openLibrary]) {
+    let res = null, bloque = 0, essais = 0; const sources = [];
+    for (const f of [bnf, googleBooks, openLibrary]) {
       essais++;
-      try { const r = await f(isbn); if (r) { res = res ? { ...r, ...Object.fromEntries(Object.entries(res).filter(([, v]) => v)) } : r; } }
-      catch (e) { if (e instanceof TypeError) bloque++; console.warn(e); }
+      try { const r = await f(isbn); if (r) { sources.push(r.source); res = res ? { ...r, ...Object.fromEntries(Object.entries(res).filter(([, v]) => v && !(Array.isArray(v) && !v.length))) } : r; } }
+      catch (e) { if (e instanceof TypeError) bloque++; console.warn(f.name, e); }
     }
     if (!res && bloque === essais) throw new Error('reseau');
+    if (res) res.source = sources.join(' + ');
     return res;
   }
 
@@ -1243,6 +1278,8 @@ const Edition = (() => {
       if (!brouillon.theme && r.theme) brouillon.theme = r.theme;
       if (!brouillon.resume && r.resume) { brouillon.resume = r.resume; brouillon.sourceResume = r.source; }
       if (!brouillon.couvertureUrl && r.couvertureUrl && !imageChoisie) brouillon.couvertureUrl = r.couvertureUrl;
+      if (r.estBd) brouillon.type = 'BD';
+      if (!brouillon.motsCles && r.motsCles?.length) brouillon.motsCles = r.motsCles.join(', ');
       afficherConserve(el);
       $('#e-isbn-res').innerHTML = `Trouvé sur ${esc(r.source)}.${doublon ? ` <span style="color:var(--or)">Déjà dans ta bibliothèque : « ${esc(doublon.titre)} ».</span>` : ''}`;
     } catch (e) {
