@@ -55,6 +55,16 @@ input[type=date].inp{color-scheme:dark}
 .modif{position:absolute;top:calc(10px + var(--safe-t));right:54px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--trait);display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--ivoire-d);background:var(--nuit)}
 .modif:hover{border-color:var(--or);color:var(--or)}
 .resultat-isbn{display:flex;gap:14px;align-items:flex-start;margin-top:14px}
+#scanner{position:fixed;inset:0;z-index:60;background:var(--nuit);display:none;flex-direction:column;padding:calc(12px + var(--safe-t)) 16px calc(14px + var(--safe-b))}
+#scanner.ouvert{display:flex}
+.sc-haut{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px}
+.sc-video{position:relative;flex:1;min-height:200px;border-radius:16px;overflow:hidden;background:#000}
+.sc-video video{width:100%;height:100%;object-fit:cover;display:block}
+.sc-cadre{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none}
+.sc-cadre i{width:84%;height:40%;border:2px solid var(--or);border-radius:12px;box-shadow:0 0 0 999px rgba(5,7,14,.45)}
+.sc-liste{max-height:30vh;overflow-y:auto;margin-top:12px;display:grid;gap:6px;font-size:14px}
+.sc-item{display:flex;gap:10px;align-items:center;padding:8px 12px;border-radius:10px;background:var(--encre)}
+.sc-bas{display:flex;gap:10px;justify-content:space-between;align-items:center;margin-top:12px}
 .pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
 main{flex:1;min-width:0;position:relative;overflow:hidden}
 .vue{position:absolute;inset:0;overflow-y:auto;display:none}
@@ -1219,7 +1229,7 @@ const Edition = (() => {
     return `<button class="fermer" aria-label="Fermer" id="e-fermer">✕</button>
       <div style="padding:18px 20px 0"><div class="sur">${nouveau ? 'Nouvelle lecture' : 'Modifier la fiche'}</div><h2 style="margin-top:6px;padding-right:40px">${esc(b.titre || 'Sans titre')}</h2></div>
       <div class="fiche-corps"><form class="form" id="e-form" autocomplete="off">
-        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après Google Books et Open Library.</div></div>` : ''}
+        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn petit" id="e-scanner">📷 Scanner</button><button type="button" class="btn petit" id="e-rafale">⚡ En rafale</button></div><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après Google Books et Open Library.</div></div>` : ''}
         <label>Titre<input class="inp" name="titre" value="${esc(b.titre)}" required></label>
         <label>Auteur<input class="inp" name="auteur" value="${esc(b.auteur)}" placeholder="Prénom Nom, Prénom Nom"></label>
         <div><div class="sur" style="margin-bottom:8px">Statut</div><div class="choix">${puce('statut', 'A_LIRE', 'À lire')}${puce('statut', 'EN_COURS', 'En cours')}${puce('statut', 'LU', 'Lu')}<span style="width:12px"></span>${puce('type', 'LIVRE', 'Livre')}${puce('type', 'BD', 'BD')}</div></div>
@@ -1255,6 +1265,8 @@ const Edition = (() => {
       el.querySelector('#e-image').onchange = async e => { const fi = e.target.files[0]; if (!fi) return; try { imageChoisie = await reduireImage(fi); retirerImage = false; el.querySelector('#e-couv').innerHTML = `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>`; } catch { toast('Image illisible'); } };
       const si = el.querySelector('#e-sans-image'); if (si) si.onclick = () => { lireForm(f); retirerImage = true; imageChoisie = null; brouillon.couvertureUrl = null; afficherConserve(el); };
       const bi = el.querySelector('#e-isbn'); if (bi) bi.onclick = () => rechercheIsbn(el, f);
+      const bs = el.querySelector('#e-scanner'); if (bs) bs.onclick = () => Scanner.ouvrir({ surIsbn: code => { const fe = $('#e-form'); fe.elements.isbnRecherche.value = code; rechercheIsbn($('#fiche'), fe); } });
+      const br = el.querySelector('#e-rafale'); if (br) br.onclick = () => { Fiche.fermer(); Scanner.ouvrir({ rafale: true }); };
       if (f.elements.isbnRecherche) f.elements.isbnRecherche.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); rechercheIsbn(el, f); } };
       const sup = el.querySelector('#e-supprimer'); if (sup) sup.onclick = () => supprimer(brouillon.id);
       f.onsubmit = e => { e.preventDefault(); lireForm(f); valider(); };
@@ -1321,6 +1333,25 @@ const Edition = (() => {
   async function nouveau(){
     if (!M.racine) { await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; }
     brouillon = modele(); imageChoisie = null; retirerImage = false; afficher();
+  }
+
+  /* ---------- Ajout direct d'un ISBN (scan en rafale) ---------- */
+  async function ajouterDepuisIsbn(isbn){
+    const doublon = M.lectures.find(l => l.isbn && variantes(isbn).has(nettoyerIsbn(l.isbn)));
+    if (doublon) return { titre: doublon.titre, etat: 'déjà là', ok: false };
+    let r = null; try { r = await chercherIsbn(isbn); } catch (e) { r = null; }
+    const l = modele();
+    l.id = nouvelId(M.lectures); l.isbn = isbn; l.dateAjout = Date.now(); l.statut = 'A_LIRE';
+    if (r) {
+      l.titre = r.titre ? (r.sousTitre && r.titre.length < 25 ? `${r.titre} : ${r.sousTitre}` : r.titre) : '';
+      l.auteur = r.auteur || ''; l.pagesTotal = r.pagesTotal || null; l.theme = r.theme || null; l.couvertureUrl = r.couvertureUrl || null;
+      if (r.resume) { l.resume = r.resume; l.sourceResume = r.source; }
+      if (r.estBd) l.type = 'BD'; if (r.motsCles?.length) l.motsCles = r.motsCles.join(', ');
+    }
+    if (!l.titre) l.titre = 'ISBN ' + isbn;
+    M.lectures.push(l); await enregistrer();
+    const m = M.parId.get(l.id)._manques;
+    return { titre: l.titre, etat: m.length ? 'à compléter' : 'ajouté', ok: true };
   }
 
   /* ---------- Compléments dans la fiche : citations, liens ---------- */
@@ -1405,7 +1436,132 @@ const Edition = (() => {
   }
 
   $('#nav-ajouter').addEventListener('click', () => nouveau());
-  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn };
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn };
+})();
+
+/* =========================================================
+   Scanner de code-barres (caméra du téléphone ou de la tablette)
+   BarcodeDetector intégré (Chrome Android) ; sinon ZXing (Safari iPhone/iPad)
+   ========================================================= */
+const Scanner = (() => {
+  const ZXING_URL = 'https://unpkg.com/@zxing/library@0.21.3/umd/index.min.js';
+  let flux = null, boucle = null, actif = false, detecteur = null, zx = null;
+  let rafale = false, surIsbn = null, vus = new Set(), dernier = { code: '', t: 0 }, occupe = false, ajoutes = [];
+
+  function isbnValide(c){
+    if (!/^97[89]\d{10}$/.test(c)) return false;
+    let t = 0; for (let i = 0; i < 12; i++) t += +c[i] * (i % 2 ? 3 : 1);
+    return (10 - t % 10) % 10 === +c[12];
+  }
+  async function preparer(){
+    if (detecteur || zx) return;
+    if ('BarcodeDetector' in window) {
+      try { const f = await BarcodeDetector.getSupportedFormats(); if (f.includes('ean_13')) { detecteur = new BarcodeDetector({ formats: ['ean_13'] }); return; } } catch (e) {}
+    }
+    if (!window.ZXing) await new Promise((ok, ko) => { const s = document.createElement('script'); s.src = ZXING_URL; s.onload = ok; s.onerror = () => ko(new Error('Lecteur de codes-barres indisponible (connexion ?)')); document.head.appendChild(s); });
+    const Z = window.ZXing, hints = new Map();
+    hints.set(Z.DecodeHintType.POSSIBLE_FORMATS, [Z.BarcodeFormat.EAN_13]);
+    hints.set(Z.DecodeHintType.TRY_HARDER, true);
+    const r = new Z.MultiFormatReader(); r.setHints(hints);
+    zx = { Z, r };
+  }
+  async function lireSource(src, l, h){
+    // src : vidéo ou image ; on lit la bande centrale (là où l'on vise), puis l'image entière si besoin
+    if (detecteur) { const res = await detecteur.detect(src); return res.map(x => x.rawValue); }
+    const c = lireSource.c || (lireSource.c = document.createElement('canvas'));
+    const essais = [[.08, .3, .84, .4], [0, 0, 1, 1]];
+    for (const [x, y, w, hh] of essais) {
+      const sw = Math.round(l * w), sh = Math.round(h * hh), f = Math.min(1, 1000 / sw);
+      c.width = Math.round(sw * f); c.height = Math.round(sh * f);
+      const g = c.getContext('2d', { willReadFrequently: true }); g.drawImage(src, l * x, h * y, sw, sh, 0, 0, c.width, c.height);
+      try { const src2 = new zx.Z.HTMLCanvasElementLuminanceSource(c); const res = zx.r.decode(new zx.Z.BinaryBitmap(new zx.Z.HybridBinarizer(src2))); zx.r.reset(); return [res.getText()]; }
+      catch (e) { zx.r.reset(); }
+    }
+    return [];
+  }
+
+  function rendre(msg){
+    let o = $('#scanner');
+    if (!o) {
+      o = document.createElement('div'); o.id = 'scanner'; document.body.appendChild(o);
+    }
+    o.innerHTML = `<div class="sc-haut"><div><div class="sur" style="color:var(--or)">${rafale ? 'Scan en rafale' : 'Scanner'}</div><div id="sc-msg" class="doux" style="font-size:13.5px;margin-top:4px">${esc(msg || 'Vise le code-barres au dos du livre')}</div></div><button class="fermer" id="sc-fermer" aria-label="Fermer" style="position:static">✕</button></div>
+      <div class="sc-video"><video id="sc-video" playsinline muted autoplay></video><div class="sc-cadre"><i></i></div></div>
+      ${rafale ? `<div class="sc-liste" id="sc-liste">${ajoutes.length ? '' : '<span class="doux">Les livres scannés s’ajoutent « À lire ».</span>'}</div>` : ''}
+      <div class="sc-bas"><label class="btn petit">📷 Photo du code<input type="file" accept="image/*" capture="environment" id="sc-photo" hidden></label>${rafale ? `<button class="btn or" id="sc-fin">Terminer${ajoutes.length ? ` (${ajoutes.length})` : ''}</button>` : ''}</div>`;
+    o.classList.add('ouvert');
+    $('#sc-fermer').onclick = fermer; const fin = $('#sc-fin'); if (fin) fin.onclick = fermer;
+    $('#sc-photo').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) photo(f); };
+    majListe();
+  }
+  const dire = (m, couleur) => { const e = $('#sc-msg'); if (e) { e.textContent = m; e.style.color = couleur || ''; } };
+  function majListe(){
+    const L = $('#sc-liste'); if (!L || !ajoutes.length) return;
+    L.innerHTML = ajoutes.slice().reverse().map(a => `<div class="sc-item"><span style="color:${a.ok ? 'var(--or)' : 'var(--brume)'}">${a.ok ? '✦' : '…'}</span><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(a.titre)}</span><span class="doux" style="font-size:12px">${esc(a.etat)}</span></div>`).join('');
+    const fin = $('#sc-fin'); if (fin) fin.textContent = `Terminer (${ajoutes.filter(a => a.ok).length})`;
+  }
+
+  async function trouve(code){
+    if (!isbnValide(code)) { dire('Ce code-barres n’est pas un ISBN (978… ou 979…)', 'var(--corail)'); return; }
+    const now = performance.now();
+    if (code === dernier.code && now - dernier.t < 2500) return;
+    dernier = { code, t: now };
+    try { navigator.vibrate && navigator.vibrate(60); } catch (e) {}
+    if (!rafale) { const cb = surIsbn; fermer(); cb && cb(code); return; }
+    if (vus.has(code)) { dire('Déjà scanné : ' + code); return; }
+    vus.add(code);
+    const a = { titre: 'ISBN ' + code, etat: 'recherche…', ok: false }; ajoutes.push(a); majListe();
+    dire('Lu : ' + code + ' — vise le suivant', 'var(--or)');
+    try { const r = await Edition.ajouterDepuisIsbn(code); Object.assign(a, r); }
+    catch (e) { a.etat = 'erreur'; console.warn(e); }
+    majListe();
+  }
+  async function balayer(){
+    if (!actif) return;
+    const v = $('#sc-video');
+    if (v && v.readyState >= 2 && !occupe) {
+      occupe = true;
+      try { const codes = await lireSource(v, v.videoWidth, v.videoHeight); if (codes[0]) await trouve(codes[0].replace(/\D/g, '')); }
+      catch (e) { console.warn(e); }
+      occupe = false;
+    }
+    if (actif) boucle = setTimeout(balayer, detecteur ? 120 : 180);
+  }
+  async function photo(f){
+    dire('Lecture de la photo…');
+    try {
+      await preparer();
+      const img = await createImageBitmap(f);
+      const codes = await lireSource(img, img.width, img.height);
+      if (codes[0]) await trouve(codes[0].replace(/\D/g, ''));
+      else dire('Pas de code-barres trouvé : rapproche-toi, évite les reflets', 'var(--corail)');
+    } catch (e) { dire(e.message || 'Photo illisible', 'var(--corail)'); }
+  }
+  async function ouvrir(opts){
+    rafale = !!opts.rafale; surIsbn = opts.surIsbn || null; vus = new Set(); ajoutes = []; dernier = { code: '', t: 0 };
+    rendre('Ouverture de la caméra…'); actif = true;
+    try { await preparer(); }
+    catch (e) { dire(e.message + ' — utilise « Photo du code »', 'var(--corail)'); }
+    if (!navigator.mediaDevices?.getUserMedia) { dire('Caméra en direct indisponible ici : utilise « Photo du code »', 'var(--or)'); return; }
+    try {
+      flux = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } }, audio: false });
+      if (!actif) { arreterFlux(); return; }
+      const v = $('#sc-video'); v.srcObject = flux; await v.play().catch(() => {});
+      try { const piste = flux.getVideoTracks()[0]; const cap = piste.getCapabilities?.(); if (cap?.focusMode?.includes('continuous')) await piste.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (e) {}
+      dire(rafale ? 'Vise les codes-barres l’un après l’autre' : 'Vise le code-barres au dos du livre');
+      balayer();
+    } catch (e) {
+      dire(e.name === 'NotAllowedError' ? 'Caméra refusée : autorise-la dans le navigateur, ou utilise « Photo du code »' : 'Caméra indisponible : utilise « Photo du code »', 'var(--corail)');
+    }
+  }
+  function arreterFlux(){ if (flux) { flux.getTracks().forEach(t => t.stop()); flux = null; } }
+  function fermer(){
+    actif = false; clearTimeout(boucle); arreterFlux();
+    const o = $('#scanner'); if (o) o.classList.remove('ouvert');
+    if (rafale) { const n = ajoutes.filter(a => a.ok).length; if (n) toast(`${n} livre${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} « À lire »`); rafale = false; }
+  }
+  addEventListener('keydown', e => { if (e.key === 'Escape' && actif) fermer(); });
+  return { ouvrir, fermer, isbnValide };
 })();
 
 /* ---------------- Démarrage ---------------- */
