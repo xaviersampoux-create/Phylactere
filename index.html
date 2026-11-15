@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0B0E1A">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Phylactère</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Phylactère">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..500;1,9..144,300..500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --nuit:#0B0E1A; --nuit-p:#10152A; --encre:#141A2C; --encre-c:#1A2136;
+  --trait:#2E3858; --trait-d:#1F2640; --ivoire:#F3EBDD; --ivoire-d:#C9CEDF;
+  --brume:#9AA3BF; --or:#E3B65C; --bleu:#8792BC; --corail:#E8A48A;
+  --serif:'Fraunces', Georgia, serif; --sans:'Manrope', system-ui, sans-serif;
+  --safe-t:env(safe-area-inset-top,0px); --safe-b:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--nuit);color:var(--ivoire);font-family:var(--sans);font-size:15px;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--or)}
+.app{display:flex;height:100%;padding-top:var(--safe-t)}
+/* Navigation */
+nav.rail{width:88px;flex:none;border-right:1px solid var(--trait-d);display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:6px}
+.logo{display:flex;flex-direction:column;align-items:center;gap:6px;margin-bottom:18px}
+.logo span{font-family:var(--serif);font-size:13px;color:var(--ivoire-d);letter-spacing:.02em}
+.nav-b{width:68px;padding:10px 0 8px;border-radius:14px;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--brume);font-size:11.5px;font-weight:600}
+.nav-b svg{width:22px;height:22px}
+.nav-b[aria-current="true"]{color:var(--or);background:var(--encre)}
+.nav-b:hover{color:var(--ivoire)}
+.plus-or{width:30px;height:30px;border-radius:50%;background:var(--or);color:var(--nuit);display:grid;place-items:center;font-size:21px;font-weight:600;line-height:1}
+/* Édition */
+.form{display:grid;gap:14px}
+.form label{display:grid;gap:6px;font-size:12.5px;color:var(--brume);font-weight:600}
+.form .deux{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form .trois{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+.inp{width:100%;background:var(--encre);color:var(--ivoire);border:1px solid var(--trait);border-radius:10px;padding:10px 12px;font:inherit;font-size:14.5px;font-weight:400}
+.inp:focus{outline:0;border-color:var(--brume)}
+textarea.inp{resize:vertical;min-height:90px;line-height:1.5}
+input[type=date].inp{color-scheme:dark}
+.choix{display:flex;gap:6px;flex-wrap:wrap}
+.note-choix button{font-size:22px;color:var(--trait);padding:0 2px;line-height:1}
+.note-choix button.on{color:var(--or)}
+.barre-actions{position:sticky;bottom:0;background:linear-gradient(transparent,var(--nuit) 30%);padding:18px 0 4px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.btn.danger{border-color:rgba(232,164,138,.5);color:var(--corail)}
+.mini-x{color:var(--brume);font-size:15px;padding:2px 6px}
+.mini-x:hover{color:var(--corail)}
+.modif{position:absolute;top:calc(10px + var(--safe-t));right:54px;height:38px;padding:0 14px;border-radius:999px;border:1px solid var(--trait);display:flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--ivoire-d);background:var(--nuit)}
+.modif:hover{border-color:var(--or);color:var(--or)}
+.resultat-isbn{display:flex;gap:14px;align-items:flex-start;margin-top:14px}
+.pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
+main{flex:1;min-width:0;position:relative;overflow:hidden}
+.vue{position:absolute;inset:0;overflow-y:auto;display:none}
+.vue.active{display:block}
+#vue-ciel{overflow:hidden}
+@media (max-width:820px){
+  .form .deux{grid-template-columns:1fr 1fr}
+  .app{flex-direction:column}
+  nav.rail{order:2;width:100%;flex-direction:row;justify-content:space-around;border-right:0;border-top:1px solid var(--trait-d);padding:6px 0 calc(6px + var(--safe-b));background:var(--nuit)}
+  .logo{display:none}
+  .nav-b{width:auto;flex:1;max-width:96px}
+}
+/* Commun */
+.page{max-width:980px;margin:0 auto;padding:22px 20px 60px}
+h1,h2,h3{font-family:var(--serif);font-weight:400;margin:0}
+h1{font-size:28px;letter-spacing:-.01em}
+h2{font-size:20px}
+.sur{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--brume);font-weight:600}
+.doux{color:var(--brume)}
+.carte{background:var(--encre);border:1px solid var(--trait-d);border-radius:16px;padding:16px}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:999px;border:1px solid var(--trait);color:var(--ivoire);font-weight:600;font-size:14px;white-space:nowrap}
+.btn:hover{border-color:var(--brume)}
+.btn.or{background:var(--or);color:var(--nuit);border-color:var(--or)}
+.btn.or:hover{filter:brightness(1.08)}
+.btn.petit{padding:6px 12px;font-size:13px}
+.puce{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;border:1px solid var(--trait);font-size:13px;color:var(--ivoire-d);font-weight:500;white-space:nowrap}
+.puce[aria-pressed="true"]{border-color:var(--or);color:var(--or);background:rgba(227,182,92,.08)}
+.puce.mot{cursor:pointer}
+.puce.mot:hover{border-color:var(--brume);color:var(--ivoire)}
+.etoiles{color:var(--or);letter-spacing:1px;font-size:13px}
+.statut{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ivoire-d)}
+.statut i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.s-LU i{background:var(--ivoire)} .s-EN_COURS i{background:var(--or)} .s-A_LIRE i{border:1.5px solid var(--bleu)}
+/* Couverture */
+.couv{position:relative;aspect-ratio:2/3;border-radius:6px;overflow:hidden;background:var(--encre-c);flex:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.couv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:1}
+.couv .dessin{position:absolute;inset:0;background:var(--encre);border:1px solid var(--trait);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10%;text-align:center;gap:6%}
+.couv .dessin b{font-family:var(--serif);font-weight:400;color:var(--ivoire);line-height:1.15;font-size:calc(var(--w,90px) * .13)}
+.couv .dessin small{color:var(--brume);font-size:calc(var(--w,90px) * .09)}
+.couv .dessin svg{width:22%;height:auto}
+
+/* Accueil vide */
+.vide{max-width:560px;margin:8vh auto;padding:24px;text-align:center}
+.vide p{color:var(--ivoire-d);line-height:1.6}
+.depot{margin-top:22px;border:1px dashed var(--trait);border-radius:18px;padding:28px 18px}
+.depot.survol{border-color:var(--or);background:rgba(227,182,92,.05)}
+/* Ciel */
+#ciel{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
+#ciel.tire{cursor:grabbing}
+.ciel-tete{position:absolute;left:0;right:0;top:0;padding:16px 20px;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:linear-gradient(var(--nuit) 30%,transparent)}
+.ciel-tete>*{pointer-events:auto}
+.ciel-tete h1{font-size:24px}
+.banniere{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;border:1px solid rgba(227,182,92,.5);color:var(--or);font-size:12.5px;font-weight:600}
+.ciel-outils{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
+.rond{width:42px;height:42px;border-radius:50%;background:var(--encre);border:1px solid var(--trait);display:grid;place-items:center;font-size:18px;color:var(--ivoire-d)}
+.rond:hover{color:var(--ivoire);border-color:var(--brume)}
+.legende{position:absolute;left:20px;bottom:18px;display:flex;gap:14px;font-size:12px;color:var(--brume);pointer-events:none}
+.bulle-etoile{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(440px,calc(100% - 32px));display:none;z-index:3}
+.bulle-etoile.ouverte{display:block}
+.bulle-etoile .carte{display:flex;gap:14px;align-items:flex-start;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.bulle-etoile h3{font-size:18px;line-height:1.2}
+.relies{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.relies button{font-size:12.5px;color:var(--or);border:1px solid rgba(227,182,92,.35);border-radius:999px;padding:4px 10px}
+.terre{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(480px,calc(100% - 32px));display:none;z-index:3}
+.terre.ouverte{display:block}
+@media (max-width:820px){.legende{display:none}.ciel-outils{bottom:14px;right:12px}}
+/* Chercher */
+.recherche{display:flex;gap:10px;align-items:center;margin:16px 0 14px}
+.champ{flex:1;display:flex;align-items:center;gap:10px;background:var(--encre);border:1px solid var(--trait);border-radius:999px;padding:0 16px}
+.champ input{flex:1;background:none;border:0;outline:0;color:var(--ivoire);font:inherit;padding:12px 0}
+.champ:focus-within{border-color:var(--brume)}
+.filtres{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.filtres::-webkit-scrollbar{display:none}
+.etagere{margin:26px 0 0}
+.etagere-tete{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px}
+.etagere-tete h2{font-size:19px}
+.etagere-tete h2 small{font-family:var(--sans);font-size:12.5px;color:var(--brume);margin-left:8px}
+.rangee{display:flex;gap:14px;overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x proximity;scrollbar-width:thin;scrollbar-color:var(--trait) transparent}
+.livre-v{width:96px;flex:none;text-align:left;scroll-snap-align:start}
+.livre-v .couv{--w:96px;width:96px}
+.livre-v .t{font-size:12.5px;line-height:1.3;margin-top:8px;color:var(--ivoire-d);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.livre-v:hover .t{color:var(--ivoire)}
+.section-lettre{font-family:var(--serif);font-size:22px;color:var(--or);margin:22px 0 6px;font-style:italic}
+.ligne{display:flex;gap:14px;align-items:center;width:100%;text-align:left;padding:10px;border-radius:12px}
+.ligne:hover{background:var(--encre)}
+.ligne .couv{--w:46px;width:46px}
+.ligne .infos{flex:1;min-width:0}
+.ligne .t{font-family:var(--serif);font-size:16.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ligne .a{font-size:13px;color:var(--brume);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.ligne .d{display:flex;gap:12px;align-items:center;margin-top:5px;font-size:12px;color:var(--brume)}
+.select{background:var(--encre);color:var(--ivoire);border:1px solid var(--trait);border-radius:999px;padding:9px 14px;font:inherit;font-size:13.5px}
+/* Fiche */
+.voile{position:fixed;inset:0;background:rgba(5,7,14,.55);z-index:20;display:none}
+.voile.ouvert{display:block}
+.fiche{position:fixed;top:0;right:0;bottom:0;width:min(520px,100%);background:var(--nuit);border-left:1px solid var(--trait-d);z-index:21;transform:translateX(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;padding-top:var(--safe-t)}
+.fiche.ouverte{transform:none}
+.fiche-tete{padding:58px 20px 0;display:flex;gap:18px}
+.fiche-tete .couv{--w:112px;width:112px}
+.fiche-tete h2{font-size:24px;line-height:1.15}
+.fiche-tete .a{color:var(--ivoire-d);margin-top:6px}
+.fiche-tete .meta{display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;align-items:center;font-size:12.5px;color:var(--brume)}
+.fermer{position:absolute;top:calc(10px + var(--safe-t));right:10px;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;color:var(--brume);font-size:20px;background:var(--nuit)}
+.fermer:hover{color:var(--ivoire)}
+.onglets{display:flex;gap:4px;padding:16px 16px 0;border-bottom:1px solid var(--trait-d);overflow-x:auto;scrollbar-width:none}
+.onglets::-webkit-scrollbar{display:none}
+.onglet{padding:10px 12px;font-size:13.5px;font-weight:600;color:var(--brume);border-bottom:2px solid transparent;white-space:nowrap}
+.onglet[aria-selected="true"]{color:var(--ivoire);border-color:var(--or)}
+.onglet sup{color:var(--or);font-size:10px;margin-left:2px}
+.fiche-corps{flex:1;overflow-y:auto;padding:18px 20px calc(40px + var(--safe-b))}
+.texte{line-height:1.65;color:var(--ivoire-d);white-space:pre-wrap;font-size:14.5px}
+.texte .spoil{filter:blur(5px);cursor:pointer;transition:filter .2s}
+.texte .spoil.vu{filter:none}
+.citation{border-left:2px solid var(--or);padding:4px 0 4px 14px;margin:0 0 18px;font-family:var(--serif);font-style:italic;font-size:16.5px;line-height:1.5;color:var(--ivoire)}
+.citation small{display:block;font-family:var(--sans);font-style:normal;font-size:12px;color:var(--brume);margin-top:6px}
+.grille-info{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;font-size:14px}
+.grille-info dt{color:var(--brume)}
+.grille-info dd{margin:0}
+.barre{height:6px;border-radius:3px;background:var(--trait-d);overflow:hidden;margin:8px 0 4px}
+.barre i{display:block;height:100%;background:var(--or);border-radius:3px}
+.proche{display:flex;gap:12px;align-items:center;width:100%;text-align:left;padding:10px;border-radius:12px;border:1px solid var(--trait-d);margin-bottom:8px}
+.proche:hover{border-color:var(--trait);background:var(--encre)}
+.proche .couv{--w:40px;width:40px}
+.proche .r{font-size:12.5px;color:var(--brume);margin-top:3px}
+.bloc{margin-bottom:24px}
+.bloc>.sur{margin-bottom:10px;display:block}
+.liens-ext{display:flex;flex-wrap:wrap;gap:8px}
+.liens-ext a{text-decoration:none}
+/* Carnet */
+.cit-carte{margin-bottom:14px}
+.cit-carte button{color:var(--brume);font-size:12.5px;margin-top:6px}
+.cit-carte button:hover{color:var(--or)}
+/* Réglages */
+.reglage{margin-top:16px}
+.reglage h2{font-size:18px;margin-bottom:6px}
+.reglage p{color:var(--ivoire-d);line-height:1.55;margin:6px 0 14px;font-size:14px}
+.toast{position:fixed;left:50%;bottom:calc(84px + var(--safe-b));transform:translateX(-50%) translateY(20px);opacity:0;background:var(--encre-c);border:1px solid var(--trait);padding:10px 16px;border-radius:999px;font-size:13.5px;transition:.25s;z-index:40;pointer-events:none}
+.toast.vu{opacity:1;transform:translateX(-50%)}
+.dialogue{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:rgba(5,7,14,.6);padding:20px}
+.dialogue.ouvert{display:grid}
+.dialogue .carte{max-width:420px}
+:focus-visible{outline:2px solid var(--or);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.fiche{transition:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav class="rail" aria-label="Navigation">
+    <div class="logo" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M8 10h32a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="#F3EBDD"/><path d="M24 14.5l2.3 4.9 5.2.6-3.9 3.6 1.1 5.2-4.7-2.7-4.7 2.7 1.1-5.2-3.9-3.6 5.2-.6z" fill="#E3B65C"/></svg><span>Phylactère</span></div>
+    <button class="nav-b" data-vue="ciel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="7" r="1.6" fill="currentColor"/><circle cx="12" cy="4" r="1.6" fill="currentColor"/><circle cx="18" cy="10" r="1.6" fill="currentColor"/><circle cx="9" cy="17" r="1.6" fill="currentColor"/><circle cx="19" cy="19" r="1.2" fill="currentColor"/><path d="M5 7l7-3 6 6-9 7-4-10" stroke-opacity=".55"/></svg>Ciel</button>
+    <button class="nav-b" data-vue="chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h3v14H4zM9 5h3v14H9zM14.2 5.6l2.9-.8 3.6 13.5-2.9.8z"/></svg>Chercher</button>
+    <button class="nav-b nav-plus" id="nav-ajouter" aria-label="Ajouter un livre"><span class="plus-or">+</span>Ajouter</button>
+    <button class="nav-b" data-vue="carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z"/><path d="M6 19a2 2 0 0 1 2-2h11M10 8h5M10 11h3"/></svg>Carnet</button>
+    <button class="nav-b" data-vue="reglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Réglages</button>
+  </nav>
+  <main>
+    <section class="vue" id="vue-vide"></section>
+    <section class="vue" id="vue-ciel">
+      <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
+      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button></div></div>
+      <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
+      <div class="ciel-outils"><button class="rond" id="zoom-plus" aria-label="Zoomer">+</button><button class="rond" id="zoom-moins" aria-label="Dézoomer">−</button><button class="rond" id="recadrer" aria-label="Recadrer le ciel">◎</button></div>
+      <div class="bulle-etoile" id="bulle-etoile"></div>
+      <div class="terre" id="terre"></div>
+    </section>
+    <section class="vue" id="vue-chercher"><div class="page" id="chercher"></div></section>
+    <section class="vue" id="vue-carnet"><div class="page" id="carnet"></div></section>
+    <section class="vue" id="vue-reglages"><div class="page" id="reglages"></div></section>
+  </main>
+</div>
+<div class="voile" id="voile"></div>
+<aside class="fiche" id="fiche" aria-label="Fiche du livre" aria-hidden="true"></aside>
+<div class="toast" id="toast" role="status"></div>
+<div class="dialogue" id="dialogue"></div>
+<input type="file" id="fichier" accept=".zip,application/zip" hidden>
+
+<script>
+'use strict';
+/* =========================================================
+   Phylactère — version web, lot 1 (consultation)
+   Toutes les données restent dans ce navigateur (IndexedDB).
+   ========================================================= */
+
+const THEMES = ["Roman","Roman historique","Policier & thriller","Science-fiction","Fantasy","Fantastique & horreur","Nouvelles","Poésie","Théâtre","Bande dessinée","Manga","Littérature jeunesse","Philosophie","Spiritualité & ésotérisme","Religion & mythologie","Psychologie","Sciences","Histoire","Société & politique","Essai","Biographie & mémoires","Arts & musique","Nature & écologie","Voyage & aventure","Développement personnel","Humour","Cuisine"];
+
+/* Atlas fixe : même géographie pour tous les lecteurs (unité = 1 case).
+   Roman au centre ; fiction à droite ; quête de sens à gauche ; lettres et arts en haut ; temps et monde en bas. */
+const ATLAS = {
+  "Roman":[0,0],
+  "Policier & thriller":[1.75,-0.55],"Science-fiction":[1.85,1.0],"Fantasy":[3.25,0.25],"Fantastique & horreur":[3.1,-1.35],
+  "Bande dessinée":[4.55,1.35],"Manga":[4.75,-0.35],"Littérature jeunesse":[3.35,2.35],"Humour":[4.7,2.75],
+  "Essai":[-1.7,0.35],"Philosophie":[-3.0,-0.75],"Spiritualité & ésotérisme":[-3.15,0.95],"Religion & mythologie":[-4.45,0.05],"Psychologie":[-2.45,2.15],"Développement personnel":[-3.9,2.25],
+  "Nouvelles":[0.75,-1.95],"Poésie":[-0.6,-2.7],"Théâtre":[0.95,-3.3],"Arts & musique":[-1.95,-2.05],"Sciences":[-3.0,-2.5],
+  "Roman historique":[0.35,1.85],"Histoire":[-0.95,2.8],"Biographie & mémoires":[1.45,3.05],"Voyage & aventure":[2.25,2.1],"Société & politique":[-2.0,3.7],"Nature & écologie":[0.25,4.0],"Cuisine":[1.85,4.25]
+};
+const U = 150;              // taille d'une case de l'atlas (px du monde)
+
+/* ---------------- Utilitaires ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s => String(s ?? '').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim();
+function hash(s, graine = 0){ let h = 2166136261 ^ graine; for (const c of String(s)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619); } h ^= h >>> 13; h = Math.imul(h, 0x5bd1e995); h ^= h >>> 15; return (h >>> 0) / 4294967296; }
+const MOIS = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+const date = ms => { if (!ms) return null; const d = new Date(ms); return `${d.getDate()} ${MOIS[d.getMonth()]} ${d.getFullYear()}`; };
+const STATUTS = { A_LIRE:'À lire', EN_COURS:'En cours', LU:'Lu' };
+const reduitMouvement = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('vu'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('vu'), 2600); }
+
+/* ---------------- Stockage local (IndexedDB) ---------------- */
+const Base = {
+  db: null,
+  async ouvrir(){
+    if (this.db) return this.db;
+    this.db = await new Promise((ok, ko) => {
+      const r = indexedDB.open('phylactere', 1);
+      r.onupgradeneeded = () => { r.result.createObjectStore('donnees'); r.result.createObjectStore('couvertures'); };
+      r.onsuccess = () => ok(r.result); r.onerror = () => ko(r.error);
+    });
+    return this.db;
+  },
+  async tx(store, mode, fn){
+    const db = await this.ouvrir();
+    return new Promise((ok, ko) => { const t = db.transaction(store, mode); const res = fn(t); t.oncomplete = () => ok(res && res.result !== undefined ? res.result : res); t.onerror = () => ko(t.error); t.onabort = () => ko(t.error); });
+  },
+  async lire(){ try { return await this.tx('donnees','readonly', t => t.objectStore('donnees').get('racine')); } catch(e){ console.warn(e); return null; } },
+  async couvertures(){
+    try {
+      const db = await this.ouvrir();
+      return await new Promise((ok, ko) => { const m = new Map(); const t = db.transaction('couvertures','readonly'); const c = t.objectStore('couvertures').openCursor(); c.onsuccess = () => { const k = c.result; if (k) { m.set(k.key, k.value); k.continue(); } }; t.oncomplete = () => ok(m); t.onerror = () => ko(t.error); });
+    } catch(e){ return new Map(); }
+  },
+  async remplacer(racine, fichiers){
+    const db = await this.ouvrir();
+    await new Promise((ok, ko) => {
+      const t = db.transaction(['donnees','couvertures'], 'readwrite');
+      t.objectStore('donnees').put(racine, 'racine');
+      const s = t.objectStore('couvertures'); s.clear();
+      for (const [nom, blob] of fichiers) s.put(blob, nom);
+      t.oncomplete = ok; t.onerror = () => ko(t.error); t.onabort = () => ko(t.error);
+    });
+  },
+  async ecrireDonnees(racine){ await this.tx('donnees','readwrite', t => t.objectStore('donnees').put(racine, 'racine')); },
+  async ecrireCouverture(nom, blob){ await this.tx('couvertures','readwrite', t => t.objectStore('couvertures').put(blob, nom)); },
+  async supprimerCouverture(nom){ await this.tx('couvertures','readwrite', t => t.objectStore('couvertures').delete(nom)); },
+  async lireCouverture(nom){ return this.tx('couvertures','readonly', t => t.objectStore('couvertures').get(nom)); },
+  async effacer(){ const db = await this.ouvrir(); await new Promise((ok, ko) => { const t = db.transaction(['donnees','couvertures'],'readwrite'); t.objectStore('donnees').clear(); t.objectStore('couvertures').clear(); t.oncomplete = ok; t.onerror = () => ko(t.error); }); }
+};
+
+/* ---------------- Lecture du .zip de sauvegarde (sans bibliothèque) ---------------- */
+async function lireZip(buf){
+  const dv = new DataView(buf), u8 = new Uint8Array(buf), dec = new TextDecoder();
+  let fin = -1;
+  for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50) { fin = i; break; }
+  if (fin < 0) throw new Error('Ce fichier n’est pas un .zip lisible');
+  const n = dv.getUint16(fin + 10, true); let p = dv.getUint32(fin + 16, true);
+  const entrees = [];
+  for (let k = 0; k < n; k++) {
+    if (dv.getUint32(p, true) !== 0x02014b50) break;
+    const methode = dv.getUint16(p + 10, true), taille = dv.getUint32(p + 20, true);
+    const ln = dv.getUint16(p + 28, true), le = dv.getUint16(p + 30, true), lc = dv.getUint16(p + 32, true);
+    const local = dv.getUint32(p + 42, true);
+    const nom = dec.decode(u8.subarray(p + 46, p + 46 + ln));
+    entrees.push({ nom, methode, taille, local });
+    p += 46 + ln + le + lc;
+  }
+  const lire = async e => {
+    const d = e.local + 30 + dv.getUint16(e.local + 26, true) + dv.getUint16(e.local + 28, true);
+    const brut = u8.slice(d, d + e.taille);
+    if (e.methode === 0) return brut.buffer;
+    if (e.methode !== 8) throw new Error('Compression non prise en charge');
+    return new Response(new Blob([brut]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).arrayBuffer();
+  };
+  return { entrees, lire };
+}
+
+async function importerSauvegarde(fichier){
+  const zip = await lireZip(await fichier.arrayBuffer());
+  const json = zip.entrees.find(e => e.nom === 'donnees.json');
+  if (!json) throw new Error('Ce fichier n’est pas une sauvegarde Phylactère');
+  const racine = JSON.parse(new TextDecoder().decode(await zip.lire(json)));
+  if (racine.application !== 'Phylactère') throw new Error('Ce fichier n’est pas une sauvegarde Phylactère');
+  const fichiers = [];
+  for (const e of zip.entrees) {
+    if (!e.nom.startsWith('couvertures/') || e.nom.endsWith('/')) continue;
+    const nom = e.nom.split('/').pop();
+    const type = /\.png$/i.test(nom) ? 'image/png' : /\.webp$/i.test(nom) ? 'image/webp' : 'image/jpeg';
+    fichiers.push([nom, new Blob([await zip.lire(e)], { type })]);
+  }
+  racine.importeLe = Date.now(); racine.fichierSource = fichier.name;
+  await Base.remplacer(racine, fichiers);
+  return { lectures: (racine.lectures || []).length, citations: (racine.citations || []).length, liens: (racine.liens || []).length, couvertures: fichiers.length };
+}
+
+/* ---------------- Modèle en mémoire ---------------- */
+const M = { racine:null, lectures:[], parId:new Map(), citations:[], liens:[], urlsCouv:new Map() };
+
+function themeDe(l){ return (l.theme && l.theme.trim()) || (l.type === 'BD' ? 'Bande dessinée' : ''); }
+function titreProvisoire(t){ const s = (t || '').trim(); return !s || /^isbn\b/i.test(s) || /^[\d\s-]+$/.test(s); }
+function manques(l){ const m = []; if (titreProvisoire(l.titre)) m.push('titre'); if (!(l.auteur || '').trim()) m.push('auteur'); if (!themeDe(l)) m.push('thème'); return m; }
+function motsDe(l){ return (l.motsCles || '').split(',').map(s => s.trim()).filter(Boolean); }
+function titreCourt(l){ let t = (l.titre || '').split(/\s[:–—]\s|\s:\s?/)[0].trim() || l.titre; if (l.tome) t += ` · t. ${l.tome}`; return t; }
+function titreComplet(l){ return l.tome && l.serie ? `${l.titre}` : l.titre; }
+const ARTICLES = /^(le |la |les |l'|l’|un |une |des |du |the |a |an )/i;
+function cleTitre(l){ return norm(l.titre).replace(ARTICLES, ''); }
+function premierAuteur(l){ return (l.auteur || '').split(/,|;| et /)[0].replace(/\([^)]*\)/g, '').replace(/\b(dir|éd|trad)\.?$/i, '').trim(); }
+function nomFamille(l){ const a = premierAuteur(l).replace(/\b(jr\.?|sr\.?)$/i, '').trim(); const p = a.split(/\s+/); return p[p.length - 1] || ''; }
+
+async function charger(){
+  const racine = await Base.lire();
+  M.urlsCouv.forEach(u => URL.revokeObjectURL(u)); M.urlsCouv.clear();
+  if (!racine) { M.racine = null; M.lectures = []; M.parId = new Map(); M.citations = []; M.liens = []; return; }
+  const couv = await Base.couvertures();
+  couv.forEach((blob, nom) => M.urlsCouv.set(nom, URL.createObjectURL(blob)));
+  M.racine = racine;
+  M.lectures = (racine.lectures || []).map(l => ({ ...l }));
+  M.citations = (racine.citations || []).map(c => ({ ...c }));
+  M.liens = (racine.liens || []).map(x => ({ ...x }));
+  indexer();
+}
+function indexer(){
+  M.parId = new Map(M.lectures.map(l => [l.id, l]));
+  M.citations = M.citations.filter(c => M.parId.has(c.lectureId));
+  M.liens = M.liens.filter(x => M.parId.has(x.lectureA) && M.parId.has(x.lectureB) && x.lectureA !== x.lectureB);
+  for (const l of M.lectures) { l._mots = motsDe(l); l._motsN = new Set(l._mots.map(norm)); l._manques = manques(l); l._theme = themeDe(l); l._cit = 0; l._liens = []; }
+  for (const c of M.citations) M.parId.get(c.lectureId)._cit++;
+  for (const x of M.liens) { M.parId.get(x.lectureA)._liens.push({ id:x.lectureB, raison:x.raison }); M.parId.get(x.lectureB)._liens.push({ id:x.lectureA, raison:x.raison }); }
+}
+
+function srcCouverture(l){
+  const u = l.couvertureUrl; if (!u) return null;
+  if (u.startsWith('local:')) return M.urlsCouv.get(u.slice(6)) || null;
+  if (u.startsWith('http://')) return 'https://' + u.slice(7);
+  if (u.startsWith('https://')) return u;
+  return null;
+}
+const ETOILE_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2.8l2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3.1-5.4 3.1 1.2-6-4.5-4.2 6.1-.7z" fill="#E3B65C"/></svg>';
+function couverture(l, largeur){
+  const src = srcCouverture(l);
+  const dessin = `<div class="dessin">${ETOILE_SVG}<b>${esc(titreCourt(l))}</b><small>${esc(premierAuteur(l))}</small></div>`;
+  const img = src ? `<img src="${esc(src)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">` : '';
+  return `<div class="couv" style="--w:${largeur}px;width:${largeur}px">${dessin}${img}</div>`;
+}
+const etoilesNote = n => n > 0 ? `<span class="etoiles" aria-label="${n} sur 5">${'★'.repeat(n)}<span style="opacity:.25">${'★'.repeat(5 - n)}</span></span>` : '';
+const pastille = s => `<span class="statut s-${s}"><i></i>${STATUTS[s] || ''}</span>`;
+
+/* =========================================================
+   Navigation
+   ========================================================= */
+let vueCourante = 'ciel';
+function montrerVue(nom){
+  if (!M.racine && nom !== 'reglages') nom = 'vide';
+  vueCourante = nom;
+  document.querySelectorAll('.vue').forEach(v => v.classList.toggle('active', v.id === 'vue-' + nom));
+  document.querySelectorAll('.nav-b').forEach(b => b.setAttribute('aria-current', String(b.dataset.vue === nom)));
+  if (nom === 'ciel') Ciel.activer();
+  if (nom === 'chercher') Chercher.rendre();
+  if (nom === 'carnet') Carnet.rendre();
+  if (nom === 'reglages') Reglages.rendre();
+  if (nom === 'vide') rendreVide();
+}
+document.querySelectorAll('.nav-b[data-vue]').forEach(b => b.addEventListener('click', () => { location.hash = b.dataset.vue; }));
+function router(){
+  const h = location.hash.slice(1);
+  const m = /^fiche-(\d+)$/.exec(h);
+  if (m) { if (!document.querySelector('.vue.active')) montrerVue('ciel'); Fiche.ouvrir(+m[1], false); return; }
+  Fiche.fermer(false);
+  montrerVue(['ciel','chercher','carnet','reglages'].includes(h) ? h : 'ciel');
+}
+addEventListener('hashchange', router);
+
+/* ---------------- Accueil vide / import ---------------- */
+function rendreVide(){
+  $('#vue-vide').innerHTML = `<div class="vide">
+    <svg width="64" height="64" viewBox="0 0 48 48" aria-hidden="true"><path d="M8 10h32a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="#F3EBDD"/><path d="M24 14.5l2.3 4.9 5.2.6-3.9 3.6 1.1 5.2-4.7-2.7-4.7 2.7 1.1-5.2-3.9-3.6 5.2-.6z" fill="#E3B65C"/></svg>
+    <h1 style="margin-top:14px">Phylactère</h1>
+    <p>Ta bibliothèque, ses constellations et ses fils, dans le navigateur.<br>Ouvre la sauvegarde <b>.zip</b> faite depuis l’appli Android (Réglages › Sauvegarde) : tout reste dans ce navigateur, rien ne part sur un serveur.</p>
+    <div class="depot" id="depot">
+      <button class="btn or" id="choisir">Ouvrir ma sauvegarde .zip</button>
+      <p class="doux" style="font-size:13px;margin:12px 0 0">ou dépose le fichier ici</p>
+    </div><button class="btn" id="commencer" style="margin-top:18px">Commencer une bibliothèque vide</button></div>`;
+  $('#choisir').onclick = () => $('#fichier').click();
+  $('#commencer').onclick = async () => { await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; montrerVue('ciel'); Edition.nouveau(); };
+  brancherDepot($('#depot'));
+}
+function brancherDepot(zone){
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('survol'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('survol'));
+  zone.addEventListener('drop', e => { e.preventDefault(); zone.classList.remove('survol'); const f = e.dataTransfer.files[0]; if (f) lancerImport(f); });
+}
+$('#fichier').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; if (f) lancerImport(f); });
+async function lancerImport(f){
+  try {
+    toast('Lecture de la sauvegarde…');
+    const b = await importerSauvegarde(f);
+    await charger(); Ciel.invalider(); Chercher.reinit();
+    toast(`${b.lectures} lectures, ${b.citations} citations, ${b.liens} liens, ${b.couvertures} couvertures`);
+    location.hash = 'ciel'; montrerVue('ciel');
+  } catch (e) { console.error(e); toast(e.message || 'Import impossible'); }
+}
+
+/* =========================================================
+   Le ciel
+   ========================================================= */
+const Ciel = (() => {
+  const cv = $('#ciel'); const ctx = cv.getContext('2d');
+  let L = 0, H = 0, dpr = 1;
+  let vue = { x:0, y:0, z:1 };          // écran = (monde - x) * z + centre
+  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null;
+  let vueAvantAllumage = null, bouge = false;
+  const C = { nuit:'#0B0E1A', ivoire:'243,235,221', or:'227,182,92', bleu:'135,146,188', brume:'154,163,191' };
+
+  function invalider(){ modele = null; allume = null; choisie = null; fermerBulle(); sale = true; }
+
+  function construire(){
+    const portrait = H > L * 1.05;
+    const fx = portrait ? 0.62 : 1, fy = portrait ? 1.4 : 1;
+    const livres = M.lectures.filter(l => l._manques.length === 0);
+    const groupes = new Map();
+    for (const l of livres) { if (!groupes.has(l._theme)) groupes.set(l._theme, []); groupes.get(l._theme).push(l); }
+    const consts = [];
+    for (const [theme, ls] of groupes) {
+      let h = ATLAS[theme];
+      if (!h) { const a = hash(norm(theme)) * Math.PI * 2; h = [Math.cos(a) * 4.55, Math.sin(a) * 4.55]; }
+      const rc = 16 * Math.sqrt(ls.length) + 22;
+      consts.push({ theme, livres: ls, maison:[h[0] * U * fx, h[1] * U * fy], c:[h[0] * U * fx, h[1] * U * fy], rc, etoiles:[], aretes:[] });
+    }
+    // 1. étoiles dans leur constellation : place fixe tirée de la clé d'œuvre ; séries en arc
+    for (const k of consts) {
+      const series = new Map(), seuls = [];
+      for (const l of k.livres) { if (l.serie) { const s = norm(l.serie); if (!series.has(s)) series.set(s, []); series.get(s).push(l); } else seuls.push(l); }
+      for (const l of seuls) {
+        const cle = norm(l.titre) + '|' + norm(premierAuteur(l));
+        const a = hash(cle, 1) * Math.PI * 2, f = Math.sqrt(hash(cle, 2)) * k.rc * 0.9;
+        k.etoiles.push({ l, x: Math.cos(a) * f, y: Math.sin(a) * f });
+      }
+      for (const [s, ls] of series) {
+        ls.sort((a, b) => (a.tome ?? 999) - (b.tome ?? 999) || cleTitre(a).localeCompare(cleTitre(b)));
+        if (ls.length === 1) { const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.9; k.etoiles.push({ l: ls[0], x: Math.cos(a) * f, y: Math.sin(a) * f }); continue; }
+        const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.55;
+        const ax = Math.cos(a) * f, ay = Math.sin(a) * f, R = 34 + ls.length * 3, t0 = hash(s, 3) * Math.PI * 2;
+        ls.forEach((l, i) => { const t = t0 + (i - (ls.length - 1) / 2) * 0.42; k.etoiles.push({ l, x: ax + Math.cos(t) * R - Math.cos(t0) * R, y: ay + Math.sin(t) * R - Math.sin(t0) * R, serie: s }); });
+      }
+      // écartement des étoiles trop proches
+      for (let it = 0; it < 40; it++) {
+        for (let i = 0; i < k.etoiles.length; i++) for (let j = i + 1; j < k.etoiles.length; j++) {
+          const A = k.etoiles[i], B = k.etoiles[j]; let dx = B.x - A.x, dy = B.y - A.y; let d = Math.hypot(dx, dy);
+          if (d < 15) { if (d < .01) { dx = hash(A.l.id + 'x') - .5; dy = hash(B.l.id + 'y') - .5; d = Math.hypot(dx, dy); } const p = (15 - d) / 2 / d; A.x -= dx * p; A.y -= dy * p; B.x += dx * p; B.y += dy * p; }
+        }
+      }
+      let rmax = 0; for (const e of k.etoiles) rmax = Math.max(rmax, Math.hypot(e.x, e.y)); k.rc = Math.max(k.rc, rmax + 12);
+      // arbre couvrant minimal (ordre de Prim, pour l'allumage)
+      const E = k.etoiles, dans = new Set([0]);
+      while (dans.size < E.length) {
+        let best = null;
+        for (const i of dans) for (let j = 0; j < E.length; j++) if (!dans.has(j)) { const d = Math.hypot(E[i].x - E[j].x, E[i].y - E[j].y); if (!best || d < best[2]) best = [i, j, d]; }
+        dans.add(best[1]); k.aretes.push([best[0], best[1]]);
+      }
+    }
+    // 2. les constellations se repoussent sans quitter leur quartier ; le Roman reste fixe
+    for (let it = 0; it < 260; it++) {
+      for (let i = 0; i < consts.length; i++) for (let j = i + 1; j < consts.length; j++) {
+        const A = consts[i], B = consts[j]; const dx = B.c[0] - A.c[0], dy = B.c[1] - A.c[1]; const d = Math.hypot(dx, dy) || 1;
+        const min = A.rc + B.rc + 46;
+        if (d < min) {
+          const p = (min - d) / d;
+          let wa = B.rc / (A.rc + B.rc), wb = A.rc / (A.rc + B.rc);
+          if (A.theme === 'Roman') { wa = 0; wb = 1; } if (B.theme === 'Roman') { wb = 0; wa = 1; }
+          A.c[0] -= dx * p * wa * .5; A.c[1] -= dy * p * wa * .5; B.c[0] += dx * p * wb * .5; B.c[1] += dy * p * wb * .5;
+        }
+      }
+      for (const k of consts) if (k.theme !== 'Roman') { k.c[0] += (k.maison[0] - k.c[0]) * .02; k.c[1] += (k.maison[1] - k.c[1]) * .02; }
+    }
+    const etoiles = [];
+    for (const k of consts) for (const e of k.etoiles) { e.wx = k.c[0] + e.x; e.wy = k.c[1] + e.y; e.k = k; etoiles.push(e); }
+    const parLivre = new Map(etoiles.map(e => [e.l.id, e]));
+    // thèmes jamais lus : nom seul, éteint
+    const eteints = THEMES.filter(t => !groupes.has(t)).map(t => ({ theme: t, wx: ATLAS[t][0] * U * fx, wy: ATLAS[t][1] * U * fy }));
+    // en cours la plus récente : anneau scintillant
+    const enCours = etoiles.filter(e => e.l.statut === 'EN_COURS').sort((a, b) => (b.l.dateDebut || b.l.dateAjout || 0) - (a.l.dateDebut || a.l.dateAjout || 0))[0];
+    modele = { consts, etoiles, parLivre, eteints, portrait, scintille: enCours ? enCours.l.id : null, aCompleter: M.lectures.length - livres.length };
+    // résumé
+    const nb = livres.length, ec = livres.filter(l => l.statut === 'EN_COURS').length;
+    $('#ciel-resume').textContent = `${nb} lectures · ${ec} en cours · ${consts.length} constellations`;
+    const b = $('#ciel-banniere');
+    if (modele.aCompleter > 0) { b.hidden = false; b.textContent = `✦ ${modele.aCompleter} fiche${modele.aCompleter > 1 ? 's attendent' : ' attend'} d’être complétée${modele.aCompleter > 1 ? 's' : ''} ›`; } else b.hidden = true;
+  }
+
+  function cadrer(liste, zmax = 3, anime = false){
+    if (!liste.length) return;
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    for (const k of liste) { x0 = Math.min(x0, k.c[0] - k.rc); y0 = Math.min(y0, k.c[1] - k.rc); x1 = Math.max(x1, k.c[0] + k.rc); y1 = Math.max(y1, k.c[1] + k.rc); }
+    const haut = 96, bas = 70;
+    const z = Math.min(zmax, (L - 60) / (x1 - x0), (H - haut - bas) / (y1 - y0));
+    const cible = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - (haut - bas) / 2 / z, z };
+    if (anime && !reduitMouvement) animerVers(cible); else { vue = cible; sale = true; }
+  }
+  function animerVers(cible, duree = 600){
+    const dep = { ...vue }, t0 = performance.now();
+    anim = t => { let p = Math.min(1, (t - t0) / duree); p = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+      const zl = Math.exp(Math.log(dep.z) + (Math.log(cible.z) - Math.log(dep.z)) * p);
+      vue = { x: dep.x + (cible.x - dep.x) * p, y: dep.y + (cible.y - dep.y) * p, z: zl };
+      if (p >= 1) anim = null; };
+  }
+
+  const ecran = (wx, wy) => [(wx - vue.x) * vue.z + L / 2, (wy - vue.y) * vue.z + H / 2];
+  const monde = (sx, sy) => [(sx - L / 2) / vue.z + vue.x, (sy - H / 2) / vue.z + vue.y];
+
+  function taille(){
+    const r = cv.getBoundingClientRect(); dpr = Math.min(2.5, devicePixelRatio || 1);
+    const nl = r.width, nh = r.height; if (!nl || !nh) return;
+    const changePortrait = modele && ((nh > nl * 1.05) !== modele.portrait);
+    L = nl; H = nh; cv.width = L * dpr; cv.height = H * dpr; sale = true;
+    if (changePortrait) { invalider(); }
+  }
+
+  let labels = [];   // zones cliquables des noms
+  function dessiner(t){
+    if (!modele) { construire(); cadrer(modele.consts); }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.fillStyle = C.nuit; ctx.fillRect(0, 0, L, H);
+    const z = vue.z, occupe = [];
+    labels = [];
+    const annee = new Date().getFullYear();
+    const lumi = allume ? allume.k : null;
+    const relies = new Set(choisie ? choisie.l._liens.map(x => x.id) : []);
+    const alpha = k => lumi ? (k === lumi ? 1 : .12) : 1;
+    const dejaEcran = e => e._s || (e._s = ecran(e.wx, e.wy));
+    for (const e of modele.etoiles) e._s = null;
+
+    // traits des constellations
+    for (const k of modele.consts) {
+      const a = alpha(k);
+      let progres = Infinity, fondu = 0;
+      if (k === lumi && allume) {
+        const par = Math.max(120, 600 / Math.max(1, k.aretes.length));
+        const ecoule = reduitMouvement ? 1e9 : t - allume.t0;
+        progres = ecoule / par;
+        const finTrace = k.aretes.length * par; fondu = Math.min(1, Math.max(0, (ecoule - finTrace - 700) / 800));
+      }
+      k.aretes.forEach(([i, j], n) => {
+        if (n >= progres) return;
+        const A = dejaEcran(k.etoiles[i]), B = dejaEcran(k.etoiles[j]);
+        const dx = B[0] - A[0], dy = B[1] - A[1], d = Math.hypot(dx, dy); if (d < 8) return;
+        const part = Math.min(1, progres - n), ux = dx / d, uy = dy / d;
+        const x0 = A[0] + ux * 4, y0 = A[1] + uy * 4, x1 = A[0] + ux * (4 + (d - 8) * part), y1 = A[1] + uy * (4 + (d - 8) * part);
+        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
+        if (k === lumi) { ctx.strokeStyle = `rgba(${C.or},${.7 * (1 - fondu)})`; ctx.lineWidth = 1.3; ctx.stroke(); ctx.strokeStyle = `rgba(${C.brume},${.4 * fondu})`; ctx.stroke(); }
+        else { ctx.strokeStyle = `rgba(${C.brume},${.22 * a})`; ctx.lineWidth = .9; ctx.stroke(); }
+      });
+    }
+    // fils d'or des liens personnels de l'étoile choisie
+    if (choisie) {
+      const A = dejaEcran(choisie);
+      for (const x of choisie.l._liens) { const e = modele.parLivre.get(x.id); if (!e) continue; const B = dejaEcran(e);
+        ctx.beginPath(); ctx.moveTo(A[0], A[1]); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2 - Math.hypot(B[0] - A[0], B[1] - A[1]) * .12; ctx.quadraticCurveTo(mx, my, B[0], B[1]);
+        ctx.strokeStyle = `rgba(${C.or},.55)`; ctx.lineWidth = 1; ctx.stroke(); }
+    }
+    // étoiles
+    const k15 = 1.5 * Math.min(1.3, Math.max(.62, Math.sqrt(z)));   // taille web, suit un peu le zoom pour ne pas saturer les petits écrans
+    for (const e of modele.etoiles) {
+      const [x, y] = dejaEcran(e); if (x < -30 || y < -30 || x > L + 30 || y > H + 30) continue;
+      let a = alpha(e.k); if (choisie && (e === choisie || relies.has(e.l.id))) a = 1;
+      const l = e.l;
+      if (l.statut === 'LU') {
+        const fin = l.dateFin ? new Date(l.dateFin).getFullYear() : annee;
+        const eclat = Math.max(.6, 1 - Math.max(0, annee - fin) * .08) * a;
+        const n = l.note || 0, r = (n === 0 || n === 3 ? 1.5 : n <= 2 ? 1.0 : n === 4 ? 2.1 : 2.8) * k15;
+        if (n >= 4) { const hr = (n === 5 ? 9 : 6) * k15; const g = ctx.createRadialGradient(x, y, 0, x, y, hr); g.addColorStop(0, `rgba(${C.ivoire},${(n === 5 ? .18 : .10) * eclat * 2})`); g.addColorStop(1, `rgba(${C.ivoire},0)`); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, hr, 0, 7); ctx.fill(); }
+        if (n === 5) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${.25 * eclat})`; ctx.lineWidth = 1; ctx.stroke(); }
+        ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fillStyle = `rgba(${C.ivoire},${eclat})`; ctx.fill();
+      } else if (l.statut === 'EN_COURS') {
+        ctx.beginPath(); ctx.arc(x, y, 1.8 * k15, 0, 7); ctx.fillStyle = `rgba(${C.or},${a})`; ctx.fill();
+        if (l.id === modele.scintille) { const p = reduitMouvement ? .5 : (Math.sin(t / 3200 * Math.PI * 2) + 1) / 2; ctx.beginPath(); ctx.arc(x, y, 5 + p * 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${(.25 + .35 * (1 - p)) * a})`; ctx.lineWidth = 1; ctx.stroke(); }
+      } else {
+        ctx.beginPath(); ctx.arc(x, y, 2 * k15, 0, 7); ctx.strokeStyle = `rgba(${C.bleu},${.7 * a})`; ctx.lineWidth = 1.2; ctx.stroke();
+      }
+      if (e === choisie) { ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.strokeStyle = `rgba(${C.or},.9)`; ctx.lineWidth = 1.2; ctx.stroke(); }
+      occupe.push([x - 5, y - 5, x + 5, y + 5]);
+    }
+    // noms des constellations
+    const chevauche = (r) => occupe.some(o => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1]) || r[1] < 70 || r[3] > H - 6 || r[0] < 4 || r[2] > L - 4;
+    const tailleNom = z >= 1.6 ? 15 : 14;
+    // un nom ne doit pas mordre sur une autre constellation (sinon on ne sait plus à qui il appartient)
+    const empiete = (r, propre) => modele.consts.some(k => { if (k === propre) return false; const [cx, cy] = ecran(k.c[0], k.c[1]); const rr = k.rc * z * .85 + 4;
+      const nx = Math.max(r[0], Math.min(cx, r[2])), ny = Math.max(r[1], Math.min(cy, r[3])); return Math.hypot(nx - cx, ny - cy) < rr; });
+    // placement des noms : d'abord les constellations qui ont le moins de places possibles
+    const prep = modele.consts.map(k => {
+      const [cx, cy] = ecran(k.c[0], k.c[1]); const r = k.rc * z; const estLumi = k === lumi;
+      const fs = estLumi ? 17 : (z < .6 ? 12.5 : tailleNom);
+      ctx.font = `italic ${estLumi ? 500 : 400} ${fs}px Fraunces, Georgia, serif`;
+      const w = ctx.measureText(k.theme).width;
+      const cands = [];
+      for (const [dx, dy] of [[0, -1], [0, 1], [1, 0], [-1, 0], [.7, -.7], [-.7, -.7], [.7, .7], [-.7, .7], [0, -1.7], [0, 1.7]]) {
+        let px = cx + dx * (r + 8) - (dx === 0 ? w / 2 : dx < 0 ? w : 0); const py = cy + dy * (r + 8) + (dy > 0 ? fs : dy === 0 ? fs / 3 : 0);
+        if (dx === 0) px = Math.max(6, Math.min(L - w - 6, px));
+        const rect = [px - 2, py - fs, px + w + 2, py + 4];
+        if (!chevauche(rect) && !empiete(rect, k)) cands.push([px, py, rect]);
+      }
+      return { k, cx, cy, r, fs, w, estLumi, cands };
+    }).sort((a, b) => b.estLumi - a.estLumi || a.cands.length - b.cands.length || b.k.livres.length - a.k.livres.length);
+    for (const P of prep) {
+      const { k, estLumi, fs, w } = P;
+      let place = P.cands.find(c => !chevauche(c[2]));
+      if (!place && (k.livres.length >= 2 || estLumi)) { const px = Math.max(6, Math.min(L - w - 6, P.cx - w / 2)), py = P.cy - P.r - 8; place = [px, py, [px, py - fs, px + w, py + 4]]; }
+      if (!place) continue;
+      occupe.push(place[2]); labels.push({ rect: place[2], k });
+      let nom = k.theme;
+      if (estLumi && !reduitMouvement) { const par = Math.max(120, 600 / Math.max(1, k.aretes.length)); const total = k.aretes.length * par; const p = Math.min(1, (t - allume.t0) / Math.max(total, 600)); nom = k.theme.slice(0, Math.ceil(k.theme.length * p)); }
+      ctx.font = `italic ${estLumi ? 500 : 400} ${fs}px Fraunces, Georgia, serif`;
+      ctx.fillStyle = estLumi ? `rgba(${C.ivoire},.92)` : `rgba(${C.brume},${.8 * alpha(k)})`;
+      ctx.fillText(nom, place[0], place[1]);
+    }
+    // titres des livres (zoom sémantique, constellation allumée, liens)
+    ctx.font = `500 ${z >= 2.5 ? 12 : 11.5}px Manrope, system-ui, sans-serif`;
+    for (const e of modele.etoiles) {
+      const montrer = (e.k === lumi) || (choisie && (e === choisie || relies.has(e.l.id))) || (!lumi && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
+      if (!montrer) continue;
+      const [x, y] = e._s || ecran(e.wx, e.wy); if (x < 0 || x > L || y < 0 || y > H) continue;
+      const tt = titreCourt(e.l); const w = ctx.measureText(tt).width;
+      for (const [px, py] of [[x + 8, y + 4], [x - 8 - w, y + 4], [x - w / 2, y - 9], [x - w / 2, y + 16]]) {
+        const rect = [px - 1, py - 11, px + w + 1, py + 3];
+        if (!chevauche(rect)) { occupe.push(rect); ctx.fillStyle = (choisie && relies.has(e.l.id)) ? `rgba(${C.or},.95)` : `rgba(${C.ivoire},.85)`; ctx.fillText(tt, px, py); break; }
+      }
+    }
+    // thèmes jamais lus
+    ctx.font = `italic 400 13px Fraunces, Georgia, serif`;
+    for (const t of modele.eteints) {
+      const [x, y] = ecran(t.wx, t.wy); const w = ctx.measureText(t.theme).width; const rect = [x - w / 2 - 2, y - 13, x + w / 2 + 2, y + 4];
+      const estTerre = terre === t.theme;
+      if (!estTerre && (lumi || chevauche(rect) || modele.consts.some(k => { const [cx, cy] = ecran(k.c[0], k.c[1]); return Math.hypot(cx - x, cy - y) < k.rc * z + 20; }))) continue;
+      occupe.push(rect); labels.push({ rect, eteint: t.theme });
+      ctx.fillStyle = estTerre ? `rgba(${C.or},.95)` : `rgba(${C.brume},.3)`; ctx.fillText(t.theme, x - w / 2, y);
+    }
+  }
+
+  function boucle(t){
+    if (vueCourante === 'ciel' && M.racine) {
+      if (anim) { anim(t); sale = true; }
+      if (allume || (modele && modele.scintille && !reduitMouvement)) sale = true;
+      if (sale) { sale = false; dessiner(t); }
+    }
+    requestAnimationFrame(boucle);
+  }
+
+  /* ---- interactions ---- */
+  function viser(sx, sy){
+    if (!modele) return null;
+    let best = null, bd = 16;
+    for (const e of modele.etoiles) { const [x, y] = ecran(e.wx, e.wy); const d = Math.hypot(x - sx, y - sy); if (d < bd && (!allume || e.k === allume.k || d < 8)) { bd = d; best = e; } }
+    if (best) return { etoile: best };
+    for (const lb of labels) if (sx >= lb.rect[0] - 4 && sx <= lb.rect[2] + 4 && sy >= lb.rect[1] - 4 && sy <= lb.rect[3] + 4) return lb.k ? { k: lb.k } : { eteint: lb.eteint };
+    for (const k of modele.consts) { const [cx, cy] = ecran(k.c[0], k.c[1]); if (Math.hypot(cx - sx, cy - sy) < k.rc * vue.z * .9) return { k }; }
+    return null;
+  }
+  function allumer(k){
+    fermerTerre();
+    if (allume && allume.k === k) { eteindre(); return; }
+    if (!allume) { vueAvantAllumage = { ...vue }; bouge = false; }
+    allume = { k, t0: performance.now() }; choisie = null; fermerBulle();
+    cadrer([k], 3, true); sale = true;
+  }
+  function eteindre(){
+    if (!allume) return;
+    allume = null; if (vueAvantAllumage && !bouge) animerVers(vueAvantAllumage, 500); vueAvantAllumage = null; sale = true;
+  }
+  function choisir(e){
+    fermerTerre();
+    choisie = e; sale = true;
+    const l = e.l, b = $('#bulle-etoile');
+    const relies = l._liens.map(x => M.parId.get(x.id)).filter(Boolean);
+    b.innerHTML = `<div class="carte">${couverture(l, 64)}<div style="flex:1;min-width:0">
+      <div class="sur">${esc(e.k.theme)}</div><h3 style="margin-top:4px">${esc(titreCourt(l))}</h3>
+      <div class="doux" style="font-size:13px;margin-top:3px">${esc(l.auteur)}</div>
+      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">${pastille(l.statut)}${etoilesNote(l.note)}</div>
+      ${relies.length ? `<div class="relies">${relies.slice(0, 6).map(r => `<button data-id="${r.id}">⟡ ${esc(titreCourt(r))}</button>`).join('')}${relies.length > 6 ? `<span class="doux" style="font-size:12px;align-self:center">+${relies.length - 6}</span>` : ''}</div>` : ''}
+      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn or petit" id="bulle-ouvrir">Ouvrir la fiche ›</button><button class="btn petit" id="bulle-fermer">Fermer</button></div></div></div>`;
+    b.classList.add('ouverte');
+    $('#bulle-ouvrir').onclick = () => Fiche.ouvrir(l.id);
+    $('#bulle-fermer').onclick = () => { choisie = null; fermerBulle(); sale = true; };
+    b.querySelectorAll('.relies button').forEach(x => x.onclick = () => { const e2 = modele.parLivre.get(+x.dataset.id); if (e2) { choisir(e2); animerVers({ x: e2.wx, y: e2.wy, z: Math.max(vue.z, 1.6) }, 500); } });
+  }
+  function fermerBulle(){ $('#bulle-etoile').classList.remove('ouverte'); }
+  function fermerTerre(){ terre = null; $('#terre').classList.remove('ouverte'); }
+  function ouvrirTerre(theme){
+    eteindre(); choisie = null; fermerBulle(); terre = theme; sale = true;
+    const t = $('#terre');
+    t.innerHTML = `<div class="carte" style="box-shadow:0 12px 40px rgba(0,0,0,.5)"><div class="sur" style="color:var(--or)">Terre inconnue</div><h3 style="font-size:20px;margin:6px 0">${esc(theme)}</h3><p class="doux" style="margin:0 0 12px;font-size:14px;line-height:1.5">Tu n’as encore rien lu ici. Les portes d’entrée (et l’ajout « À lire ») arrivent avec l’édition, au prochain lot.</p><button class="btn petit" id="terre-fermer">Fermer</button></div>`;
+    t.classList.add('ouverte'); $('#terre-fermer').onclick = () => { fermerTerre(); sale = true; };
+  }
+
+  const pointeurs = new Map(); let geste = null, deplace = 0;
+  cv.addEventListener('pointerdown', e => {
+    cv.setPointerCapture(e.pointerId); pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); deplace = 0;
+    if (pointeurs.size === 1) geste = { type:'glisse', dep:[e.offsetX, e.offsetY], vue:{ ...vue } };
+    if (pointeurs.size === 2) { const [a, b] = [...pointeurs.values()]; geste = { type:'pince', d: Math.hypot(a[0] - b[0], a[1] - b[1]), m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], vue:{ ...vue } }; }
+    cv.classList.add('tire');
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!pointeurs.has(e.pointerId)) { const v = viser(e.offsetX, e.offsetY); cv.style.cursor = v ? 'pointer' : 'grab'; return; }
+    pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); anim = null;
+    if (geste?.type === 'glisse' && pointeurs.size === 1) {
+      const dx = e.offsetX - geste.dep[0], dy = e.offsetY - geste.dep[1]; deplace = Math.max(deplace, Math.hypot(dx, dy));
+      if (deplace > 4) { vue = { ...geste.vue, x: geste.vue.x - dx / vue.z, y: geste.vue.y - dy / vue.z }; bouge = true; sale = true; }
+    } else if (geste?.type === 'pince' && pointeurs.size === 2) {
+      const [a, b] = [...pointeurs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      const z = Math.min(12, Math.max(.25, geste.vue.z * d / geste.d));
+      const w = [(geste.m[0] - L / 2) / geste.vue.z + geste.vue.x, (geste.m[1] - H / 2) / geste.vue.z + geste.vue.y];
+      vue = { z, x: w[0] - (m[0] - L / 2) / z, y: w[1] - (m[1] - H / 2) / z }; deplace = 99; bouge = true; sale = true;
+    }
+  });
+  const fin = e => {
+    const etaitSeul = pointeurs.size === 1 && geste?.type === 'glisse';
+    pointeurs.delete(e.pointerId); cv.classList.remove('tire');
+    if (etaitSeul && deplace <= 4 && e.type === 'pointerup') clic(e.offsetX, e.offsetY);
+    if (pointeurs.size === 1) { const [p] = [...pointeurs.values()]; geste = { type:'glisse', dep:p, vue:{ ...vue } }; deplace = 99; } else if (!pointeurs.size) geste = null;
+  };
+  cv.addEventListener('pointerup', fin); cv.addEventListener('pointercancel', fin);
+  let dernierClic = 0;
+  function clic(x, y){
+    const now = performance.now();
+    if (now - dernierClic < 300) { zoomer(2, x, y); dernierClic = 0; return; }
+    dernierClic = now;
+    const v = viser(x, y);
+    if (v?.etoile) choisir(v.etoile);
+    else if (v?.k) allumer(v.k);
+    else if (v?.eteint) ouvrirTerre(v.eteint);
+    else { if (choisie) { choisie = null; fermerBulle(); } if (terre) fermerTerre(); eteindre(); sale = true; }
+  }
+  function zoomer(f, sx = L / 2, sy = H / 2, anime = true){
+    const z = Math.min(12, Math.max(.25, vue.z * f)); const w = monde(sx, sy);
+    const cible = { z, x: w[0] - (sx - L / 2) / z, y: w[1] - (sy - H / 2) / z }; bouge = true;
+    if (anime && !reduitMouvement) animerVers(cible, 260); else { vue = cible; sale = true; }
+  }
+  cv.addEventListener('wheel', e => { e.preventDefault(); anim = null; zoomer(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0018)), e.offsetX, e.offsetY, false); }, { passive:false });
+  $('#zoom-plus').onclick = () => zoomer(1.6); $('#zoom-moins').onclick = () => zoomer(1 / 1.6);
+  $('#recadrer').onclick = () => { allume = null; choisie = null; fermerBulle(); fermerTerre(); cadrer(modele.consts, 3, true); };
+  $('#ciel-banniere').onclick = () => { Chercher.filtre = 'COMPLETER'; Chercher.mode = 'liste'; location.hash = 'chercher'; };
+  addEventListener('keydown', e => { if (vueCourante !== 'ciel' || Fiche.estOuverte()) return; if (e.key === 'Escape') clic(-999, -999); if (e.key === '+' || e.key === '=') zoomer(1.4); if (e.key === '-') zoomer(1 / 1.4); });
+  new ResizeObserver(() => taille()).observe(cv);
+  requestAnimationFrame(boucle);
+  if (document.fonts) document.fonts.ready.then(() => { sale = true; });
+
+  return { invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; choisir(e); animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); } } };
+})();
+
+/* =========================================================
+   Chercher : étagères et liste
+   ========================================================= */
+const Chercher = {
+  mode: 'etageres', filtre: 'TOUS', tri: 'ajout', requete: '', limite: null,
+  reinit(){ this.mode = 'etageres'; this.filtre = 'TOUS'; this.requete = ''; this.limite = null; },
+  rendre(){
+    const el = $('#chercher');
+    el.innerHTML = `<h1>Chercher</h1>
+      <div class="recherche"><label class="champ"><span class="doux">⌕</span><input id="q" type="search" placeholder="Titre, auteur, série, mot-clé…" value="${esc(this.requete)}" autocomplete="off"></label>
+      <div class="filtres" style="padding:0"><button class="puce" data-mode="etageres" aria-pressed="${this.mode === 'etageres' && !this.requete}">Étagères</button><button class="puce" data-mode="liste" aria-pressed="${this.mode === 'liste' || !!this.requete}">Liste</button></div></div>
+      <div id="resultats"></div>`;
+    const q = $('#q');
+    q.addEventListener('input', () => { this.requete = q.value; this.limite = null; this.resultats(); el.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === (this.requete ? 'liste' : this.mode)))); });
+    el.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { this.mode = b.dataset.mode; this.requete = ''; this.limite = null; this.rendre(); });
+    this.resultats();
+  },
+  resultats(){
+    const r = $('#resultats');
+    if (this.mode === 'etageres' && !this.requete) { r.innerHTML = this.etageres(); }
+    else r.innerHTML = this.liste();
+    r.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => Fiche.ouvrir(+b.dataset.livre));
+    r.querySelectorAll('[data-etagere]').forEach(b => b.onclick = () => { this.limite = JSON.parse(b.dataset.etagere); this.mode = 'liste'; this.filtre = 'TOUS'; this.rendre(); scrollTo(0, 0); });
+    r.querySelectorAll('[data-filtre]').forEach(b => b.onclick = () => { this.filtre = b.dataset.filtre; this.resultats(); });
+    r.querySelectorAll('[data-sortir]').forEach(b => b.onclick = () => { this.limite = null; this.resultats(); });
+    const s = r.querySelector('#tri'); if (s) s.onchange = () => { this.tri = s.value; this.resultats(); };
+  },
+  etagere(titre, livres, limite, sous = ''){
+    if (!livres.length) return '';
+    return `<div class="etagere"><div class="etagere-tete"><h2>${esc(titre)}<small>${livres.length}${sous ? ' · ' + esc(sous) : ''}</small></h2><button class="btn petit" data-etagere='${esc(JSON.stringify({ ...limite, titre }))}'>Tout voir ›</button></div>
+      <div class="rangee">${livres.slice(0, 30).map(l => `<button class="livre-v" data-livre="${l.id}">${couverture(l, 96)}<div class="t">${esc(titreCourt(l))}</div></button>`).join('')}</div></div>`;
+  },
+  etageres(){
+    const L = M.lectures; const recents = (a, b) => (b.dateAjout || 0) - (a.dateAjout || 0);
+    let h = '';
+    h += this.etagere('En cours', L.filter(l => l.statut === 'EN_COURS').sort((a, b) => (b.dateDebut || 0) - (a.dateDebut || 0)), { statut:'EN_COURS' });
+    h += this.etagere('À lire', L.filter(l => l.statut === 'A_LIRE').sort(recents), { statut:'A_LIRE' });
+    h += this.etagere('Lus', L.filter(l => l.statut === 'LU').sort((a, b) => (b.dateFin || 0) - (a.dateFin || 0)), { statut:'LU' });
+    h += this.etagere('À compléter', L.filter(l => l._manques.length), { completer:true });
+    h += this.etagere('Sans couverture', L.filter(l => !l.couvertureUrl), { sansCouv:true });
+    h += this.etagere('Prêtés', L.filter(l => l.pretA), { pretes:true });
+    h += `<div class="sur" style="margin-top:36px">Tes constellations</div>`;
+    const parTheme = new Map(); for (const l of L) if (l._theme) { if (!parTheme.has(l._theme)) parTheme.set(l._theme, []); parTheme.get(l._theme).push(l); }
+    for (const [t, ls] of [...parTheme].sort((a, b) => b[1].length - a[1].length)) h += this.etagere(t, ls.sort(recents), { theme:t });
+    const series = new Map(); for (const l of L) if (l.serie) { const k = norm(l.serie); if (!series.has(k)) series.set(k, { nom:l.serie, ls:[] }); series.get(k).ls.push(l); }
+    const s2 = [...series.values()].filter(s => s.ls.length >= 2);
+    if (s2.length) { h += `<div class="sur" style="margin-top:36px">Tes séries</div>`; for (const s of s2.sort((a, b) => b.ls.length - a.ls.length)) h += this.etagere(s.nom, s.ls.sort((a, b) => (a.tome ?? 99) - (b.tome ?? 99)), { serie:norm(s.nom) }); }
+    const fils = this.fils();
+    if (fils.length) { h += `<div class="sur" style="margin-top:36px">Tes fils <span style="text-transform:none;letter-spacing:0;font-weight:500">· mots partagés par plusieurs livres</span></div>`; for (const f of fils) h += this.etagere(f.mot, f.ls, { mot:f.cle }); }
+    return h;
+  },
+  fils(){
+    const m = new Map();
+    for (const l of M.lectures) for (const w of l._mots) { const k = norm(w); if (!m.has(k)) m.set(k, { mot:w, cle:k, ls:[] }); m.get(k).ls.push(l); }
+    return [...m.values()].filter(f => f.ls.length >= 4).sort((a, b) => b.ls.length - a.ls.length).slice(0, 8);
+  },
+  liste(){
+    let ls = M.lectures.slice(); const lim = this.limite;
+    if (lim) {
+      if (lim.statut) ls = ls.filter(l => l.statut === lim.statut);
+      if (lim.completer) ls = ls.filter(l => l._manques.length);
+      if (lim.sansCouv) ls = ls.filter(l => !l.couvertureUrl);
+      if (lim.pretes) ls = ls.filter(l => l.pretA);
+      if (lim.theme) ls = ls.filter(l => l._theme === lim.theme);
+      if (lim.serie) ls = ls.filter(l => norm(l.serie) === lim.serie);
+      if (lim.mot) ls = ls.filter(l => l._motsN.has(lim.mot));
+    }
+    const f = this.filtre;
+    if (f === 'COMPLETER') ls = ls.filter(l => l._manques.length);
+    else if (['LU','EN_COURS','A_LIRE'].includes(f)) ls = ls.filter(l => l.statut === f);
+    else if (f === 'BD' || f === 'LIVRE') ls = ls.filter(l => l.type === f);
+    const q = norm(this.requete);
+    if (q) { const mots = q.split(/\s+/); ls = ls.filter(l => { const tout = norm([l.titre, l.auteur, l.serie, l.theme, l.motsCles, l.isbn].join(' ')); return mots.every(m => tout.includes(m)); }); }
+    const nb = c => M.lectures.filter(c).length;
+    const puces = [['TOUS','Tous'],['EN_COURS','En cours'],['A_LIRE','À lire'],['LU','Lus'],['LIVRE','Livres'],['BD','BD'],['COMPLETER',`À compléter · ${nb(l => l._manques.length)}`]];
+    let h = '';
+    if (lim) h += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><span class="sur">Étagère</span><h2 style="font-size:20px">${esc(lim.titre)}</h2><button class="btn petit" data-sortir>✕</button></div>`;
+    h += `<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px"><div class="filtres" style="flex:1;min-width:0">${puces.map(([k, t]) => `<button class="puce" data-filtre="${k}" aria-pressed="${f === k}">${esc(t)}</button>`).join('')}</div>
+      <select class="select" id="tri" aria-label="Trier">${[['ajout','Date d’ajout'],['titre','Titre'],['auteur','Auteur'],['debut','Début de lecture'],['fin','Fin de lecture'],['theme','Thème'],['serie','Série'],['note','Note']].map(([k, t]) => `<option value="${k}" ${this.tri === k ? 'selected' : ''}>${t}</option>`).join('')}</select></div>`;
+    if (f === 'COMPLETER') h += `<p class="doux" style="font-size:13.5px;line-height:1.5">Ces fiches n’entrent ni dans le ciel tant qu’il leur manque un titre, un auteur ou un thème. Leurs citations restent dans le carnet.</p>`;
+    h += `<div class="doux" style="font-size:12.5px;margin:10px 0">${ls.length} livre${ls.length > 1 ? 's' : ''}</div>`;
+    if (!ls.length) return h + `<p class="doux">Aucun livre ne correspond.</p>`;
+    const tri = this.tri; let section = null;
+    const cmp = {
+      ajout: (a, b) => (b.dateAjout || 0) - (a.dateAjout || 0),
+      titre: (a, b) => cleTitre(a).localeCompare(cleTitre(b), 'fr') || (a.tome ?? 0) - (b.tome ?? 0),
+      auteur: (a, b) => norm(nomFamille(a) || '~').localeCompare(norm(nomFamille(b) || '~'), 'fr') || norm(a.serie || '').localeCompare(norm(b.serie || '')) || (a.tome ?? 0) - (b.tome ?? 0) || cleTitre(a).localeCompare(cleTitre(b), 'fr'),
+      debut: (a, b) => (b.dateDebut || 0) - (a.dateDebut || 0),
+      fin: (a, b) => (b.dateFin || 0) - (a.dateFin || 0),
+      theme: (a, b) => (a._theme || '~').localeCompare(b._theme || '~', 'fr') || cleTitre(a).localeCompare(cleTitre(b), 'fr'),
+      serie: (a, b) => norm(a.serie || '~~').localeCompare(norm(b.serie || '~~'), 'fr') || (a.tome ?? 0) - (b.tome ?? 0),
+      note: (a, b) => (b.note || 0) - (a.note || 0) || cleTitre(a).localeCompare(cleTitre(b), 'fr')
+    }[tri];
+    ls.sort(cmp);
+    const cleSection = l => tri === 'titre' ? (cleTitre(l)[0] || '#').toUpperCase() : tri === 'auteur' ? (premierAuteur(l) || 'Auteur inconnu') : tri === 'theme' ? (l._theme || 'Sans thème') : tri === 'serie' ? (l.serie || 'Hors série') : null;
+    const comptes = new Map(); if (tri === 'auteur') for (const l of ls) { const k = cleSection(l); comptes.set(k, (comptes.get(k) || 0) + 1); }
+    for (const l of ls) {
+      const s = cleSection(l);
+      if (s !== null && s !== section) { section = s; h += `<div class="section-lettre">${esc(s)}${comptes.get(s) ? ` <span class="doux" style="font-style:normal;font-size:14px;font-family:var(--sans)">(${comptes.get(s)})</span>` : ''}</div>`; }
+      h += `<button class="ligne" data-livre="${l.id}">${couverture(l, 46)}<div class="infos"><div class="t">${esc(titreCourt(l))}</div><div class="a">${esc(l.auteur || '—')}${l.serie && !l.titre.includes(l.serie) ? ' · ' + esc(l.serie) : ''}</div>
+        <div class="d">${pastille(l.statut)}${etoilesNote(l.note)}${l._theme ? `<span>${esc(l._theme)}</span>` : ''}${l._manques.length ? `<span style="color:var(--or)">Manque : ${l._manques.join(', ')}</span>` : ''}</div></div></button>`;
+    }
+    return h;
+  }
+};
+
+/* =========================================================
+   Fiche
+   ========================================================= */
+const Fiche = (() => {
+  let ouverte = false, livre = null, onglet = null;
+  const el = $('#fiche'), voile = $('#voile');
+  function proches(l){
+    const exclus = new Set([l.id, ...l._liens.map(x => x.id)]);
+    const res = [];
+    for (const o of M.lectures) {
+      if (exclus.has(o.id)) continue;
+      if (l.serie && o.serie && norm(l.serie) === norm(o.serie)) continue;
+      const communs = l._mots.filter(w => o._motsN.has(norm(w)));
+      let score = communs.length * 2, raisons = [];
+      if (premierAuteur(l) && norm(premierAuteur(l)) === norm(premierAuteur(o))) { score += 3; raisons.push('même auteur'); }
+      if (communs.length && l._theme && l._theme === o._theme) score += 1;
+      if (communs.length) raisons.push((communs.length > 1 ? 'mots partagés : ' : 'mot partagé : ') + communs.slice(0, 4).join(', '));
+      if (score >= 3) res.push({ o, score, raison: raisons.join(' · ') });
+    }
+    return res.sort((a, b) => b.score - a.score).slice(0, 5);
+  }
+  function memeSerie(l){ if (!l.serie) return []; return M.lectures.filter(o => o.id !== l.id && o.serie && norm(o.serie) === norm(l.serie)).sort((a, b) => (a.tome ?? 99) - (b.tome ?? 99)); }
+  function texteNotes(t){
+    // « [Spoiler] … » jusqu'à la fin de la ligne : flouté, révélé au toucher
+    return esc(t).replace(/\[Spoiler\]([^\n]*)/gi, (_, s) => `<span class="doux">[Spoiler]</span><span class="spoil" title="Toucher pour révéler">${s}</span>`);
+  }
+  const ligneLivre = (o, r) => `<button class="proche" data-livre="${o.id}">${couverture(o, 40)}<div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:15.5px">${esc(titreCourt(o))}</div><div class="doux" style="font-size:12.5px">${esc(o.auteur)}</div>${r ? `<div class="r">${esc(r)}</div>` : ''}</div></button>`;
+  function corps(l, nom){
+    if (nom === 'lecture') {
+      const p = l.pagesTotal && l.pageActuelle != null ? Math.min(100, Math.round(l.pageActuelle / l.pagesTotal * 100)) : null;
+      const duree = l.dateDebut && l.dateFin ? Math.max(1, Math.round((l.dateFin - l.dateDebut) / 864e5)) : null;
+      return `${p != null ? `<div class="bloc"><span class="sur">Progression</span><div class="barre"><i style="width:${p}%"></i></div><div class="doux" style="font-size:13px">Page ${l.pageActuelle} sur ${l.pagesTotal} · ${p} %</div></div>` : ''}
+        <dl class="grille-info bloc">
+          <dt>Statut</dt><dd>${pastille(l.statut)}</dd>
+          ${l.note ? `<dt>Note</dt><dd>${etoilesNote(l.note)}</dd>` : ''}
+          ${l.dateDebut ? `<dt>Commencé</dt><dd>${date(l.dateDebut)}</dd>` : ''}
+          ${l.dateFin ? `<dt>Terminé</dt><dd>${date(l.dateFin)}${duree ? ` <span class="doux">· ${duree} jour${duree > 1 ? 's' : ''}</span>` : ''}</dd>` : ''}
+          ${l.relectures ? `<dt>Relectures</dt><dd>${l.relectures}</dd>` : ''}
+          ${l.pretA ? `<dt>Prêté à</dt><dd>${esc(l.pretA)}${l.pretDepuis ? ` <span class="doux">depuis le ${date(l.pretDepuis)}</span>` : ''}</dd>` : ''}
+          <dt>Ajouté</dt><dd>${date(l.dateAjout) || '—'}</dd>
+        </dl>`;
+    }
+    if (nom === 'notes') return l.notes ? `<div class="texte">${texteNotes(l.notes)}</div>` : `<p class="doux">Pas encore de notes sur ce livre.</p>`;
+    if (nom === 'citations') {
+      const cs = M.citations.filter(c => c.lectureId === l.id).sort((a, b) => (a.page ?? 1e9) - (b.page ?? 1e9) || a.dateAjout - b.dateAjout);
+      return cs.length ? cs.map(c => `<blockquote class="citation">« ${esc(c.texte)} »<small>${c.page ? 'p. ' + c.page + ' · ' : ''}${date(c.dateAjout)} <button class="mini-x" data-supcit="${c.id}" aria-label="Supprimer la citation">✕</button></small></blockquote>`).join('') : `<p class="doux">Aucune citation gardée pour ce livre.</p>`;
+    }
+    if (nom === 'livre') {
+      const a = premierAuteur(l), ddg = q => 'https://duckduckgo.com/?q=' + encodeURIComponent(q);
+      return `${l.resume ? `<div class="bloc"><span class="sur">4e de couverture${l.sourceResume ? ' · ' + esc(l.sourceResume) : ''}</span><div class="texte">${esc(l.resume)}</div></div>` : ''}
+        ${l._mots.length ? `<div class="bloc"><span class="sur">Mots-clés</span><div style="display:flex;flex-wrap:wrap;gap:6px">${l._mots.map(w => `<button class="puce mot" data-mot="${esc(norm(w))}" data-label="${esc(w)}">${esc(w)}</button>`).join('')}</div></div>` : ''}
+        <dl class="grille-info bloc">
+          <dt>Type</dt><dd>${l.type === 'BD' ? 'Bande dessinée' : 'Livre'}</dd>
+          ${l._theme ? `<dt>Thème</dt><dd>${esc(l._theme)}</dd>` : ''}
+          ${l.serie ? `<dt>Série</dt><dd>${esc(l.serie)}${l.tome ? ' · tome ' + l.tome : ''}</dd>` : ''}
+          ${l.pagesTotal ? `<dt>Pages</dt><dd>${l.pagesTotal}</dd>` : ''}
+          ${l.isbn ? `<dt>ISBN</dt><dd>${esc(l.isbn)}</dd>` : ''}
+        </dl>
+        <div class="bloc"><span class="sur">Ailleurs</span><div class="liens-ext">
+          <a class="btn petit" href="${ddg('!ducky site:babelio.com/livres ' + l.titre + ' ' + a)}" target="_blank" rel="noopener">Babelio ↗</a>
+          ${l.type === 'BD' ? `<a class="btn petit" href="${ddg('!ducky site:bedetheque.com ' + (l.serie || l.titre) + ' ' + a)}" target="_blank" rel="noopener">Bédéthèque ↗</a>` : ''}
+          ${a ? `<a class="btn petit" href="https://www.literature-map.com/${encodeURIComponent(a.toLowerCase()).replace(/%20/g, '+')}" target="_blank" rel="noopener">Literature-Map ↗</a>` : ''}
+        </div></div>`;
+    }
+    if (nom === 'proches') {
+      const liens = l._liens.map(x => ({ o: M.parId.get(x.id), r: x.raison })).filter(x => x.o);
+      const serie = memeSerie(l), pr = proches(l);
+      let h = '';
+      if (liens.length) h += `<div class="bloc"><span class="sur">Tes liens · ${liens.length}</span>${liens.map(x => `<div style="display:flex;gap:4px;align-items:center">${ligneLivre(x.o, x.r).replace('class="proche"', 'class="proche" style="flex:1"')}<button class="mini-x" data-delier="${x.o.id}" aria-label="Retirer ce lien" style="margin-bottom:8px">✕</button></div>`).join('')}</div>`;
+      if (serie.length) h += `<div class="bloc"><span class="sur">Même série</span>${serie.map(o => ligneLivre(o, o.tome ? 'tome ' + o.tome : '')).join('')}</div>`;
+      if (pr.length) h += `<div class="bloc"><span class="sur">Dans ta bibliothèque</span>${pr.map(x => `<div style="display:flex;gap:8px;align-items:center">${ligneLivre(x.o, x.raison).replace('class="proche"', 'class="proche" style="flex:1"')}<button class="btn petit" data-relier="${x.o.id}" data-raison="${esc(x.raison)}" style="margin-bottom:8px">＋ Relier</button></div>`).join('')}</div>`;
+      if (!h) h = `<p class="doux">Aucun livre relié pour l’instant.</p>`;
+      if (Ciel && M.parId.get(l.id)?._manques.length === 0) h += `<button class="btn petit" id="voir-ciel" style="margin-top:6px">✦ Voir dans le ciel</button>`;
+      return h;
+    }
+    return '';
+  }
+  function ordre(l){
+    const nbCit = l._cit, base = { A_LIRE:['livre','proches','notes','citations','lecture'], EN_COURS:['lecture','citations','notes','livre','proches'], LU:['citations','notes','proches','livre','lecture'] }[l.statut] || ['livre','notes','citations','proches','lecture'];
+    return base;
+  }
+  const NOMS = { lecture:'Lecture', notes:'Notes', citations:'Citations', livre:'Le livre', proches:'Proches' };
+  function plein(l, nom){ if (nom === 'notes') return !!l.notes; if (nom === 'citations') return l._cit > 0; if (nom === 'livre') return true; if (nom === 'proches') return l._liens.length > 0 || !!l.serie; return true; }
+  function rendre(){
+    const l = livre; const ord = ordre(l);
+    if (!onglet || !ord.includes(onglet)) onglet = ord.find(n => plein(l, n)) || ord[0];
+    el.innerHTML = `<button class="fermer" aria-label="Fermer">✕</button><button class="modif" id="modifier">✎ Modifier</button>
+      <div class="fiche-tete">${couverture(l, 112)}<div style="min-width:0;padding-right:30px">
+        <div class="sur">${esc(l._theme || 'Sans thème')}</div>
+        <h2 style="margin-top:6px">${esc(l.titre || 'Sans titre')}</h2>
+        <div class="a">${esc(l.auteur || 'Auteur inconnu')}</div>
+        ${l.serie ? `<div class="doux" style="font-size:13px;margin-top:4px">${esc(l.serie)}${l.tome ? ' · tome ' + l.tome : ''}</div>` : ''}
+        <div class="meta">${pastille(l.statut)}${etoilesNote(l.note)}${l.type === 'BD' ? '<span>BD</span>' : ''}</div>
+        ${l._manques.length ? `<div style="color:var(--or);font-size:12.5px;margin-top:8px">Manque : ${l._manques.join(', ')}</div>` : ''}
+      </div></div>
+      <div class="onglets" role="tablist">${ord.map(n => `<button class="onglet" role="tab" data-onglet="${n}" aria-selected="${n === onglet}">${NOMS[n]}${n === 'citations' && l._cit ? `<sup>${l._cit}</sup>` : n === 'proches' && l._liens.length ? `<sup>${l._liens.length}</sup>` : ''}</button>`).join('')}</div>
+      <div class="fiche-corps" role="tabpanel">${corps(l, onglet)}${Edition.complement(l, onglet)}</div>`;
+    el.querySelector('#modifier').onclick = () => Edition.ouvrir(l.id);
+    Edition.brancher(el, l, onglet);
+    el.querySelector('.fermer').onclick = () => fermer();
+    el.querySelectorAll('[data-onglet]').forEach(b => b.onclick = () => { onglet = b.dataset.onglet; rendre(); });
+    el.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => ouvrir(+b.dataset.livre));
+    el.querySelectorAll('.spoil').forEach(s => s.onclick = () => s.classList.add('vu'));
+    el.querySelectorAll('[data-mot]').forEach(b => b.onclick = () => { Chercher.limite = { mot: b.dataset.mot, titre: b.dataset.label }; Chercher.mode = 'liste'; Chercher.filtre = 'TOUS'; Chercher.requete = ''; fermer(false); location.hash = 'chercher'; if (vueCourante === 'chercher') Chercher.rendre(); });
+    const vc = el.querySelector('#voir-ciel'); if (vc) vc.onclick = () => { const id = l.id; fermer(false); location.hash = 'ciel'; setTimeout(() => Ciel.choisirLivre(id), 60); };
+  }
+  function ouvrir(id, maj = true){
+    const l = M.parId.get(id); if (!l) return;
+    if (livre?.id !== id) onglet = null;
+    livre = l; ouverte = true; rendre();
+    el.classList.add('ouverte'); el.setAttribute('aria-hidden', 'false'); voile.classList.add('ouvert');
+    el.querySelector('.fiche-corps').scrollTop = 0;
+    if (maj && location.hash !== '#fiche-' + id) { history.pushState(null, '', '#fiche-' + id); }
+  }
+  function fermer(maj = true){
+    if (!ouverte) return; ouverte = false;
+    el.classList.remove('ouverte'); el.setAttribute('aria-hidden', 'true'); voile.classList.remove('ouvert');
+    if (maj && /^#fiche-/.test(location.hash)) history.pushState(null, '', '#' + (vueCourante === 'vide' ? 'ciel' : vueCourante));
+  }
+  voile.onclick = () => fermer();
+  addEventListener('keydown', e => { if (e.key === 'Escape' && ouverte) fermer(); });
+  addEventListener('popstate', () => { if (!/^#fiche-/.test(location.hash)) fermer(false); });
+  function rafraichir(){ if (!ouverte || !livre) return; const l = M.parId.get(livre.id); if (!l) { fermer(); return; } livre = l; const sc = el.querySelector('.fiche-corps')?.scrollTop || 0; rendre(); el.querySelector('.fiche-corps').scrollTop = sc; }
+  function montrer(html, brancher){ ouverte = true; el.innerHTML = html; el.classList.add('ouverte'); el.setAttribute('aria-hidden', 'false'); voile.classList.add('ouvert'); brancher(el); }
+  return { ouvrir, fermer, rafraichir, montrer, estOuverte: () => ouverte, livreId: () => livre?.id };
+})();
+
+/* =========================================================
+   Carnet (citations)
+   ========================================================= */
+const Carnet = {
+  rendre(){
+    const cs = M.citations.slice().sort((a, b) => b.dateAjout - a.dateAjout);
+    const el = $('#carnet');
+    const oracle = cs.length ? cs[Math.floor(Math.random() * cs.length)] : null;
+    const ligne = c => { const l = M.parId.get(c.lectureId); return `<div class="carte cit-carte"><blockquote class="citation" style="margin:0">« ${esc(c.texte)} »<small>${esc(l ? titreCourt(l) : '')}${l?.auteur ? ' · ' + esc(l.auteur) : ''}${c.page ? ' · p. ' + c.page : ''}</small></blockquote><button data-livre="${c.lectureId}">Ouvrir le livre ›</button></div>`; };
+    el.innerHTML = `<h1>Carnet de pensées</h1><p class="doux" style="margin:6px 0 22px">${cs.length} citation${cs.length > 1 ? 's' : ''} gardée${cs.length > 1 ? 's' : ''}.</p>
+      ${oracle ? `<div class="sur" style="margin-bottom:10px">Oracle du jour</div><div class="carte cit-carte" style="border-color:rgba(227,182,92,.4)"><blockquote class="citation" style="margin:0;font-size:19px">« ${esc(oracle.texte)} »<small>${esc(titreCourt(M.parId.get(oracle.lectureId)))}</small></blockquote><div style="display:flex;gap:8px;margin-top:10px"><button class="btn petit" id="autre">↻ Une autre</button><button class="btn petit" data-livre="${oracle.lectureId}">Ouvrir le livre</button></div></div><div class="sur" style="margin:30px 0 10px">Toutes les citations</div>` : ''}
+      ${cs.map(ligne).join('') || '<p class="doux">Aucune citation pour l’instant.</p>'}`;
+    el.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => Fiche.ouvrir(+b.dataset.livre));
+    const a = $('#autre'); if (a) a.onclick = () => this.rendre();
+  }
+};
+
+/* =========================================================
+   Réglages
+   ========================================================= */
+const Reglages = {
+  rendre(){
+    const r = M.racine; const el = $('#reglages');
+    el.innerHTML = `<h1>Réglages</h1>
+      <div class="carte reglage"><h2>Ta bibliothèque</h2>
+        ${r ? `<p>${M.lectures.length} lectures, ${M.citations.length} citations, ${M.liens.length} liens, ${M.urlsCouv.size} couvertures photographiées.<br><span class="doux">Sauvegarde du ${date(r.date) || '—'}${r.fichierSource ? ' · ' + esc(r.fichierSource) : ''}, ouverte le ${date(r.importeLe)}.</span></p>` : `<p>Aucune bibliothèque dans ce navigateur.</p>`}
+        <div id="depot2" class="depot" style="margin-top:0;padding:18px;text-align:center"><button class="btn or" id="importer">${r ? 'Ouvrir une autre sauvegarde .zip' : 'Ouvrir ma sauvegarde .zip'}</button><p class="doux" style="font-size:12.5px;margin:10px 0 0">ou dépose le fichier ici · ${r ? 'remplace tout ce qui est affiché ici (l’appli Android n’est pas touchée)' : 'faite depuis l’appli Android, Réglages › Sauvegarde'}</p></div>
+      </div>
+      ${r ? `<div class="carte reglage"><h2>Exporter${Edition.nonExporte() ? '<span class="pastille-export" title="Modifications non exportées"></span>' : ''}</h2>
+        <p>Crée un .zip au même format que la sauvegarde de l’appli (lectures, citations, liens et couvertures photographiées).${r.exporteLe ? ` <span class="doux">Dernier export : ${date(r.exporteLe)}.</span>` : ''}${Edition.nonExporte() ? ' <span style="color:var(--or)">Des modifications faites ici ne sont pas encore exportées.</span>' : ''}</p>
+        <p class="doux" style="font-size:13px">Pour les retrouver sur le téléphone : Réglages › Sauvegarde › Restaurer, avec ce fichier. Attention, la restauration remplace tout ce que contient l’appli : ne modifie pas la même bibliothèque des deux côtés à la fois.</p>
+        <button class="btn or" id="exporter">Exporter la bibliothèque (.zip)</button></div>` : ''}
+      <div class="carte reglage"><h2>Où sont tes données</h2>
+        <p>Uniquement dans ce navigateur, sur cet appareil. Rien n’est envoyé à un serveur. Les couvertures venues d’Internet sont chargées depuis leur site d’origine ; si elles ne s’affichent pas, une couverture dessinée les remplace.</p>
+        <p>Tes modifications sont gardées dans ce navigateur. Elles ne vont dans l’appli Android que par un export puis une restauration.</p>
+        ${r ? `<button class="btn" id="effacer" style="border-color:rgba(232,164,138,.5);color:var(--corail)">Effacer les données de ce navigateur</button>` : ''}
+      </div>
+      <p class="doux" style="font-size:12.5px;margin-top:22px">Phylactère web · version en ligne · novembre 2026</p>`;
+    $('#importer').onclick = () => $('#fichier').click();
+    const ex = $('#exporter'); if (ex) ex.onclick = () => Edition.exporter();
+    brancherDepot($('#depot2'));
+    const ef = $('#effacer'); if (ef) ef.onclick = () => confirmer('Effacer la bibliothèque de ce navigateur ?', 'Les lectures, citations et couvertures importées ici seront supprimées. Ta sauvegarde .zip et l’appli Android ne sont pas touchées.', 'Effacer', async () => { await Base.effacer(); await charger(); Ciel.invalider(); toast('Données effacées'); location.hash = 'reglages'; Reglages.rendre(); });
+  }
+};
+function confirmer(titre, texte, action, fn){
+  const d = $('#dialogue');
+  d.innerHTML = `<div class="carte"><h2 style="font-size:19px">${esc(titre)}</h2><p class="doux" style="line-height:1.5;font-size:14px">${esc(texte)}</p><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn petit" id="d-non">Annuler</button><button class="btn or petit" id="d-oui">${esc(action)}</button></div></div>`;
+  d.classList.add('ouvert');
+  $('#d-non').onclick = () => d.classList.remove('ouvert');
+  $('#d-oui').onclick = async () => { d.classList.remove('ouvert'); await fn(); };
+}
+
+/* =========================================================
+   Lot 2 — Édition, ajout par ISBN, export .zip
+   ========================================================= */
+const Edition = (() => {
+  const jour = ms => { if (!ms) return ''; const d = new Date(ms); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
+  const depuisJour = v => { if (!v) return null; const [a, m, j] = v.split('-').map(Number); return new Date(a, m - 1, j, 12).getTime(); };
+  const entier = v => { const n = parseInt(String(v).replace(/\s/g, ''), 10); return Number.isFinite(n) && n > 0 ? n : null; };
+  const nouvelId = liste => liste.reduce((m, x) => Math.max(m, x.id || 0), 0) + 1;
+  function propre(o){ const r = {}; for (const k in o) if (!k.startsWith('_')) r[k] = o[k]; return r; }
+
+  async function enregistrer(){
+    indexer();
+    M.racine.lectures = M.lectures.map(propre);
+    M.racine.citations = M.citations.map(propre);
+    M.racine.liens = M.liens.map(propre);
+    M.racine.modifieLe = Date.now();
+    try { await Base.ecrireDonnees(M.racine); } catch (e) { console.error(e); toast('Enregistrement impossible dans ce navigateur'); }
+    Ciel.invalider();
+    if (vueCourante === 'chercher') Chercher.resultats();
+    if (vueCourante === 'carnet') Carnet.rendre();
+    if (vueCourante === 'reglages') Reglages.rendre();
+  }
+  const nonExporte = () => !!(M.racine && M.racine.modifieLe && (!M.racine.exporteLe || M.racine.modifieLe > M.racine.exporteLe));
+
+  /* ---------- Thèmes depuis une catégorie (Google Books / Open Library) ---------- */
+  const CORRESP = [[['manga'],'Manga'],[['comic','graphic novel','bande dessinée','bandes dessinées'],'Bande dessinée'],[['juvenile','young adult','children'],'Littérature jeunesse'],[['science fiction'],'Science-fiction'],[['fantasy'],'Fantasy'],[['horror','ghost','fantastique'],'Fantastique & horreur'],[['mystery','thriller','crime','detective','suspense','policier'],'Policier & thriller'],[['historical fiction','fiction / historical'],'Roman historique'],[['short stories','nouvelles'],'Nouvelles'],[['poetry','poésie'],'Poésie'],[['drama','théâtre'],'Théâtre'],[['body, mind & spirit','occult','spiritual','esoter','ésotér','mysticism'],'Spiritualité & ésotérisme'],[['religion','mytholog','bible'],'Religion & mythologie'],[['philosoph'],'Philosophie'],[['psycholog'],'Psychologie'],[['science','mathematic','technology','computers','medical','astronom','physics'],'Sciences'],[['history','histoire'],'Histoire'],[['social science','political','business','economics','law','sociolog'],'Société & politique'],[['biography','autobiography','memoir'],'Biographie & mémoires'],[['literary criticism','literary collections','essays','essai'],'Essai'],[['art','music','photography','architecture','performing arts','design'],'Arts & musique'],[['nature','ecology','environment','gardening'],'Nature & écologie'],[['travel','adventure'],'Voyage & aventure'],[['self-help','health','fitness','personal growth'],'Développement personnel'],[['humor','humour'],'Humour'],[['cooking','cuisine'],'Cuisine'],[['fiction','roman','novel','literature','littérature'],'Roman']];
+  function themeDepuis(cat){ if (!cat) return null; const c = cat.toLowerCase(); const t = THEMES.find(x => x.toLowerCase() === c); if (t) return t; const m = CORRESP.find(([mots]) => mots.some(w => c.includes(w))); return m ? m[1] : null; }
+
+  /* ---------- Recherche ISBN ---------- */
+  const nettoyerIsbn = s => String(s || '').toUpperCase().replace(/[^0-9X]/g, '');
+  function variantes(isbn){
+    const v = new Set([isbn]);
+    if (isbn.length === 10) { const b = '978' + isbn.slice(0, 9); let t = 0; for (let i = 0; i < 12; i++) t += +b[i] * (i % 2 ? 3 : 1); v.add(b + ((10 - t % 10) % 10)); }
+    if (isbn.length === 13 && isbn.startsWith('978')) { const b = isbn.slice(3, 12); let t = 0; for (let i = 0; i < 9; i++) t += +b[i] * (10 - i); const c = (11 - t % 11) % 11; v.add(b + (c === 10 ? 'X' : c)); }
+    return v;
+  }
+  async function json(url){ const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+  async function googleBooks(isbn){
+    const vs = variantes(isbn);
+    for (const q of ['isbn:' + isbn, isbn]) {
+      const d = await json('https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(q));
+      for (const it of d.items || []) {
+        const v = it.volumeInfo || {};
+        if (!(v.industryIdentifiers || []).some(x => vs.has(nettoyerIsbn(x.identifier)))) continue;   // vérification exacte
+        const img = v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail);
+        return { titre: v.title, sousTitre: v.subtitle, auteur: (v.authors || []).join(', '), pagesTotal: v.pageCount || null,
+          couvertureUrl: img ? img.replace(/^http:/, 'https:').replace('&edge=curl', '') : null,
+          resume: v.description || '', theme: (v.categories || []).map(themeDepuis).find(Boolean) || null, source: 'Google Books' };
+      }
+    }
+    return null;
+  }
+  async function openLibrary(isbn){
+    const d = await json(`https://openlibrary.org/api/books?bibkeys=ISBN:${isbn}&format=json&jscmd=data`);
+    const b = d['ISBN:' + isbn]; if (!b) return null;
+    return { titre: b.title, sousTitre: b.subtitle, auteur: (b.authors || []).map(a => a.name).join(', '), pagesTotal: b.number_of_pages || null,
+      couvertureUrl: b.cover ? (b.cover.medium || b.cover.large) : null, resume: '',
+      theme: (b.subjects || []).map(x => themeDepuis(x.name)).find(Boolean) || null, source: 'Open Library' };
+  }
+  async function chercherIsbn(isbn){
+    let res = null, bloque = 0, essais = 0;
+    for (const f of [googleBooks, openLibrary]) {
+      essais++;
+      try { const r = await f(isbn); if (r) { res = res ? { ...r, ...Object.fromEntries(Object.entries(res).filter(([, v]) => v)) } : r; } }
+      catch (e) { if (e instanceof TypeError) bloque++; console.warn(e); }
+    }
+    if (!res && bloque === essais) throw new Error('reseau');
+    return res;
+  }
+
+  /* ---------- Couverture choisie : réduite à 800 px, gardée dans le navigateur ---------- */
+  async function reduireImage(fichier){
+    const bmp = await createImageBitmap(fichier);
+    const f = Math.min(1, 800 / Math.max(bmp.width, bmp.height));
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * f); c.height = Math.round(bmp.height * f);
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+    return new Promise(ok => c.toBlob(ok, 'image/jpeg', .85));
+  }
+  async function poserCouverture(l, blob){
+    const ancien = (l.couvertureUrl || '').startsWith('local:') ? l.couvertureUrl.slice(6) : null;
+    const nom = `lecture_${l.id}_${Date.now()}.jpg`;
+    await Base.ecrireCouverture(nom, blob);
+    M.urlsCouv.set(nom, URL.createObjectURL(blob));
+    if (ancien && ancien !== nom) { await Base.supprimerCouverture(ancien).catch(() => {}); const u = M.urlsCouv.get(ancien); if (u) URL.revokeObjectURL(u); M.urlsCouv.delete(ancien); }
+    l.couvertureUrl = 'local:' + nom;
+  }
+
+  /* ---------- Formulaire de fiche (nouvelle ou existante) ---------- */
+  let brouillon = null, imageChoisie = null, retirerImage = false;
+  function modele(){
+    return { id: null, titre: '', auteur: '', type: 'LIVRE', statut: 'A_LIRE', note: 0, isbn: null, serie: null, tome: null, couvertureUrl: null, notes: '',
+      dateDebut: null, dateFin: null, theme: null, motsCles: '', resume: '', sourceResume: null, pagesTotal: null, pageActuelle: null, dateAjout: Date.now(),
+      pretA: null, pretDepuis: null, relectures: 0, aCompleter: false, precisionDates: 0 };
+  }
+  function formulaire(b){
+    const nouveau = b.id == null;
+    const puce = (nom, val, lib) => `<button type="button" class="puce" data-champ="${nom}" data-val="${val}" aria-pressed="${b[nom] === val}">${lib}</button>`;
+    return `<button class="fermer" aria-label="Fermer" id="e-fermer">✕</button>
+      <div style="padding:18px 20px 0"><div class="sur">${nouveau ? 'Nouvelle lecture' : 'Modifier la fiche'}</div><h2 style="margin-top:6px;padding-right:40px">${esc(b.titre || 'Sans titre')}</h2></div>
+      <div class="fiche-corps"><form class="form" id="e-form" autocomplete="off">
+        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après Google Books et Open Library.</div></div>` : ''}
+        <label>Titre<input class="inp" name="titre" value="${esc(b.titre)}" required></label>
+        <label>Auteur<input class="inp" name="auteur" value="${esc(b.auteur)}" placeholder="Prénom Nom, Prénom Nom"></label>
+        <div><div class="sur" style="margin-bottom:8px">Statut</div><div class="choix">${puce('statut', 'A_LIRE', 'À lire')}${puce('statut', 'EN_COURS', 'En cours')}${puce('statut', 'LU', 'Lu')}<span style="width:12px"></span>${puce('type', 'LIVRE', 'Livre')}${puce('type', 'BD', 'BD')}</div></div>
+        <div><div class="sur" style="margin-bottom:6px">Note</div><div class="choix note-choix">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-note="${n}" class="${b.note >= n ? 'on' : ''}" aria-label="${n} sur 5">★</button>`).join('')}<button type="button" class="btn petit" data-note="0" style="margin-left:8px">Sans note</button></div></div>
+        <label>Thème<input class="inp" name="theme" list="liste-themes" value="${esc(b.theme || '')}" placeholder="Choisis dans la liste ou écris le tien"></label>
+        <div class="trois"><label>Série<input class="inp" name="serie" value="${esc(b.serie || '')}"></label><label>Tome<input class="inp" name="tome" inputmode="numeric" value="${b.tome ?? ''}"></label></div>
+        <div class="deux"><label>Début de lecture<input class="inp" type="date" name="dateDebut" value="${jour(b.dateDebut)}"></label><label>Fin de lecture<input class="inp" type="date" name="dateFin" value="${jour(b.dateFin)}"></label></div>
+        <div class="deux"><label>Page actuelle<input class="inp" name="pageActuelle" inputmode="numeric" value="${b.pageActuelle ?? ''}"></label><label>Nombre de pages<input class="inp" name="pagesTotal" inputmode="numeric" value="${b.pagesTotal ?? ''}"></label></div>
+        <label>Mots-clés <span style="font-weight:400">· séparés par des virgules</span><textarea class="inp" name="motsCles" style="min-height:70px">${esc(b.motsCles)}</textarea></label>
+        <label>Notes<textarea class="inp" name="notes" style="min-height:140px">${esc(b.notes)}</textarea></label>
+        <label>4e de couverture${b.sourceResume ? ` <span style="font-weight:400">· ${esc(b.sourceResume)}</span>` : ''}<textarea class="inp" name="resume">${esc(b.resume)}</textarea></label>
+        <div class="deux"><label>ISBN<input class="inp" name="isbn" value="${esc(b.isbn || '')}"></label><label>Prêté à<input class="inp" name="pretA" value="${esc(b.pretA || '')}"></label></div>
+        <div><div class="sur" style="margin-bottom:8px">Couverture</div><div style="display:flex;gap:14px;align-items:center"><div id="e-couv">${couverture(b, 70)}</div><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><label class="btn petit" style="display:inline-flex;color:var(--ivoire);font-size:13px">Choisir une image<input type="file" accept="image/*" id="e-image" hidden></label>${b.couvertureUrl ? '<button type="button" class="btn petit" id="e-sans-image">Retirer</button>' : ''}</div></div></div>
+        <div class="barre-actions">${nouveau ? '' : '<button type="button" class="btn danger" id="e-supprimer" style="margin-right:auto">Supprimer</button>'}<button type="button" class="btn" id="e-annuler">Annuler</button><button type="submit" class="btn or">${nouveau ? 'Ajouter' : 'Enregistrer'}</button></div>
+      </form><datalist id="liste-themes">${THEMES.map(t => `<option value="${esc(t)}">`).join('')}</datalist></div>`;
+  }
+  function lireForm(f){
+    const v = n => (f.elements[n]?.value ?? '').trim();
+    Object.assign(brouillon, {
+      titre: v('titre'), auteur: v('auteur'), theme: v('theme') || null, serie: v('serie') || null, tome: entier(v('tome')),
+      dateDebut: depuisJour(v('dateDebut')), dateFin: depuisJour(v('dateFin')), pageActuelle: entier(v('pageActuelle')), pagesTotal: entier(v('pagesTotal')),
+      motsCles: v('motsCles').split(',').map(x => x.trim()).filter(Boolean).join(', '), notes: f.elements.notes.value.replace(/\s+$/, ''), resume: f.elements.resume.value.trim(),
+      isbn: nettoyerIsbn(v('isbn')) || null, pretA: v('pretA') || null
+    });
+  }
+  function afficher(){
+    Fiche.montrer(formulaire(brouillon), el => {
+      const f = el.querySelector('#e-form');
+      const fermer = () => { if (brouillon.id != null) Fiche.ouvrir(brouillon.id, false); else Fiche.fermer(); };
+      el.querySelector('#e-fermer').onclick = fermer; el.querySelector('#e-annuler').onclick = fermer;
+      el.querySelectorAll('[data-champ]').forEach(b => b.onclick = () => { lireForm(f); brouillon[b.dataset.champ] = b.dataset.val; afficherConserve(el); });
+      el.querySelectorAll('[data-note]').forEach(b => b.onclick = () => { lireForm(f); brouillon.note = +b.dataset.note; afficherConserve(el); });
+      el.querySelector('#e-image').onchange = async e => { const fi = e.target.files[0]; if (!fi) return; try { imageChoisie = await reduireImage(fi); retirerImage = false; el.querySelector('#e-couv').innerHTML = `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>`; } catch { toast('Image illisible'); } };
+      const si = el.querySelector('#e-sans-image'); if (si) si.onclick = () => { lireForm(f); retirerImage = true; imageChoisie = null; brouillon.couvertureUrl = null; afficherConserve(el); };
+      const bi = el.querySelector('#e-isbn'); if (bi) bi.onclick = () => rechercheIsbn(el, f);
+      if (f.elements.isbnRecherche) f.elements.isbnRecherche.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); rechercheIsbn(el, f); } };
+      const sup = el.querySelector('#e-supprimer'); if (sup) sup.onclick = () => supprimer(brouillon.id);
+      f.onsubmit = e => { e.preventDefault(); lireForm(f); valider(); };
+      if (brouillon.id == null && !brouillon.titre) setTimeout(() => (f.elements.isbnRecherche || f.elements.titre).focus(), 50);
+    });
+  }
+  function afficherConserve(el){ const sc = el.querySelector('.fiche-corps').scrollTop; afficher(); $('#fiche .fiche-corps').scrollTop = sc; }
+  async function rechercheIsbn(el, f){
+    const isbn = nettoyerIsbn(f.elements.isbnRecherche.value), out = el.querySelector('#e-isbn-res');
+    if (isbn.length !== 10 && isbn.length !== 13) { out.innerHTML = '<span style="color:var(--corail)">Un ISBN compte 10 ou 13 chiffres.</span>'; return; }
+    const doublon = M.lectures.find(l => l.isbn && variantes(isbn).has(nettoyerIsbn(l.isbn)));
+    out.textContent = 'Recherche…';
+    try {
+      const r = await chercherIsbn(isbn);
+      lireForm(f); brouillon.isbn = isbn;
+      if (!r) { out.innerHTML = 'Aucune fiche trouvée pour cet ISBN. Remplis-la à la main.'; return; }
+      const titre = r.titre ? (r.sousTitre && r.titre.length < 25 ? `${r.titre} : ${r.sousTitre}` : r.titre) : '';
+      if (!brouillon.titre) brouillon.titre = titre;
+      if (!brouillon.auteur) brouillon.auteur = r.auteur || '';
+      if (!brouillon.pagesTotal) brouillon.pagesTotal = r.pagesTotal;
+      if (!brouillon.theme && r.theme) brouillon.theme = r.theme;
+      if (!brouillon.resume && r.resume) { brouillon.resume = r.resume; brouillon.sourceResume = r.source; }
+      if (!brouillon.couvertureUrl && r.couvertureUrl && !imageChoisie) brouillon.couvertureUrl = r.couvertureUrl;
+      afficherConserve(el);
+      $('#e-isbn-res').innerHTML = `Trouvé sur ${esc(r.source)}.${doublon ? ` <span style="color:var(--or)">Déjà dans ta bibliothèque : « ${esc(doublon.titre)} ».</span>` : ''}`;
+    } catch (e) {
+      out.innerHTML = e.message === 'reseau'
+        ? '<span style="color:var(--or)">La recherche en ligne est bloquée sur cette page claude.ai (elle marchera une fois le site hébergé). Remplis la fiche à la main.</span>'
+        : 'Recherche impossible pour l’instant. Remplis la fiche à la main.';
+    }
+  }
+  async function valider(){
+    const b = brouillon;
+    if (!b.titre) { toast('Il faut au moins un titre'); return; }
+    if (b.statut === 'EN_COURS' && !b.dateDebut) b.dateDebut = Date.now();
+    if (b.statut === 'LU' && !b.dateFin) b.dateFin = Date.now();
+    if (b.dateDebut && b.dateFin && b.dateFin < b.dateDebut) { toast('La fin est avant le début'); return; }
+    if (b.pagesTotal && b.pageActuelle > b.pagesTotal) b.pageActuelle = b.pagesTotal;
+    const nouveau = b.id == null;
+    let l; const ancienneCouv = nouveau ? null : (M.parId.get(b.id)?.couvertureUrl || '');
+    if (nouveau) { b.id = nouvelId(M.lectures); b.dateAjout = Date.now(); l = propre(b); M.lectures.push(l); }
+    else { l = M.parId.get(b.id); if (!l) return; Object.assign(l, propre(b)); }
+    if (imageChoisie) await poserCouverture(l, imageChoisie);
+    else if (retirerImage) { const a = ancienneCouv || ''; l.couvertureUrl = null; if (a.startsWith('local:')) Base.supprimerCouverture(a.slice(6)).catch(() => {}); }
+    l.aCompleter = false;
+    await enregistrer();
+    const fiche = M.parId.get(l.id);
+    toast(nouveau ? (fiche._manques.length ? `Ajouté · manque : ${fiche._manques.join(', ')}` : `« ${titreCourt(fiche)} » rejoint ton ciel`) : 'Fiche enregistrée');
+    Fiche.ouvrir(l.id, !nouveau ? false : true);
+  }
+  function supprimer(id){
+    const l = M.parId.get(id); if (!l) return;
+    confirmer(`Supprimer « ${l.titre} » ?`, `Ses ${l._cit} citation(s) et ${l._liens.length} lien(s) seront supprimés aussi.`, 'Supprimer', async () => {
+      M.lectures = M.lectures.filter(x => x.id !== id);
+      M.citations = M.citations.filter(c => c.lectureId !== id);
+      M.liens = M.liens.filter(x => x.lectureA !== id && x.lectureB !== id);
+      if ((l.couvertureUrl || '').startsWith('local:')) Base.supprimerCouverture(l.couvertureUrl.slice(6)).catch(() => {});
+      await enregistrer(); Fiche.fermer(); toast('Livre supprimé');
+    });
+  }
+  function ouvrir(id){ const l = M.parId.get(id); if (!l) return; brouillon = propre(l); imageChoisie = null; retirerImage = false; afficher(); }
+  async function nouveau(){
+    if (!M.racine) { await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; }
+    brouillon = modele(); imageChoisie = null; retirerImage = false; afficher();
+  }
+
+  /* ---------- Compléments dans la fiche : citations, liens ---------- */
+  function complement(l, onglet){
+    if (onglet === 'citations') return `<div class="carte" style="margin-top:8px"><div class="sur" style="margin-bottom:8px">Nouvelle citation</div><textarea class="inp" id="c-texte" placeholder="Le passage, sans guillemets"></textarea><div style="display:flex;gap:8px;margin-top:8px"><input class="inp" id="c-page" inputmode="numeric" placeholder="Page" style="width:96px"><button class="btn or" id="c-ajouter" style="margin-left:auto">Garder</button></div></div>`;
+    if (onglet === 'proches') return `<div class="carte" style="margin-top:8px"><div class="sur" style="margin-bottom:8px">Relier à un autre livre</div><input class="inp" id="r-livre" list="liste-livres" placeholder="Titre du livre"><datalist id="liste-livres">${M.lectures.filter(o => o.id !== l.id).map(o => `<option value="${esc(titreCourt(o) + ' — ' + (o.auteur || '?'))}">`).join('')}</datalist><input class="inp" id="r-raison" placeholder="Pourquoi, en quelques mots" style="margin-top:8px"><div style="display:flex;margin-top:8px"><button class="btn or" id="r-ajouter" style="margin-left:auto">Relier</button></div></div>`;
+    if (onglet === 'lecture' && l.statut !== 'LU') return `<div class="carte" style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="sur">J’en suis à la page</span><input class="inp" id="p-page" inputmode="numeric" value="${l.pageActuelle ?? ''}" style="width:90px">${l.pagesTotal ? `<span class="doux">/ ${l.pagesTotal}</span>` : ''}<button class="btn petit" id="p-ok">OK</button>${l.statut === 'A_LIRE' ? '<button class="btn or petit" id="p-commencer" style="margin-left:auto">Commencer</button>' : '<button class="btn or petit" id="p-fini" style="margin-left:auto">Terminé ✓</button>'}</div>`;
+    return '';
+  }
+  function relier(a, b, raison){
+    if (a === b || M.liens.some(x => (x.lectureA === a && x.lectureB === b) || (x.lectureA === b && x.lectureB === a))) { toast('Ces deux livres sont déjà reliés'); return false; }
+    M.liens.push({ id: nouvelId(M.liens), lectureA: a, lectureB: b, raison: raison || '', dateAjout: Date.now() }); return true;
+  }
+  function brancher(el, l, onglet){
+    const apres = async msg => { await enregistrer(); Fiche.rafraichir(); if (msg) toast(msg); };
+    el.querySelectorAll('[data-supcit]').forEach(b => b.onclick = () => confirmer('Supprimer cette citation ?', 'Elle disparaîtra aussi du carnet.', 'Supprimer', async () => { M.citations = M.citations.filter(c => c.id !== +b.dataset.supcit); await apres('Citation supprimée'); }));
+    el.querySelectorAll('[data-delier]').forEach(b => b.onclick = async () => { const o = +b.dataset.delier; M.liens = M.liens.filter(x => !((x.lectureA === l.id && x.lectureB === o) || (x.lectureA === o && x.lectureB === l.id))); await apres('Lien retiré'); });
+    el.querySelectorAll('[data-relier]').forEach(b => b.onclick = async () => { if (relier(l.id, +b.dataset.relier, b.dataset.raison)) await apres('Livres reliés'); });
+    const ca = el.querySelector('#c-ajouter'); if (ca) ca.onclick = async () => { const t = el.querySelector('#c-texte').value.trim().replace(/^[«"“]\s*|\s*[»"”]$/g, ''); if (!t) return; M.citations.push({ id: nouvelId(M.citations), lectureId: l.id, texte: t, page: entier(el.querySelector('#c-page').value), dateAjout: Date.now() }); await apres('Citation gardée'); };
+    const ra = el.querySelector('#r-ajouter'); if (ra) ra.onclick = async () => {
+      const v = el.querySelector('#r-livre').value.trim(); if (!v) return;
+      const cible = M.lectures.find(o => o.id !== l.id && (titreCourt(o) + ' — ' + (o.auteur || '?')) === v) || M.lectures.find(o => o.id !== l.id && norm(o.titre) === norm(v));
+      if (!cible) { toast('Choisis un livre de la liste'); return; }
+      if (relier(l.id, cible.id, el.querySelector('#r-raison').value.trim())) await apres('Livres reliés');
+    };
+    const pp = el.querySelector('#p-ok'); if (pp) pp.onclick = async () => { const p = entier(el.querySelector('#p-page').value); l.pageActuelle = l.pagesTotal && p > l.pagesTotal ? l.pagesTotal : p; await apres('Progression notée'); };
+    const pc = el.querySelector('#p-commencer'); if (pc) pc.onclick = async () => { l.statut = 'EN_COURS'; l.dateDebut = l.dateDebut || Date.now(); await apres('Bonne lecture'); };
+    const pf = el.querySelector('#p-fini'); if (pf) pf.onclick = async () => { l.statut = 'LU'; l.dateFin = l.dateFin || Date.now(); if (l.pagesTotal) l.pageActuelle = l.pagesTotal; await apres('Lecture terminée ✓'); };
+  }
+
+  /* ---------- Export .zip (même format que l'appli) ---------- */
+  const TABLE = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(u8){ let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = TABLE[(c ^ u8[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function creerZip(fichiers){
+    const enc = new TextEncoder(), parts = [], central = []; let pos = 0;
+    const d = new Date(), heure = (d.getHours() << 11) | (d.getMinutes() << 5) | (d.getSeconds() >> 1), dt = ((d.getFullYear() - 1980) << 9) | ((d.getMonth() + 1) << 5) | d.getDate();
+    for (const f of fichiers) {
+      const nom = enc.encode(f.nom), crc = crc32(f.data), n = f.data.length;
+      const h = new DataView(new ArrayBuffer(30));
+      h.setUint32(0, 0x04034b50, true); h.setUint16(4, 20, true); h.setUint16(6, 0x0800, true); h.setUint16(8, 0, true); h.setUint16(10, heure, true); h.setUint16(12, dt, true);
+      h.setUint32(14, crc, true); h.setUint32(18, n, true); h.setUint32(22, n, true); h.setUint16(26, nom.length, true); h.setUint16(28, 0, true);
+      parts.push(h.buffer, nom, f.data);
+      const c = new DataView(new ArrayBuffer(46));
+      c.setUint32(0, 0x02014b50, true); c.setUint16(4, 20, true); c.setUint16(6, 20, true); c.setUint16(8, 0x0800, true); c.setUint16(10, 0, true); c.setUint16(12, heure, true); c.setUint16(14, dt, true);
+      c.setUint32(16, crc, true); c.setUint32(20, n, true); c.setUint32(24, n, true); c.setUint16(28, nom.length, true); c.setUint32(42, pos, true);
+      central.push(c.buffer, nom);
+      pos += 30 + nom.length + n;
+    }
+    const taille = central.reduce((t, x) => t + x.byteLength, 0);
+    const fin = new DataView(new ArrayBuffer(22));
+    fin.setUint32(0, 0x06054b50, true); fin.setUint16(8, fichiers.length, true); fin.setUint16(10, fichiers.length, true); fin.setUint32(12, taille, true); fin.setUint32(16, pos, true);
+    return new Blob([...parts, ...central, fin.buffer], { type: 'application/zip' });
+  }
+  async function construireExport(){
+    const fichiers = [], utilises = new Set();
+    for (const l of M.lectures) if ((l.couvertureUrl || '').startsWith('local:')) {
+      const nom = l.couvertureUrl.slice(6); if (utilises.has(nom)) continue;
+      const blob = await Base.lireCouverture(nom).catch(() => null);
+      if (blob) { fichiers.push({ nom: 'couvertures/' + nom, data: new Uint8Array(await blob.arrayBuffer()) }); utilises.add(nom); }
+    }
+    const lectures = M.lectures.map(propre).map(l => ((l.couvertureUrl || '').startsWith('local:') && !utilises.has(l.couvertureUrl.slice(6))) ? { ...l, couvertureUrl: null } : l);
+    const racine = { application: 'Phylactère', version: M.racine.version || 3, date: Date.now(), lectures, citations: M.citations.map(propre), liens: M.liens.map(propre) };
+    fichiers.unshift({ nom: 'donnees.json', data: new TextEncoder().encode(JSON.stringify(racine, null, 2)) });
+    return { blob: creerZip(fichiers), nb: lectures.length, couv: utilises.size };
+  }
+  async function exporter(){
+    try {
+      const { blob, nb, couv } = await construireExport();
+      const nom = `phylactere-web-${jour(Date.now())}.zip`;
+      let ok = false;
+      const dl = window.claude && typeof window.claude.use === 'function' ? await window.claude.use('downloads').catch(() => null) : null;
+      if (dl) {
+        try { await dl.save({ filename: nom, data: blob }); ok = true; }
+        catch (e) { if (e && e.code === 'declined') { toast('Export annulé'); return; } if (e && e.code === 'rate_limited') { toast('Une fenêtre d’enregistrement est déjà ouverte'); return; } console.warn(e); }
+      }
+      if (!ok && !dl) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = nom; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); ok = true; }
+      if (!ok) { toast('Export impossible ici'); return; }
+      M.racine.exporteLe = Date.now(); await Base.ecrireDonnees(M.racine);
+      toast(`${nb} lectures et ${couv} couvertures exportées`);
+      if (vueCourante === 'reglages') Reglages.rendre();
+    } catch (e) { console.error(e); toast('Export impossible : ' + (e.message || e)); }
+  }
+
+  $('#nav-ajouter').addEventListener('click', () => nouveau());
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn };
+})();
+
+/* ---------------- Démarrage ---------------- */
+if ('serviceWorker' in navigator && location.protocol === 'https:') { try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {} }
+(async () => {
+  try { await charger(); } catch (e) { console.error(e); }
+  router();
+})();
+</script>
+</body>
+</html>
