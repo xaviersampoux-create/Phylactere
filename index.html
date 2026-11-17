@@ -92,6 +92,12 @@ input[type=date].inp{color-scheme:dark}
 .rc-cadre i[data-c=se]{right:-4px;bottom:-4px;border-left:0;border-top:0;cursor:nwse-resize}
 .edition{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:8px;border-radius:10px;border:1px solid var(--trait-d);margin-top:6px}
 .edition:hover{border-color:var(--or)}
+/* cartes du ciel en transparence : la carte reste visible dessous */
+.bulle-etoile .carte,.terre .carte{background:rgba(20,26,44,.42)!important;border-color:rgba(154,163,191,.28)!important;box-shadow:none!important;-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px)}
+.bulle-etoile .carte *,.terre .carte *{text-shadow:0 1px 3px rgba(11,14,26,.95),0 0 8px rgba(11,14,26,.7)}
+.bulle-etoile .btn.or,.terre .btn.or,.bulle-etoile .btn.or *,.terre .btn.or *{text-shadow:none}
+.bulle-etoile .relies button,.terre .btn:not(.or),.bulle-etoile .btn:not(.or){background:rgba(11,14,26,.35)}
+.bulle-etoile .ligne:hover{background:rgba(20,26,44,.5)}
 .pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
 main{flex:1;min-width:0;position:relative;overflow:hidden}
 .vue{position:absolute;inset:0;overflow-y:auto;display:none}
