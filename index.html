@@ -80,6 +80,18 @@ input[type=date].inp{color-scheme:dark}
 .astuce{display:inline-block;margin-top:8px;font-size:12.5px;color:var(--brume)}
 .porte{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--trait-d)}
 .porte:first-of-type{border-top:0}
+#recadreur{position:fixed;inset:0;z-index:70;background:var(--nuit);display:flex;flex-direction:column;padding:calc(12px + var(--safe-t)) 16px calc(14px + var(--safe-b))}
+.rc-scene{flex:1;display:grid;place-items:center;min-height:200px;overflow:hidden}
+.rc-boite{position:relative;touch-action:none}
+.rc-boite canvas{display:block;border-radius:4px}
+.rc-cadre{position:absolute;border:2px solid var(--or);box-shadow:0 0 0 9999px rgba(5,7,14,.6);cursor:move;touch-action:none}
+.rc-cadre i{position:absolute;width:22px;height:22px;border:3px solid var(--or);background:transparent}
+.rc-cadre i[data-c=nw]{left:-4px;top:-4px;border-right:0;border-bottom:0;cursor:nwse-resize}
+.rc-cadre i[data-c=ne]{right:-4px;top:-4px;border-left:0;border-bottom:0;cursor:nesw-resize}
+.rc-cadre i[data-c=sw]{left:-4px;bottom:-4px;border-right:0;border-top:0;cursor:nesw-resize}
+.rc-cadre i[data-c=se]{right:-4px;bottom:-4px;border-left:0;border-top:0;cursor:nwse-resize}
+.edition{display:flex;gap:10px;align-items:center;width:100%;text-align:left;padding:8px;border-radius:10px;border:1px solid var(--trait-d);margin-top:6px}
+.edition:hover{border-color:var(--or)}
 .pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
 main{flex:1;min-width:0;position:relative;overflow:hidden}
 .vue{position:absolute;inset:0;overflow-y:auto;display:none}
@@ -241,7 +253,7 @@ h2{font-size:20px}
     <section class="vue" id="vue-ciel">
       <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
       <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button><div><span class="astuce" id="ciel-astuce">✦ Appui long sur le ciel pour l’éclairer</span></div></div></div>
-      <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
+      <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ou son titre ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
       <div class="ciel-outils"><button class="rond" id="zoom-plus" aria-label="Zoomer">+</button><button class="rond" id="zoom-moins" aria-label="Dézoomer">−</button><button class="rond" id="recadrer" aria-label="Recadrer le ciel">◎</button></div>
       <div class="bulle-etoile" id="bulle-etoile"></div>
       <div class="terre" id="terre"></div>
@@ -337,7 +349,10 @@ const Base = {
     const db = await this.ouvrir();
     return new Promise((ok, ko) => { const t = db.transaction(store, mode); const res = fn(t); t.oncomplete = () => ok(res && res.result !== undefined ? res.result : res); t.onerror = () => ko(t.error); t.onabort = () => ko(t.error); });
   },
-  async lire(){ try { return await this.tx('donnees','readonly', t => t.objectStore('donnees').get('racine')); } catch(e){ console.warn(e); return null; } },
+  async lire(){
+    try { const db = await this.ouvrir(); return await new Promise((ok, ko) => { const r = db.transaction('donnees', 'readonly').objectStore('donnees').get('racine'); r.onsuccess = () => ok(r.result || null); r.onerror = () => ko(r.error); }); }
+    catch(e){ console.warn(e); return null; }
+  },
   async couvertures(){
     try {
       const db = await this.ouvrir();
@@ -357,7 +372,7 @@ const Base = {
   async ecrireDonnees(racine){ await this.tx('donnees','readwrite', t => t.objectStore('donnees').put(racine, 'racine')); },
   async ecrireCouverture(nom, blob){ await this.tx('couvertures','readwrite', t => t.objectStore('couvertures').put(blob, nom)); },
   async supprimerCouverture(nom){ await this.tx('couvertures','readwrite', t => t.objectStore('couvertures').delete(nom)); },
-  async lireCouverture(nom){ return this.tx('couvertures','readonly', t => t.objectStore('couvertures').get(nom)); },
+  async lireCouverture(nom){ const db = await this.ouvrir(); return new Promise((ok, ko) => { const r = db.transaction('couvertures', 'readonly').objectStore('couvertures').get(nom); r.onsuccess = () => ok(r.result || null); r.onerror = () => ko(r.error); }); },
   async effacer(){ const db = await this.ouvrir(); await new Promise((ok, ko) => { const t = db.transaction(['donnees','couvertures'],'readwrite'); t.objectStore('donnees').clear(); t.objectStore('couvertures').clear(); t.oncomplete = ok; t.onerror = () => ko(t.error); }); }
 };
 
@@ -410,7 +425,7 @@ async function importerSauvegarde(fichier){
 const M = { racine:null, lectures:[], parId:new Map(), citations:[], liens:[], urlsCouv:new Map() };
 
 function themeDe(l){ return (l.theme && l.theme.trim()) || (l.type === 'BD' ? 'Bande dessinée' : ''); }
-function titreProvisoire(t){ const s = (t || '').trim(); return !s || /^isbn\b/i.test(s) || /^[\d\s-]+$/.test(s); }
+function titreProvisoire(t){ const s = (t || '').trim(); return !s || /^isbn\b/i.test(s) || /^[\d\s-]{8,}$/.test(s); }
 function manques(l){ const m = []; if (titreProvisoire(l.titre)) m.push('titre'); if (!(l.auteur || '').trim()) m.push('auteur'); if (!themeDe(l)) m.push('thème'); return m; }
 function motsDe(l){ return (l.motsCles || '').split(',').map(s => s.trim()).filter(Boolean); }
 function titreCourt(l){ let t = (l.titre || '').split(/\s[:–—]\s|\s:\s?/)[0].trim() || l.titre; if (l.tome) t += ` · t. ${l.tome}`; return t; }
@@ -493,9 +508,9 @@ function rendreVide(){
     <div class="depot" id="depot">
       <button class="btn or" id="choisir">Ouvrir ma sauvegarde .zip</button>
       <p class="doux" style="font-size:13px;margin:12px 0 0">ou dépose le fichier ici</p>
-    </div><button class="btn" id="commencer" style="margin-top:18px">Commencer une bibliothèque vide</button></div>`;
+    </div><button class="btn" id="commencer" style="margin-top:18px">Je n’ai pas de sauvegarde : commencer ✦</button></div>`;
   $('#choisir').onclick = () => $('#fichier').click();
-  $('#commencer').onclick = async () => { await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; montrerVue('ciel'); Edition.nouveau(); };
+  $('#commencer').onclick = () => PremierPas.ouvrir();
   brancherDepot($('#depot'));
 }
 function brancherDepot(zone){
@@ -553,9 +568,17 @@ const Ciel = (() => {
       for (const [s, ls] of series) {
         ls.sort((a, b) => (a.tome ?? 999) - (b.tome ?? 999) || cleTitre(a).localeCompare(cleTitre(b)));
         if (ls.length === 1) { const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.9; k.etoiles.push({ l: ls[0], x: Math.cos(a) * f, y: Math.sin(a) * f }); continue; }
-        const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.55;
-        const ax = Math.cos(a) * f, ay = Math.sin(a) * f, R = 34 + ls.length * 3, t0 = hash(s, 3) * Math.PI * 2;
-        ls.forEach((l, i) => { const t = t0 + (i - (ls.length - 1) / 2) * 0.42; k.etoiles.push({ l, x: ax + Math.cos(t) * R - Math.cos(t0) * R, y: ay + Math.sin(t) * R - Math.sin(t0) * R, serie: s }); });
+        // une série = une seule étoile, qui s'ouvre sur ses tomes
+        const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.8;
+        const lus = ls.filter(l => l.statut === 'LU');
+        const statut = ls.some(l => l.statut === 'EN_COURS') ? 'EN_COURS' : lus.length ? 'LU' : 'A_LIRE';
+        const ids = new Set(ls.map(l => l.id)), liens = [], vusL = new Set();
+        for (const l of ls) for (const x of l._liens) if (!ids.has(x.id) && !vusL.has(x.id)) { vusL.add(x.id); liens.push(x); }
+        const nomSerie = ls[0].serie.trim();
+        const g = { id: ls[0].id, titre: `${nomSerie} · ${ls.length} tomes`, serie: nomSerie, tome: null, auteur: ls[0].auteur, type: ls[0].type, statut,
+          note: Math.max(0, ...ls.map(l => l.note || 0)), dateFin: Math.max(0, ...lus.map(l => l.dateFin || 0)) || null, dateDebut: Math.max(0, ...ls.map(l => l.dateDebut || 0)) || null,
+          couvertureUrl: (ls.find(l => l.couvertureUrl) || {}).couvertureUrl || null, _liens: liens, _manques: [], _theme: k.theme };
+        k.etoiles.push({ l: g, groupe: ls, x: Math.cos(a) * f, y: Math.sin(a) * f });
       }
       // écartement des étoiles trop proches
       for (let it = 0; it < 40; it++) {
@@ -589,12 +612,13 @@ const Ciel = (() => {
     }
     const etoiles = [];
     for (const k of consts) for (const e of k.etoiles) { e.wx = k.c[0] + e.x; e.wy = k.c[1] + e.y; e.k = k; etoiles.push(e); }
-    const parLivre = new Map(etoiles.map(e => [e.l.id, e]));
+    const parLivre = new Map();
+    for (const e of etoiles) { if (e.groupe) e.groupe.forEach(t => parLivre.set(t.id, e)); else parLivre.set(e.l.id, e); }
     // thèmes jamais lus : nom seul, éteint
     const eteints = THEMES.filter(t => !groupes.has(t)).map(t => ({ theme: t, wx: ATLAS[t][0] * U * fx, wy: ATLAS[t][1] * U * fy }));
     // en cours la plus récente : anneau scintillant
-    const enCours = etoiles.filter(e => e.l.statut === 'EN_COURS').sort((a, b) => (b.l.dateDebut || b.l.dateAjout || 0) - (a.l.dateDebut || a.l.dateAjout || 0))[0];
-    modele = { consts, etoiles, parLivre, eteints, portrait, scintille: enCours ? enCours.l.id : null, aCompleter: M.lectures.length - livres.length };
+    const enCours = livres.filter(l => l.statut === 'EN_COURS').sort((a, b) => (b.dateDebut || b.dateAjout || 0) - (a.dateDebut || a.dateAjout || 0))[0];
+    modele = { consts, etoiles, parLivre, eteints, portrait, scintille: enCours ? parLivre.get(enCours.id) : null, aCompleter: M.lectures.length - livres.length };
     // résumé
     const nb = livres.length, ec = livres.filter(l => l.statut === 'EN_COURS').length;
     $('#ciel-resume').textContent = `${nb} lectures · ${ec} en cours · ${consts.length} constellations`;
@@ -639,7 +663,7 @@ const Ciel = (() => {
     labels = [];
     const annee = new Date().getFullYear();
     const lumi = allume ? allume.k : null;
-    const relies = new Set(choisie ? choisie.l._liens.map(x => x.id) : []);
+    const relies = new Set(choisie ? choisie.l._liens.map(x => modele.parLivre.get(x.id)).filter(Boolean) : []);
     const alpha = k => lumi ? (k === lumi ? 1 : .12) : 1;
     const dejaEcran = e => e._s || (e._s = ecran(e.wx, e.wy));
     for (const e of modele.etoiles) e._s = null;
@@ -668,7 +692,7 @@ const Ciel = (() => {
     // fils d'or des liens personnels de l'étoile choisie
     if (choisie) {
       const A = dejaEcran(choisie);
-      for (const x of choisie.l._liens) { const e = modele.parLivre.get(x.id); if (!e) continue; const B = dejaEcran(e);
+      for (const e of relies) { const B = dejaEcran(e);
         ctx.beginPath(); ctx.moveTo(A[0], A[1]); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2 - Math.hypot(B[0] - A[0], B[1] - A[1]) * .12; ctx.quadraticCurveTo(mx, my, B[0], B[1]);
         ctx.strokeStyle = `rgba(${C.or},.55)`; ctx.lineWidth = 1; ctx.stroke(); }
     }
@@ -676,7 +700,7 @@ const Ciel = (() => {
     const k15 = 1.5 * Math.min(1.3, Math.max(.62, Math.sqrt(z)));   // taille web, suit un peu le zoom pour ne pas saturer les petits écrans
     for (const e of modele.etoiles) {
       const [x, y] = dejaEcran(e); if (x < -30 || y < -30 || x > L + 30 || y > H + 30) continue;
-      let a = alpha(e.k); if (choisie && (e === choisie || relies.has(e.l.id))) a = 1;
+      let a = alpha(e.k); if (choisie && (e === choisie || relies.has(e))) a = 1;
       const l = e.l;
       if (l.statut === 'LU') {
         const fin = l.dateFin ? new Date(l.dateFin).getFullYear() : annee;
@@ -687,9 +711,23 @@ const Ciel = (() => {
         ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fillStyle = `rgba(${C.ivoire},${eclat})`; ctx.fill();
       } else if (l.statut === 'EN_COURS') {
         ctx.beginPath(); ctx.arc(x, y, 1.8 * k15, 0, 7); ctx.fillStyle = `rgba(${C.or},${a})`; ctx.fill();
-        if (l.id === modele.scintille) { const p = reduitMouvement ? .5 : (Math.sin(t / 3200 * Math.PI * 2) + 1) / 2; ctx.beginPath(); ctx.arc(x, y, 5 + p * 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${(.25 + .35 * (1 - p)) * a})`; ctx.lineWidth = 1; ctx.stroke(); }
+        if (e === modele.scintille) { const p = reduitMouvement ? .5 : (Math.sin(t / 3200 * Math.PI * 2) + 1) / 2; ctx.beginPath(); ctx.arc(x, y, 5 + p * 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${(.25 + .35 * (1 - p)) * a})`; ctx.lineWidth = 1; ctx.stroke(); }
       } else {
         ctx.beginPath(); ctx.arc(x, y, 2 * k15, 0, 7); ctx.strokeStyle = `rgba(${C.bleu},${.7 * a})`; ctx.lineWidth = 1.2; ctx.stroke();
+      }
+      if (e.groupe && e !== choisie) { ctx.beginPath(); ctx.arc(x, y, 7.5, 0, 7); ctx.strokeStyle = `rgba(${C.brume},${.45 * a})`; ctx.lineWidth = 1; ctx.setLineDash([2, 2.5]); ctx.stroke(); ctx.setLineDash([]); }
+      if (e === choisie && e.groupe) {
+        // la série s'ouvre : ses tomes en couronne autour de l'étoile
+        const n = e.groupe.length, Rg = 30 + n * 2.2;
+        e.groupe.forEach((tl, i) => {
+          const ang = -Math.PI / 2 + i * 2 * Math.PI / n, sx = x + Math.cos(ang) * Rg, sy = y + Math.sin(ang) * Rg;
+          ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * 6, y + Math.sin(ang) * 6); ctx.lineTo(sx - Math.cos(ang) * 4, sy - Math.sin(ang) * 4); ctx.strokeStyle = `rgba(${C.or},.35)`; ctx.lineWidth = .8; ctx.stroke();
+          ctx.beginPath(); ctx.arc(sx, sy, 2.6, 0, 7);
+          if (tl.statut === 'A_LIRE') { ctx.strokeStyle = `rgba(${C.bleu},.9)`; ctx.lineWidth = 1.1; ctx.stroke(); } else { ctx.fillStyle = tl.statut === 'EN_COURS' ? `rgba(${C.or},1)` : `rgba(${C.ivoire},.95)`; ctx.fill(); }
+          ctx.font = '600 10.5px Manrope, system-ui, sans-serif'; const lab = tl.tome ? 't. ' + tl.tome : String(i + 1); const w = ctx.measureText(lab).width;
+          ctx.fillStyle = `rgba(${C.ivoire},.8)`; ctx.fillText(lab, sx + Math.cos(ang) * 9 - (Math.cos(ang) < -.3 ? w : Math.cos(ang) > .3 ? 0 : w / 2), sy + Math.sin(ang) * 9 + 4);
+          occupe.push([sx - 10, sy - 10, sx + 10, sy + 10]);
+        });
       }
       if (e === choisie) { ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.strokeStyle = `rgba(${C.or},.9)`; ctx.lineWidth = 1.2; ctx.stroke(); }
       occupe.push([x - 5, y - 5, x + 5, y + 5]);
@@ -730,13 +768,13 @@ const Ciel = (() => {
     // titres des livres (zoom sémantique, constellation allumée, liens)
     ctx.font = `500 ${z >= 2.5 ? 12 : 11.5}px Manrope, system-ui, sans-serif`;
     for (const e of modele.etoiles) {
-      const montrer = (e.k === lumi) || (choisie && (e === choisie || relies.has(e.l.id))) || (!lumi && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
+      const montrer = (e.k === lumi) || (choisie && (e === choisie || relies.has(e))) || (!lumi && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
       if (!montrer) continue;
       const [x, y] = e._s || ecran(e.wx, e.wy); if (x < 0 || x > L || y < 0 || y > H) continue;
       const tt = titreCourt(e.l); const w = ctx.measureText(tt).width;
       for (const [px, py] of [[x + 8, y + 4], [x - 8 - w, y + 4], [x - w / 2, y - 9], [x - w / 2, y + 16]]) {
         const rect = [px - 1, py - 11, px + w + 1, py + 3];
-        if (!chevauche(rect)) { occupe.push(rect); ctx.fillStyle = (choisie && relies.has(e.l.id)) ? `rgba(${C.or},.95)` : `rgba(${C.ivoire},.85)`; ctx.fillText(tt, px, py); break; }
+        if (!chevauche(rect)) { occupe.push(rect); labels.push({ rect, etoile: e }); ctx.fillStyle = (choisie && relies.has(e)) ? `rgba(${C.or},.95)` : `rgba(${C.ivoire},.85)`; ctx.fillText(tt, px, py); break; }
       }
     }
     // thèmes jamais lus
@@ -803,7 +841,8 @@ const Ciel = (() => {
     let best = null, bd = 16;
     for (const e of modele.etoiles) { const [x, y] = ecran(e.wx, e.wy); const d = Math.hypot(x - sx, y - sy); if (d < bd && (!allume || e.k === allume.k || d < 8)) { bd = d; best = e; } }
     if (best) return { etoile: best };
-    for (const lb of labels) if (sx >= lb.rect[0] - 4 && sx <= lb.rect[2] + 4 && sy >= lb.rect[1] - 4 && sy <= lb.rect[3] + 4) return lb.k ? { k: lb.k } : { eteint: lb.eteint };
+    for (const lb of labels) if (lb.etoile && sx >= lb.rect[0] - 3 && sx <= lb.rect[2] + 3 && sy >= lb.rect[1] - 3 && sy <= lb.rect[3] + 3) return { etoile: lb.etoile };
+    for (const lb of labels) if (!lb.etoile && sx >= lb.rect[0] - 4 && sx <= lb.rect[2] + 4 && sy >= lb.rect[1] - 4 && sy <= lb.rect[3] + 4) return lb.k ? { k: lb.k } : { eteint: lb.eteint };
     for (const k of modele.consts) { const [cx, cy] = ecran(k.c[0], k.c[1]); if (Math.hypot(cx - sx, cy - sy) < k.rc * vue.z * .9) return { k }; }
     return null;
   }
@@ -822,6 +861,23 @@ const Ciel = (() => {
     fermerTerre();
     choisie = e; sale = true;
     const l = e.l, b = $('#bulle-etoile');
+    if (e.groupe) {
+      const relies = l._liens.map(x => M.parId.get(x.id)).filter(Boolean), lus = e.groupe.filter(t => t.statut === 'LU').length;
+      b.innerHTML = `<div class="carte" style="display:block;max-height:min(56vh, calc(100% - 210px));overflow-y:auto"><div style="display:flex;gap:14px;align-items:flex-start">${couverture(l, 52)}<div style="flex:1;min-width:0">
+        <div class="sur">${esc(e.k.theme)} · série</div><h3 style="margin-top:4px">${esc(l.serie)}</h3>
+        <div class="doux" style="font-size:13px;margin-top:3px">${esc(l.auteur)} · ${lus} lu${lus > 1 ? 's' : ''} sur ${e.groupe.length}</div></div><button class="mini-x" id="bulle-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
+        <div style="margin-top:10px">${e.groupe.map(t => `<button class="ligne" data-tome="${t.id}" style="padding:7px 6px">${couverture(t, 34)}<div class="infos"><div class="t" style="font-size:15px">${t.tome ? `<span style="color:var(--or);font-family:var(--sans);font-size:12px;font-weight:700;margin-right:6px">T. ${t.tome}</span>` : ''}${esc(t.titre)}</div><div class="d" style="margin-top:2px">${pastille(t.statut)}${etoilesNote(t.note)}</div></div></button>`).join('')}</div>
+        ${relies.length ? `<div class="relies">${relies.slice(0, 6).map(r => `<button data-id="${r.id}">⟡ ${esc(titreCourt(r))}</button>`).join('')}</div>` : ''}
+        <div style="margin-top:12px"><button class="btn petit" id="bulle-serie">Voir la série dans Chercher ›</button></div></div>`;
+      b.classList.add('ouverte');
+      // l'étoile ouverte reste visible au-dessus de la liste
+      const z2 = Math.max(vue.z, 1.8); animerVers({ x: e.wx, y: e.wy + (H * .5 - Math.max(150, H * .2)) / z2, z: z2 }, 450);
+      b.querySelectorAll('[data-tome]').forEach(x => x.onclick = () => Fiche.ouvrir(+x.dataset.tome));
+      $('#bulle-fermer').onclick = () => { choisie = null; fermerBulle(); sale = true; };
+      $('#bulle-serie').onclick = () => { Chercher.limite = { serie: norm(l.serie), titre: l.serie }; Chercher.mode = 'liste'; Chercher.filtre = 'TOUS'; Chercher.requete = ''; location.hash = 'chercher'; };
+      b.querySelectorAll('.relies button').forEach(x => x.onclick = () => { const e2 = modele.parLivre.get(+x.dataset.id); if (e2) { choisir(e2); animerVers({ x: e2.wx, y: e2.wy, z: Math.max(vue.z, 1.6) }, 500); } });
+      return;
+    }
     const relies = l._liens.map(x => M.parId.get(x.id)).filter(Boolean);
     b.innerHTML = `<div class="carte">${couverture(l, 64)}<div style="flex:1;min-width:0">
       <div class="sur">${esc(e.k.theme)}</div><h3 style="margin-top:4px">${esc(titreCourt(l))}</h3>
@@ -843,13 +899,14 @@ const Ciel = (() => {
     const portes = (PORTES[theme] || []).filter(([ti]) => !deja.has(norm(ti).replace(ARTICLES, '')));
     t.innerHTML = `<div class="carte" style="box-shadow:0 12px 40px rgba(0,0,0,.5);max-height:62vh;overflow-y:auto"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="sur" style="color:var(--or)">Terre inconnue</div><h3 style="font-size:20px;margin:6px 0">${esc(theme)}</h3></div><button class="mini-x" id="terre-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
       <p class="doux" style="margin:0 0 8px;font-size:14px;line-height:1.5">Tu n’as encore rien lu ici. ${portes.length ? 'Quelques portes d’entrée :' : 'Toutes les portes proposées sont déjà dans ta bibliothèque.'}</p>
-      ${portes.map(([ti, au, ph], i) => `<div class="porte"><div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:16px">${esc(ti)}</div><div class="doux" style="font-size:12.5px">${esc(au)}</div><div style="font-size:13px;color:var(--ivoire-d);margin-top:3px;line-height:1.4">${esc(ph)}</div></div><button class="btn petit" data-porte="${i}">+ À lire</button></div>`).join('')}</div>`;
+      ${portes.map(([ti, au, ph], i) => `<div class="porte"><div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:16px">${esc(ti)}</div><div class="doux" style="font-size:12.5px">${esc(au)}</div><div style="font-size:13px;color:var(--ivoire-d);margin-top:3px;line-height:1.4">${esc(ph)}</div></div><div style="display:flex;flex-direction:column;gap:6px;flex:none"><button class="btn petit" data-porte="${i}" data-statut="LU">✓ Lu</button><button class="btn petit" data-porte="${i}" data-statut="A_LIRE">+ À lire</button></div></div>`).join('')}</div>`;
     t.classList.add('ouverte'); $('#terre-fermer').onclick = () => { fermerTerre(); sale = true; };
     t.querySelectorAll('[data-porte]').forEach(b => b.onclick = async () => {
-      if (b.disabled) return; b.disabled = true;
-      const [ti, au] = portes[+b.dataset.porte];
-      await Edition.ajouterSimple({ titre: ti, auteur: au, theme, statut: 'A_LIRE' });
-      b.textContent = '✓ À lire'; b.classList.add('or'); toast(`« ${ti} » rejoint ton ciel (${theme})`);
+      if (b.disabled) return;
+      const grp = t.querySelectorAll(`[data-porte="${b.dataset.porte}"]`); grp.forEach(x => x.disabled = true);
+      const [ti, au] = portes[+b.dataset.porte], statut = b.dataset.statut;
+      await Edition.ajouterSimple({ titre: ti, auteur: au, theme, statut });
+      grp.forEach(x => { if (x !== b) x.style.visibility = 'hidden'; }); b.textContent = statut === 'LU' ? '✓ Lu' : '✓ À lire'; b.classList.add('or'); toast(`« ${ti} » rejoint ton ciel (${theme})`);
     });
   }
 
@@ -918,7 +975,7 @@ const Ciel = (() => {
   requestAnimationFrame(boucle);
   if (document.fonts) document.fonts.ready.then(() => { sale = true; });
 
-  return { invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; choisir(e); animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); } } };
+  return { invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; if (!e.groupe) animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); choisir(e); } } };
 })();
 
 /* =========================================================
@@ -987,6 +1044,7 @@ const Chercher = {
       if (lim.theme) ls = ls.filter(l => l._theme === lim.theme);
       if (lim.serie) ls = ls.filter(l => norm(l.serie) === lim.serie);
       if (lim.mot) ls = ls.filter(l => l._motsN.has(lim.mot));
+      if (lim.ids) ls = ls.filter(l => lim.ids.includes(l.id));
     }
     const f = this.filtre;
     if (f === 'COMPLETER') ls = ls.filter(l => l._manques.length);
@@ -1293,7 +1351,8 @@ const Edition = (() => {
     if (isbn.length === 13 && isbn.startsWith('978')) { const b = isbn.slice(3, 12); let t = 0; for (let i = 0; i < 9; i++) t += +b[i] * (10 - i); const c = (11 - t % 11) % 11; v.add(b + (c === 10 ? 'X' : c)); }
     return v;
   }
-  async function json(url){ const r = await fetch(url); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
+  const delai = () => (AbortSignal && AbortSignal.timeout ? AbortSignal.timeout(8000) : undefined);
+  async function json(url){ const r = await fetch(url, { signal: delai() }); if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); }
   async function googleBooks(isbn){
     const vs = variantes(isbn);
     for (const q of ['isbn:' + isbn, isbn]) {
@@ -1336,7 +1395,7 @@ const Edition = (() => {
   }
   async function bnf(isbn){
     const cql = `bib.fuzzyISBN all "${isbn}"`;
-    const r = await fetch('https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=' + encodeURIComponent(cql) + '&recordSchema=dublincore&maximumRecords=1');
+    const r = await fetch('https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=' + encodeURIComponent(cql) + '&recordSchema=dublincore&maximumRecords=1', { signal: delai() });
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const doc = new DOMParser().parseFromString(await r.text(), 'application/xml');
     const rec = doc.getElementsByTagName('srw:record')[0]; if (!rec) return null;
@@ -1348,6 +1407,44 @@ const Edition = (() => {
     const pages = formats.map(f => (/(\d{2,4})\s*p\./.exec(f) || [])[1]).find(Boolean);
     return { titre: titreBrut.split(' / ')[0].trim().replace(/[.\s]+$/, ''), sousTitre: null, auteur: auteurs.join(', '), pagesTotal: pages ? +pages : null,
       couvertureUrl: null, resume: '', theme: estBd ? 'Bande dessinée' : null, estBd, motsCles: motsDepuisSujets(sujets), source: 'BnF' };
+  }
+  /* Recherche par titre et auteur : toutes les éditions trouvées, au choix */
+  async function chercherEditions(titre, auteur){
+    const res = [], vus = new Set();
+    const ajouter = e => { const k = e.isbn ? (e.isbn.length === 10 ? [...variantes(e.isbn)].find(x => x.length === 13) || e.isbn : e.isbn) : norm(e.titre + e.editeur + e.annee); if (vus.has(k)) return; vus.add(k); res.push(e); };
+    const taches = [
+      (async () => {   // BnF
+        let cql = `bib.title all "${titre.replace(/"/g, '')}"`; if (auteur) cql += ` and bib.author all "${auteur.replace(/"/g, '')}"`;
+        const r = await fetch('https://catalogue.bnf.fr/api/SRU?version=1.2&operation=searchRetrieve&query=' + encodeURIComponent(cql) + '&recordSchema=dublincore&maximumRecords=15', { signal: delai() });
+        const doc = new DOMParser().parseFromString(await r.text(), 'application/xml'); const out = [];
+        for (const rec of doc.getElementsByTagName('srw:record')) {
+          const tous = n => [...rec.getElementsByTagName(n)].map(e => e.textContent.trim()).filter(Boolean);
+          const t = (tous('dc:title')[0] || '').split(' / ')[0].trim(); if (!t) continue;
+          const isbn = (tous('dc:identifier').map(x => /ISBN\s*([\dX-]{10,17})/i.exec(x)).find(Boolean) || [])[1];
+          const sujets = tous('dc:subject'), pages = tous('dc:format').map(f => (/(\d{2,4})\s*p\./.exec(f) || [])[1]).find(Boolean);
+          out.push({ titre: t.replace(/[.\s]+$/, ''), auteur: [...new Set(tous('dc:creator').map(auteurBnf).filter(Boolean))].slice(0, 2).join(', '), editeur: (tous('dc:publisher')[0] || '').split(' (')[0].replace(/^[^:]*:\s*/, ''), annee: (tous('dc:date')[0] || '').slice(0, 4),
+            isbn: isbn ? nettoyerIsbn(isbn) : null, pagesTotal: pages ? +pages : null, couvertureUrl: null, resume: '', estBd: sujets.some(x => /bandes? dessinée/i.test(x)), motsCles: motsDepuisSujets(sujets), source: 'BnF' });
+        }
+        return out;
+      })(),
+      (async () => {   // Google Books
+        const q = `intitle:${titre}` + (auteur ? ` inauthor:${auteur}` : '');
+        const d = await json('https://www.googleapis.com/books/v1/volumes?maxResults=20&printType=books&q=' + encodeURIComponent(q));
+        return (d.items || []).map(it => { const v = it.volumeInfo || {}, ids = v.industryIdentifiers || [], img = v.imageLinks && (v.imageLinks.thumbnail || v.imageLinks.smallThumbnail);
+          const isbn = (ids.find(x => x.type === 'ISBN_13') || ids.find(x => x.type === 'ISBN_10') || {}).identifier;
+          return { titre: v.title || '', sousTitre: v.subtitle, auteur: (v.authors || []).join(', '), editeur: v.publisher || '', annee: (v.publishedDate || '').slice(0, 4), isbn: isbn ? nettoyerIsbn(isbn) : null,
+            pagesTotal: v.pageCount || null, couvertureUrl: img ? img.replace(/^http:/, 'https:').replace('&edge=curl', '') : null, resume: v.description || '', theme: (v.categories || []).map(themeDepuis).find(Boolean) || null, source: 'Google Books' }; });
+      })(),
+      (async () => {   // Open Library
+        const d = await json(`https://openlibrary.org/search.json?limit=10&fields=title,author_name,first_publish_year,isbn,cover_i,number_of_pages_median,publisher&title=${encodeURIComponent(titre)}${auteur ? '&author=' + encodeURIComponent(auteur) : ''}`);
+        return (d.docs || []).map(x => ({ titre: x.title || '', auteur: (x.author_name || []).slice(0, 2).join(', '), editeur: (x.publisher || [])[0] || '', annee: x.first_publish_year ? String(x.first_publish_year) : '',
+          isbn: (x.isbn || []).map(nettoyerIsbn).find(i => i.length === 13) || null, pagesTotal: x.number_of_pages_median || null, couvertureUrl: x.cover_i ? `https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg` : null, resume: '', source: 'Open Library' }));
+      })()
+    ];
+    const lots = await Promise.allSettled(taches);
+    if (lots.every(l => l.status === 'rejected')) throw new Error(lots.some(l => l.reason instanceof TypeError) ? 'reseau' : 'erreur');
+    for (const l of lots) if (l.status === 'fulfilled') l.value.filter(e => e.titre).forEach(ajouter);
+    return res.slice(0, 25);
   }
   async function chercherIsbn(isbn){
     let res = null, bloque = 0, essais = 0; const sources = [];
@@ -1391,9 +1488,10 @@ const Edition = (() => {
     return `<button class="fermer" aria-label="Fermer" id="e-fermer">✕</button>
       <div style="padding:18px 20px 0"><div class="sur">${nouveau ? 'Nouvelle lecture' : 'Modifier la fiche'}</div><h2 style="margin-top:6px;padding-right:40px">${esc(b.titre || 'Sans titre')}</h2></div>
       <div class="fiche-corps"><form class="form" id="e-form" autocomplete="off">
-        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn petit" id="e-scanner">📷 Scanner</button><button type="button" class="btn petit" id="e-rafale">⚡ En rafale</button></div><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après Google Books et Open Library.</div></div>` : ''}
+        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn petit" id="e-scanner">📷 Scanner</button><button type="button" class="btn petit" id="e-rafale">⚡ En rafale</button></div><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après la BnF, Google Books et Open Library.</div></div>` : ''}
         <label>Titre<input class="inp" name="titre" value="${esc(b.titre)}" required></label>
         <label>Auteur<input class="inp" name="auteur" value="${esc(b.auteur)}" placeholder="Prénom Nom, Prénom Nom"></label>
+        ${nouveau ? `<div style="margin-top:-4px"><button type="button" class="btn petit" id="e-editions">🔎 Chercher les éditions de ce titre</button><div class="doux" style="font-size:12px;margin-top:6px">Sans ISBN : tape le titre (et l’auteur), puis choisis ton édition dans la liste.</div><div id="e-editions-res"></div></div>` : ''}
         <div><div class="sur" style="margin-bottom:8px">Statut</div><div class="choix">${puce('statut', 'A_LIRE', 'À lire')}${puce('statut', 'EN_COURS', 'En cours')}${puce('statut', 'LU', 'Lu')}<span style="width:12px"></span>${puce('type', 'LIVRE', 'Livre')}${puce('type', 'BD', 'BD')}</div></div>
         <div><div class="sur" style="margin-bottom:6px">Note</div><div class="choix note-choix">${[1, 2, 3, 4, 5].map(n => `<button type="button" data-note="${n}" class="${b.note >= n ? 'on' : ''}" aria-label="${n} sur 5">★</button>`).join('')}<button type="button" class="btn petit" data-note="0" style="margin-left:8px">Sans note</button></div></div>
         <label>Thème<input class="inp" name="theme" list="liste-themes" value="${esc(b.theme || '')}" placeholder="Choisis dans la liste ou écris le tien"></label>
@@ -1401,10 +1499,10 @@ const Edition = (() => {
         <div class="deux"><label>Début de lecture<input class="inp" type="date" name="dateDebut" value="${jour(b.dateDebut)}"></label><label>Fin de lecture<input class="inp" type="date" name="dateFin" value="${jour(b.dateFin)}"></label></div>
         <div class="deux"><label>Page actuelle<input class="inp" name="pageActuelle" inputmode="numeric" value="${b.pageActuelle ?? ''}"></label><label>Nombre de pages<input class="inp" name="pagesTotal" inputmode="numeric" value="${b.pagesTotal ?? ''}"></label></div>
         <label>Mots-clés <span style="font-weight:400">· séparés par des virgules</span><textarea class="inp" name="motsCles" style="min-height:70px">${esc(b.motsCles)}</textarea></label>
-        <label>Notes<textarea class="inp" name="notes" style="min-height:140px">${esc(b.notes)}</textarea></label>
+        <label><span style="display:flex;justify-content:space-between;align-items:center">Notes<button type="button" class="btn petit" id="e-dicter" style="font-size:12px;padding:4px 10px">🎙 Dicter</button></span><textarea class="inp" name="notes" style="min-height:140px">${esc(b.notes)}</textarea></label>
         <label>4e de couverture${b.sourceResume ? ` <span style="font-weight:400">· ${esc(b.sourceResume)}</span>` : ''}<textarea class="inp" name="resume">${esc(b.resume)}</textarea></label>
         <div class="deux"><label>ISBN<input class="inp" name="isbn" value="${esc(b.isbn || '')}"></label><label>Prêté à<input class="inp" name="pretA" value="${esc(b.pretA || '')}"></label></div>
-        <div><div class="sur" style="margin-bottom:8px">Couverture</div><div style="display:flex;gap:14px;align-items:center"><div id="e-couv">${couverture(b, 70)}</div><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><label class="btn petit" style="display:inline-flex;color:var(--ivoire);font-size:13px">Choisir une image<input type="file" accept="image/*" id="e-image" hidden></label>${b.couvertureUrl ? '<button type="button" class="btn petit" id="e-sans-image">Retirer</button>' : ''}</div></div></div>
+        <div><div class="sur" style="margin-bottom:8px">Couverture</div><div style="display:flex;gap:14px;align-items:center"><div id="e-couv">${imageChoisie ? `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>` : couverture(b, 70)}</div><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><label class="btn petit" style="display:inline-flex;color:var(--ivoire);font-size:13px">Choisir une image<input type="file" accept="image/*" id="e-image" hidden></label>${imageChoisie || (b.couvertureUrl || '').startsWith('local:') ? '<button type="button" class="btn petit" id="e-recadrer">Recadrer / tourner</button>' : ''}${b.couvertureUrl || imageChoisie ? '<button type="button" class="btn petit" id="e-sans-image">Retirer</button>' : ''}</div></div></div>
         <div class="barre-actions">${nouveau ? '' : '<button type="button" class="btn danger" id="e-supprimer" style="margin-right:auto">Supprimer</button>'}<button type="button" class="btn" id="e-annuler">Annuler</button><button type="submit" class="btn or">${nouveau ? 'Ajouter' : 'Enregistrer'}</button></div>
       </form><datalist id="liste-themes">${THEMES.map(t => `<option value="${esc(t)}">`).join('')}</datalist></div>`;
   }
@@ -1420,20 +1518,54 @@ const Edition = (() => {
   function afficher(){
     Fiche.montrer(formulaire(brouillon), el => {
       const f = el.querySelector('#e-form');
-      const fermer = () => { if (brouillon.id != null) Fiche.ouvrir(brouillon.id, false); else Fiche.fermer(); };
+      const fermer = () => { Dictee.arreter(); if (brouillon.id != null) Fiche.ouvrir(brouillon.id, false); else Fiche.fermer(); };
       el.querySelector('#e-fermer').onclick = fermer; el.querySelector('#e-annuler').onclick = fermer;
       el.querySelectorAll('[data-champ]').forEach(b => b.onclick = () => { lireForm(f); brouillon[b.dataset.champ] = b.dataset.val; afficherConserve(el); });
       el.querySelectorAll('[data-note]').forEach(b => b.onclick = () => { lireForm(f); brouillon.note = +b.dataset.note; afficherConserve(el); });
-      el.querySelector('#e-image').onchange = async e => { const fi = e.target.files[0]; if (!fi) return; try { imageChoisie = await reduireImage(fi); retirerImage = false; el.querySelector('#e-couv').innerHTML = `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>`; } catch { toast('Image illisible'); } };
+      el.querySelector('#e-image').onchange = async e => { const fi = e.target.files[0]; e.target.value = ''; if (!fi) return; try { const bmp = await createImageBitmap(fi); const b2 = await Recadreur.ouvrir(bmp); if (!b2) return; lireForm(f); imageChoisie = b2; retirerImage = false; afficherConserve(el); } catch { toast('Image illisible'); } };
       const si = el.querySelector('#e-sans-image'); if (si) si.onclick = () => { lireForm(f); retirerImage = true; imageChoisie = null; brouillon.couvertureUrl = null; afficherConserve(el); };
       const bi = el.querySelector('#e-isbn'); if (bi) bi.onclick = () => rechercheIsbn(el, f);
+      const be = el.querySelector('#e-editions'); if (be) be.onclick = () => rechercheEditions(el, f);
+      Dictee.brancher(el.querySelector('#e-dicter'), f.elements.notes);
+      const rc = el.querySelector('#e-recadrer'); if (rc) rc.onclick = async () => { const src = imageChoisie || await Base.lireCouverture(brouillon.couvertureUrl.slice(6)).catch(() => null); if (!src) return; const b2 = await Recadreur.ouvrir(await createImageBitmap(src)); if (b2) { lireForm(f); imageChoisie = b2; retirerImage = false; afficherConserve(el); } };
       const bs = el.querySelector('#e-scanner'); if (bs) bs.onclick = () => Scanner.ouvrir({ surIsbn: code => { const fe = $('#e-form'); fe.elements.isbnRecherche.value = code; rechercheIsbn($('#fiche'), fe); } });
       const br = el.querySelector('#e-rafale'); if (br) br.onclick = () => { Fiche.fermer(); Scanner.ouvrir({ rafale: true }); };
       if (f.elements.isbnRecherche) f.elements.isbnRecherche.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); rechercheIsbn(el, f); } };
       const sup = el.querySelector('#e-supprimer'); if (sup) sup.onclick = () => supprimer(brouillon.id);
-      f.onsubmit = e => { e.preventDefault(); lireForm(f); valider(); };
+      f.onsubmit = e => { e.preventDefault(); Dictee.arreter(); lireForm(f); valider(); };
       if (brouillon.id == null && !brouillon.titre) setTimeout(() => (f.elements.isbnRecherche || f.elements.titre).focus(), 50);
     });
+  }
+  let editions = [];
+  async function rechercheEditions(el, f){
+    lireForm(f); const out = el.querySelector('#e-editions-res');
+    if (!brouillon.titre) { out.innerHTML = '<p style="color:var(--corail);font-size:13px">Tape d’abord le titre dans le champ « Titre ».</p>'; f.elements.titre.focus(); return; }
+    out.innerHTML = '<p class="doux" style="font-size:13px">Recherche des éditions…</p>';
+    try {
+      editions = await chercherEditions(brouillon.titre, brouillon.auteur);
+      if (!editions.length) { out.innerHTML = '<p class="doux" style="font-size:13px">Aucune édition trouvée. Vérifie l’orthographe ou remplis la fiche à la main.</p>'; return; }
+      out.innerHTML = `<p class="doux" style="font-size:13px;margin:8px 0 4px">${editions.length} édition${editions.length > 1 ? 's' : ''} : choisis la tienne</p>` + editions.map((e, i) => `<button type="button" class="edition" data-ed="${i}">${couverture({ titre: e.titre, auteur: e.auteur, couvertureUrl: e.couvertureUrl }, 34)}<div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:15px;line-height:1.25">${esc(e.titre)}</div><div class="doux" style="font-size:12px">${esc([e.auteur, e.editeur, e.annee].filter(Boolean).join(' · '))}</div><div class="doux" style="font-size:11.5px">${esc([e.pagesTotal ? e.pagesTotal + ' p.' : '', e.isbn ? 'ISBN ' + e.isbn : 'sans ISBN', e.source].filter(Boolean).join(' · '))}</div></div></button>`).join('');
+      out.querySelectorAll('[data-ed]').forEach(b => b.onclick = () => choisirEdition(el, f, editions[+b.dataset.ed]));
+    } catch (e) {
+      out.innerHTML = e.message === 'reseau' ? '<p style="color:var(--or);font-size:13px">La recherche en ligne est bloquée sur cette page claude.ai ; elle marche sur ton site.</p>' : '<p class="doux" style="font-size:13px">Recherche impossible pour l’instant.</p>';
+    }
+  }
+  async function choisirEdition(el, f, e){
+    lireForm(f);
+    Object.assign(brouillon, { titre: e.sousTitre && e.titre.length < 25 ? `${e.titre} : ${e.sousTitre}` : e.titre, auteur: e.auteur || brouillon.auteur, isbn: e.isbn || brouillon.isbn, pagesTotal: e.pagesTotal || brouillon.pagesTotal });
+    if (e.couvertureUrl && !imageChoisie) brouillon.couvertureUrl = e.couvertureUrl;
+    if (e.resume && !brouillon.resume) { brouillon.resume = e.resume; brouillon.sourceResume = e.source; }
+    if (e.theme && !brouillon.theme) brouillon.theme = e.theme;
+    if (e.estBd) { brouillon.type = 'BD'; if (!brouillon.theme) brouillon.theme = 'Bande dessinée'; }
+    if (e.motsCles?.length && !brouillon.motsCles) brouillon.motsCles = e.motsCles.join(', ');
+    afficherConserve(el); toast('Édition choisie');
+    if (e.isbn) {   // complète avec les autres sources (4e, couverture, thème)
+      try { const r = await chercherIsbn(e.isbn); if (r && $('#e-form')) { const fe = $('#e-form'); lireForm(fe);
+        if (!brouillon.resume && r.resume) { brouillon.resume = r.resume; brouillon.sourceResume = r.source; }
+        if (!brouillon.couvertureUrl && r.couvertureUrl && !imageChoisie) brouillon.couvertureUrl = r.couvertureUrl;
+        if (!brouillon.theme && r.theme) brouillon.theme = r.theme; if (!brouillon.pagesTotal && r.pagesTotal) brouillon.pagesTotal = r.pagesTotal;
+        afficherConserve($('#fiche')); } } catch (er) {}
+    }
   }
   function afficherConserve(el){ const sc = el.querySelector('.fiche-corps').scrollTop; afficher(); $('#fiche .fiche-corps').scrollTop = sc; }
   async function rechercheIsbn(el, f){
@@ -1498,12 +1630,17 @@ const Edition = (() => {
   }
 
   /* ---------- Ajout direct d'un ISBN (scan en rafale) ---------- */
-  async function ajouterDepuisIsbn(isbn){
+  async function ajouterDepuisIsbn(isbn, majEnCours){
     const doublon = M.lectures.find(l => l.isbn && variantes(isbn).has(nettoyerIsbn(l.isbn)));
     if (doublon) return { titre: doublon.titre, etat: 'déjà là', ok: false };
-    let r = null; try { r = await chercherIsbn(isbn); } catch (e) { r = null; }
+    // 1. la fiche existe tout de suite (rien n'est perdu si l'on termine avant la fin des recherches)
     const l = modele();
-    l.id = nouvelId(M.lectures); l.isbn = isbn; l.dateAjout = Date.now(); l.statut = 'A_LIRE';
+    l.id = nouvelId(M.lectures); l.isbn = isbn; l.dateAjout = Date.now(); l.statut = 'A_LIRE'; l.titre = 'ISBN ' + isbn;
+    M.lectures.push(l); await enregistrer();
+    majEnCours && majEnCours({ id: l.id, titre: l.titre, etat: 'recherche…', ok: true });
+    // 2. puis on la complète
+    let r = null; try { r = await chercherIsbn(isbn); } catch (e) { r = null; }
+    if (!M.parId.has(l.id)) return { titre: l.titre, etat: 'supprimé', ok: false };
     if (r) {
       l.titre = r.titre ? (r.sousTitre && r.titre.length < 25 ? `${r.titre} : ${r.sousTitre}` : r.titre) : '';
       l.auteur = r.auteur || ''; l.pagesTotal = r.pagesTotal || null; l.theme = r.theme || null; l.couvertureUrl = r.couvertureUrl || null;
@@ -1511,14 +1648,14 @@ const Edition = (() => {
       if (r.estBd) l.type = 'BD'; if (r.motsCles?.length) l.motsCles = r.motsCles.join(', ');
     }
     if (!l.titre) l.titre = 'ISBN ' + isbn;
-    M.lectures.push(l); await enregistrer();
+    await enregistrer();
     const m = M.parId.get(l.id)._manques;
-    return { titre: l.titre, etat: m.length ? 'à compléter' : 'ajouté', ok: true };
+    return { id: l.id, titre: l.titre, etat: m.length ? 'à compléter' : 'ajouté', ok: true };
   }
 
   /* ---------- Compléments dans la fiche : citations, liens ---------- */
   function complement(l, onglet){
-    if (onglet === 'citations') return `<div class="carte" style="margin-top:8px"><div class="sur" style="margin-bottom:8px">Nouvelle citation</div><textarea class="inp" id="c-texte" placeholder="Le passage, sans guillemets"></textarea><div style="display:flex;gap:8px;margin-top:8px"><input class="inp" id="c-page" inputmode="numeric" placeholder="Page" style="width:96px"><button class="btn or" id="c-ajouter" style="margin-left:auto">Garder</button></div></div>`;
+    if (onglet === 'citations') return `<div class="carte" style="margin-top:8px"><div class="sur" style="margin-bottom:8px">Nouvelle citation</div><textarea class="inp" id="c-texte" placeholder="Le passage, sans guillemets"></textarea><div style="display:flex;gap:8px;margin-top:8px"><input class="inp" id="c-page" inputmode="numeric" placeholder="Page" style="width:96px"><button type="button" class="btn petit" id="c-dicter">🎙 Dicter</button><button class="btn or" id="c-ajouter" style="margin-left:auto">Garder</button></div></div>`;
     if (onglet === 'proches') return `<div class="carte" style="margin-top:8px"><div class="sur" style="margin-bottom:8px">Relier à un autre livre</div><input class="inp" id="r-livre" list="liste-livres" placeholder="Titre du livre"><datalist id="liste-livres">${M.lectures.filter(o => o.id !== l.id).map(o => `<option value="${esc(titreCourt(o) + ' — ' + (o.auteur || '?'))}">`).join('')}</datalist><input class="inp" id="r-raison" placeholder="Pourquoi, en quelques mots" style="margin-top:8px"><div style="display:flex;margin-top:8px"><button class="btn or" id="r-ajouter" style="margin-left:auto">Relier</button></div></div>`;
     if (onglet === 'lecture' && l.statut !== 'LU') return `<div class="carte" style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="sur">J’en suis à la page</span><input class="inp" id="p-page" inputmode="numeric" value="${l.pageActuelle ?? ''}" style="width:90px">${l.pagesTotal ? `<span class="doux">/ ${l.pagesTotal}</span>` : ''}<button class="btn petit" id="p-ok">OK</button>${l.statut === 'A_LIRE' ? '<button class="btn or petit" id="p-commencer" style="margin-left:auto">Commencer</button>' : '<button class="btn or petit" id="p-fini" style="margin-left:auto">Terminé ✓</button>'}</div>`;
     return '';
@@ -1532,7 +1669,8 @@ const Edition = (() => {
     el.querySelectorAll('[data-supcit]').forEach(b => b.onclick = () => confirmer('Supprimer cette citation ?', 'Elle disparaîtra aussi du carnet.', 'Supprimer', async () => { M.citations = M.citations.filter(c => c.id !== +b.dataset.supcit); await apres('Citation supprimée'); }));
     el.querySelectorAll('[data-delier]').forEach(b => b.onclick = async () => { const o = +b.dataset.delier; M.liens = M.liens.filter(x => !((x.lectureA === l.id && x.lectureB === o) || (x.lectureA === o && x.lectureB === l.id))); await apres('Lien retiré'); });
     el.querySelectorAll('[data-relier]').forEach(b => b.onclick = async () => { if (relier(l.id, +b.dataset.relier, b.dataset.raison)) await apres('Livres reliés'); });
-    const ca = el.querySelector('#c-ajouter'); if (ca) ca.onclick = async () => { const t = el.querySelector('#c-texte').value.trim().replace(/^[«"“]\s*|\s*[»"”]$/g, ''); if (!t) return; M.citations.push({ id: nouvelId(M.citations), lectureId: l.id, texte: t, page: entier(el.querySelector('#c-page').value), dateAjout: Date.now() }); await apres('Citation gardée'); };
+    Dictee.brancher(el.querySelector('#c-dicter'), el.querySelector('#c-texte'));
+    const ca = el.querySelector('#c-ajouter'); if (ca) ca.onclick = async () => { Dictee.arreter(); const t = el.querySelector('#c-texte').value.trim().replace(/^[«"“]\s*|\s*[»"”]$/g, ''); if (!t) return; M.citations.push({ id: nouvelId(M.citations), lectureId: l.id, texte: t, page: entier(el.querySelector('#c-page').value), dateAjout: Date.now() }); await apres('Citation gardée'); };
     const ra = el.querySelector('#r-ajouter'); if (ra) ra.onclick = async () => {
       const v = el.querySelector('#r-livre').value.trim(); if (!v) return;
       const cible = M.lectures.find(o => o.id !== l.id && (titreCourt(o) + ' — ' + (o.auteur || '?')) === v) || M.lectures.find(o => o.id !== l.id && norm(o.titre) === norm(v));
@@ -1598,8 +1736,9 @@ const Edition = (() => {
   }
 
   $('#nav-ajouter').addEventListener('click', () => nouveau());
+  async function ajouterPlusieurs(liste){ for (const o of liste) M.lectures.push({ ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }); await enregistrer(); }
   async function ajouterSimple(o){ const l = { ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }; M.lectures.push(l); await enregistrer(); return l; }
-  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple };
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple, ajouterPlusieurs };
 })();
 
 /* =========================================================
@@ -1675,9 +1814,8 @@ const Scanner = (() => {
     vus.add(code);
     const a = { titre: 'ISBN ' + code, etat: 'recherche…', ok: false }; ajoutes.push(a); majListe();
     dire('Lu : ' + code + ' — vise le suivant', 'var(--or)');
-    try { const r = await Edition.ajouterDepuisIsbn(code); Object.assign(a, r); }
-    catch (e) { a.etat = 'erreur'; console.warn(e); }
-    majListe();
+    // on n'attend pas la recherche pour viser le livre suivant
+    Edition.ajouterDepuisIsbn(code, x => { Object.assign(a, x); majListe(); }).then(r => { Object.assign(a, r); majListe(); }).catch(e => { a.etat = 'erreur'; console.warn(e); majListe(); });
   }
   async function balayer(){
     if (!actif) return;
@@ -1721,11 +1859,136 @@ const Scanner = (() => {
   function fermer(){
     actif = false; clearTimeout(boucle); arreterFlux();
     const o = $('#scanner'); if (o) o.classList.remove('ouvert');
-    if (rafale) { const n = ajoutes.filter(a => a.ok).length; if (n) toast(`${n} livre${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} « À lire »`); rafale = false; }
+    if (rafale) {
+      rafale = false; const ids = ajoutes.filter(a => a.ok && a.id).map(a => a.id), n = ids.length;
+      if (n) {   // montre tout de suite les livres scannés
+        toast(`${n} livre${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} « À lire »${ajoutes.some(a => a.etat === 'recherche…') ? ' · recherche en cours' : ''}`);
+        Chercher.limite = { ids, titre: 'Scannés à l’instant' }; Chercher.mode = 'liste'; Chercher.filtre = 'TOUS'; Chercher.requete = '';
+        if (location.hash === '#chercher') Chercher.rendre(); else location.hash = 'chercher';
+      }
+    }
   }
   addEventListener('keydown', e => { if (e.key === 'Escape' && actif) fermer(); });
   return { ouvrir, fermer, isbnValide };
 })();
+
+/* =========================================================
+   Dictée (notes et citations) — reconnaissance vocale du navigateur
+   ========================================================= */
+const Dictee = (() => {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let rec = null, bouton = null;
+  function arreter(){ try { rec && rec.stop(); } catch (e) {} rec = null; if (bouton) { bouton.classList.remove('or'); bouton.textContent = '🎙 Dicter'; } bouton = null; }
+  function brancher(btn, cible){
+    if (!btn) return;
+    if (!SR) { btn.hidden = true; return; }
+    btn.onclick = () => {
+      if (rec && bouton === btn) { arreter(); return; }
+      arreter();
+      rec = new SR(); rec.lang = 'fr-FR'; rec.continuous = true; rec.interimResults = false;
+      rec.onresult = ev => { let t = ''; for (let i = ev.resultIndex; i < ev.results.length; i++) if (ev.results[i].isFinal) t += ev.results[i][0].transcript; t = t.trim(); if (!t) return;
+        const v = cible.value; cible.value = v + (v && !/\s$/.test(v) ? ' ' : '') + t.charAt(0).toUpperCase() + t.slice(1); cible.dispatchEvent(new Event('input')); };
+      rec.onerror = ev => { toast(ev.error === 'not-allowed' ? 'Micro refusé par le navigateur' : 'Dictée interrompue'); arreter(); };
+      rec.onend = () => { if (bouton === btn) arreter(); };
+      try { rec.start(); bouton = btn; btn.classList.add('or'); btn.textContent = '■ Arrêter'; } catch (e) { toast('Dictée indisponible'); arreter(); }
+    };
+  }
+  return { brancher, arreter, possible: !!SR };
+})();
+
+/* =========================================================
+   Recadrer et tourner une couverture
+   ========================================================= */
+const Recadreur = (() => {
+  function ouvrir(bitmap){
+    return new Promise(resoudre => {
+      let src = document.createElement('canvas'); src.width = bitmap.width; src.height = bitmap.height; src.getContext('2d').drawImage(bitmap, 0, 0);
+      const o = document.createElement('div'); o.id = 'recadreur';
+      o.innerHTML = `<div class="sc-haut"><div><div class="sur" style="color:var(--or)">Couverture</div><div class="doux" style="font-size:13.5px;margin-top:4px">Fais glisser le cadre ou ses coins, tourne si besoin.</div></div></div>
+        <div class="rc-scene" id="rc-scene"><div class="rc-boite" id="rc-boite"><canvas id="rc-img"></canvas><div class="rc-cadre" id="rc-cadre"><i data-c="nw"></i><i data-c="ne"></i><i data-c="sw"></i><i data-c="se"></i></div></div></div>
+        <div class="sc-bas"><div style="display:flex;gap:8px"><button class="rond" id="rc-g" aria-label="Tourner à gauche">↺</button><button class="rond" id="rc-d" aria-label="Tourner à droite">↻</button></div><div style="display:flex;gap:8px"><button class="btn" id="rc-non">Annuler</button><button class="btn or" id="rc-oui">Valider</button></div></div>`;
+      document.body.appendChild(o);
+      const cv = o.querySelector('#rc-img'), cadre = o.querySelector('#rc-cadre'), scene = o.querySelector('#rc-scene');
+      let s = 1, W = 0, Hh = 0, r = null;
+      function afficher(){
+        const mw = scene.clientWidth - 16, mh = scene.clientHeight - 16;
+        s = Math.min(mw / src.width, mh / src.height, 1.5); W = Math.round(src.width * s); Hh = Math.round(src.height * s);
+        cv.width = W; cv.height = Hh; cv.getContext('2d').drawImage(src, 0, 0, W, Hh);
+        r = { x: W * .04, y: Hh * .04, w: W * .92, h: Hh * .92 }; poser();
+      }
+      function poser(){ Object.assign(cadre.style, { left: r.x + 'px', top: r.y + 'px', width: r.w + 'px', height: r.h + 'px' }); }
+      function tourner(sens){
+        const n = document.createElement('canvas'); n.width = src.height; n.height = src.width; const g = n.getContext('2d');
+        g.translate(n.width / 2, n.height / 2); g.rotate(sens * Math.PI / 2); g.drawImage(src, -src.width / 2, -src.height / 2); src = n; afficher();
+      }
+      let geste = null;
+      cadre.addEventListener('pointerdown', e => { e.preventDefault(); cadre.setPointerCapture(e.pointerId); geste = { c: e.target.dataset.c || 'm', x: e.clientX, y: e.clientY, r: { ...r } }; });
+      cadre.addEventListener('pointermove', e => {
+        if (!geste) return; const dx = e.clientX - geste.x, dy = e.clientY - geste.y, a = geste.r, MIN = 40; let { x, y, w, h } = a;
+        if (geste.c === 'm') { x = Math.min(Math.max(0, a.x + dx), W - a.w); y = Math.min(Math.max(0, a.y + dy), Hh - a.h); }
+        else {
+          if (geste.c.includes('w')) { x = Math.min(Math.max(0, a.x + dx), a.x + a.w - MIN); w = a.x + a.w - x; }
+          if (geste.c.includes('e')) { w = Math.min(Math.max(MIN, a.w + dx), W - a.x); }
+          if (geste.c.includes('n')) { y = Math.min(Math.max(0, a.y + dy), a.y + a.h - MIN); h = a.y + a.h - y; }
+          if (geste.c.includes('s')) { h = Math.min(Math.max(MIN, a.h + dy), Hh - a.y); }
+        }
+        r = { x, y, w, h }; poser();
+      });
+      const lacher = () => { geste = null; }; cadre.addEventListener('pointerup', lacher); cadre.addEventListener('pointercancel', lacher);
+      const finir = res => { o.remove(); removeEventListener('resize', afficher); resoudre(res); };
+      o.querySelector('#rc-g').onclick = () => tourner(-1); o.querySelector('#rc-d').onclick = () => tourner(1);
+      o.querySelector('#rc-non').onclick = () => finir(null);
+      o.querySelector('#rc-oui').onclick = () => {
+        const sx = r.x / s, sy = r.y / s, sw = r.w / s, sh = r.h / s, f = Math.min(1, 800 / Math.max(sw, sh));
+        const out = document.createElement('canvas'); out.width = Math.round(sw * f); out.height = Math.round(sh * f);
+        out.getContext('2d').drawImage(src, sx, sy, sw, sh, 0, 0, out.width, out.height);
+        out.toBlob(b => finir(b), 'image/jpeg', .88);
+      };
+      addEventListener('resize', afficher);
+      requestAnimationFrame(afficher);
+    });
+  }
+  return { ouvrir };
+})();
+
+/* =========================================================
+   Premier pas : choisir des thèmes et cocher ses lectures
+   ========================================================= */
+const PremierPas = {
+  themes: new Set(), choix: new Map(),
+  ouvrir(){ this.themes = new Set(); this.choix = new Map(); this.etape1(); },
+  cadre(html){ $('#vue-vide').innerHTML = `<div class="page" style="max-width:720px">${html}</div>`; },
+  etape1(){
+    this.cadre(`<div class="sur" style="color:var(--or)">Premier pas · 1 sur 2</div><h1 style="margin-top:8px">Quels thèmes t’attirent ?</h1>
+      <p class="doux" style="line-height:1.55">Choisis-en deux ou trois. Tu pourras cocher ensuite les livres que tu as déjà lus, pour que ton ciel ne parte pas de rien.</p>
+      <div class="choix" style="margin:18px 0 26px">${THEMES.map(t => `<button class="puce" data-t="${esc(t)}" aria-pressed="${this.themes.has(t)}">${esc(t)}</button>`).join('')}</div>
+      <div style="display:flex;gap:10px;justify-content:space-between;align-items:center"><button class="btn" id="pp-passer">Passer</button><button class="btn or" id="pp-suite" ${this.themes.size ? '' : 'disabled style="opacity:.5"'}>Continuer${this.themes.size ? ` (${this.themes.size})` : ''}</button></div>`);
+    document.querySelectorAll('[data-t]').forEach(b => b.onclick = () => { const t = b.dataset.t; this.themes.has(t) ? this.themes.delete(t) : this.themes.add(t); this.etape1(); });
+    $('#pp-passer').onclick = () => this.finir();
+    $('#pp-suite').onclick = () => { if (this.themes.size) this.etape2(); };
+  },
+  etape2(){
+    const bloc = t => `<div class="etagere"><h2 style="font-size:19px;margin-bottom:6px">${esc(t)}</h2>${(PORTES[t] || []).map(([ti, au, ph]) => { const k = t + '|' + ti, v = this.choix.get(k);
+      return `<div class="porte"><div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:16px">${esc(ti)}</div><div class="doux" style="font-size:12.5px">${esc(au)} · ${esc(ph)}</div></div><div class="choix" style="flex:none"><button class="puce" data-k="${esc(k)}" data-v="LU" aria-pressed="${v === 'LU'}">Lu</button><button class="puce" data-k="${esc(k)}" data-v="A_LIRE" aria-pressed="${v === 'A_LIRE'}">À lire</button></div></div>`; }).join('')}</div>`;
+    const n = this.choix.size;
+    this.cadre(`<div class="sur" style="color:var(--or)">Premier pas · 2 sur 2</div><h1 style="margin-top:8px">Qu’as-tu déjà lu ?</h1>
+      <p class="doux" style="line-height:1.55">Marque « Lu » ce que tu as lu, « À lire » ce qui te tente. Le reste est ignoré.</p>
+      ${[...this.themes].map(bloc).join('')}
+      <div class="barre-actions" style="justify-content:space-between"><button class="btn" id="pp-retour">‹ Thèmes</button><button class="btn or" id="pp-fin">${n ? `Créer mon ciel (${n})` : 'Créer mon ciel'}</button></div>`);
+    document.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { const k = b.dataset.k, v = b.dataset.v; this.choix.get(k) === v ? this.choix.delete(k) : this.choix.set(k, v); const sc = scrollY, el = $('#vue-vide'), st = el.scrollTop; this.etape2(); el.scrollTop = st; });
+    $('#pp-retour').onclick = () => this.etape1();
+    $('#pp-fin').onclick = () => this.finir();
+  },
+  async finir(){
+    await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []);
+    await charger();
+    const livres = [];
+    for (const [k, statut] of this.choix) { const [theme, ti] = k.split('|'); const p = (PORTES[theme] || []).find(x => x[0] === ti); if (p) livres.push({ titre: p[0], auteur: p[1], theme, statut }); }
+    if (livres.length) await Edition.ajouterPlusieurs(livres);
+    Ciel.invalider(); location.hash = 'ciel'; montrerVue('ciel');
+    toast(livres.length ? `${livres.length} livre${livres.length > 1 ? 's' : ''} dans ton ciel` : 'Ton ciel t’attend : + Ajouter pour commencer');
+  }
+};
 
 /* ---------------- Démarrage ---------------- */
 if ('serviceWorker' in navigator && location.protocol === 'https:') { try { navigator.serviceWorker.register('sw.js').catch(() => {}); } catch (e) {} }
