@@ -98,6 +98,11 @@ input[type=date].inp{color-scheme:dark}
 .bulle-etoile .btn.or,.terre .btn.or,.bulle-etoile .btn.or *,.terre .btn.or *{text-shadow:none}
 .bulle-etoile .relies button,.terre .btn:not(.or),.bulle-etoile .btn:not(.or){background:rgba(11,14,26,.35)}
 .bulle-etoile .ligne:hover{background:rgba(20,26,44,.5)}
+.zone-couv{border:1px dashed transparent;border-radius:12px;padding:6px;margin:-6px}
+.zone-couv.survol{border-color:var(--or);background:rgba(227,182,92,.06)}
+.mot-btn{border-color:rgba(154,163,191,.45);color:var(--ivoire-d);margin-right:6px}
+.mot-btn[aria-pressed="true"]{border-color:var(--or);color:var(--or)}
+#mot-carte .carte{max-height:46vh;overflow-y:auto}
 .pastille-export{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--or);margin-left:6px;vertical-align:middle}
 main{flex:1;min-width:0;position:relative;overflow:hidden}
 .vue{position:absolute;inset:0;overflow-y:auto;display:none}
@@ -258,11 +263,12 @@ h2{font-size:20px}
     <section class="vue" id="vue-vide"></section>
     <section class="vue" id="vue-ciel">
       <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
-      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button><div><span class="astuce" id="ciel-astuce">✦ Appui long sur le ciel pour l’éclairer</span></div></div></div>
+      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button><div><button class="banniere mot-btn" id="ciel-mot">✦ Relier par un mot</button> <span class="astuce" id="ciel-astuce">✦ Appui long sur le ciel pour l’éclairer</span></div></div></div>
       <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ou son titre ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
       <div class="ciel-outils"><button class="rond" id="zoom-plus" aria-label="Zoomer">+</button><button class="rond" id="zoom-moins" aria-label="Dézoomer">−</button><button class="rond" id="recadrer" aria-label="Recadrer le ciel">◎</button></div>
       <div class="bulle-etoile" id="bulle-etoile"></div>
       <div class="terre" id="terre"></div>
+      <div class="terre" id="mot-carte"></div>
     </section>
     <section class="vue" id="vue-fil"><div class="page" id="fil" style="max-width:none"></div></section>
     <section class="vue" id="vue-chercher"><div class="page" id="chercher"></div></section>
@@ -498,6 +504,7 @@ function montrerVue(nom){
 document.querySelectorAll('.nav-b[data-vue]').forEach(b => b.addEventListener('click', () => { location.hash = b.dataset.vue; }));
 function router(){
   const h = location.hash.slice(1);
+  if (h === 'partage') { history.replaceState(null, '', '#ciel'); montrerVue('ciel'); Edition.recevoirPartage().then(ok => { if (!ok) toast('Rien à importer'); }); return; }
   const m = /^fiche-(\d+)$/.exec(h);
   if (m) { if (!document.querySelector('.vue.active')) montrerVue('ciel'); Fiche.ouvrir(+m[1], false); return; }
   Fiche.fermer(false);
@@ -543,7 +550,7 @@ const Ciel = (() => {
   const cv = $('#ciel'); const ctx = cv.getContext('2d');
   let L = 0, H = 0, dpr = 1;
   let vue = { x:0, y:0, z:1 };          // écran = (monde - x) * z + centre
-  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null, lampe = null, minuterieLampe = null;
+  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null, lampe = null, minuterieLampe = null, mot = null;
   let vueAvantAllumage = null, bouge = false;
   const C = { nuit:'11,14,26', nuitHex:'#0B0E1A', ivoire:'243,235,221', or:'227,182,92', bleu:'135,146,188', brume:'154,163,191' };
 
@@ -632,11 +639,63 @@ const Ciel = (() => {
     if (modele.aCompleter > 0) { b.hidden = false; b.textContent = `✦ ${modele.aCompleter} fiche${modele.aCompleter > 1 ? 's attendent' : ' attend'} d’être complétée${modele.aCompleter > 1 ? 's' : ''} ›`; } else b.hidden = true;
   }
 
-  function cadrer(liste, zmax = 3, anime = false){
+  /* ---- Relier par un mot ---- */
+  const aLeMot = (l, cle) => (l._mots || []).some(w => { const n = norm(w); return n === cle || (' ' + n + ' ').includes(' ' + cle + ' '); });
+  function etoilesDuMot(){
+    if (!mot || !modele) return null;
+    if (mot.modele === modele) return mot;
+    const es = modele.etoiles.filter(e => (e.groupe || [e.l]).some(l => aLeMot(l, mot.cle)));
+    const aretes = [], dans = new Set(es.length ? [0] : []);
+    while (dans.size < es.length) { let best = null; for (const i of dans) for (let j = 0; j < es.length; j++) if (!dans.has(j)) { const d = Math.hypot(es[i].wx - es[j].wx, es[i].wy - es[j].wy); if (!best || d < best[2]) best = [i, j, d]; } dans.add(best[1]); aretes.push([best[0], best[1]]); }
+    Object.assign(mot, { modele, etoiles: es, set: new Set(es), aretes });
+    return mot;
+  }
+  function motsFrequents(){
+    const m = new Map();
+    for (const l of M.lectures) if (!l._manques.length) for (const w of new Set(l._mots.map(norm))) { if (!m.has(w)) m.set(w, { cle: w, label: l._mots.find(x => norm(x) === w), n: 0 }); m.get(w).n++; }
+    return [...m.values()].filter(x => x.n >= 2).sort((a, b) => b.n - a.n || a.cle.localeCompare(b.cle, 'fr'));
+  }
+  function choisirMot(label){
+    const cle = norm(label); if (!cle) return;
+    allume = null; choisie = null; fermerBulle(); fermerTerre();
+    mot = { cle, label }; const r = etoilesDuMot(); sale = true;
+    carteMot();
+    if (r.etoiles.length) cadrer(r.etoiles.map(e => ({ c: [e.wx, e.wy], rc: 40 })), 2.6, true, ($('#mot-carte').offsetHeight || 0) + 10);
+  }
+  function quitterMot(){ mot = null; $('#mot-carte').classList.remove('ouverte'); $('#ciel-mot').setAttribute('aria-pressed', 'false'); sale = true; }
+  function carteMot(){
+    const c = $('#mot-carte'), r = etoilesDuMot(), freq = motsFrequents();
+    $('#ciel-mot').setAttribute('aria-pressed', 'true');
+    let h = `<div class="carte"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div class="sur" style="color:var(--or)">Relier par un mot</div><button class="mini-x" id="mot-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
+      <div style="display:flex;gap:8px;margin:8px 0"><input class="inp" id="mot-saisie" list="mot-liste" placeholder="Un mot-clé : mort, quête, bouddhisme…" value="${esc(mot ? mot.label : '')}"><button class="btn or petit" id="mot-ok">Relier</button></div>
+      <datalist id="mot-liste">${freq.slice(0, 200).map(x => `<option value="${esc(x.label)}">`).join('')}</datalist>`;
+    if (r) {
+      const livres = r.etoiles.map(e => e.l);
+      h += r.etoiles.length
+        ? `<p style="margin:4px 0 8px;font-size:14px">« ${esc(mot.label)} » relie <b>${r.etoiles.length}</b> étoile${r.etoiles.length > 1 ? 's' : ''}${r.etoiles.length > 1 ? ', dans ' + new Set(r.etoiles.map(e => e.k.theme)).size + ' constellation(s)' : ''}.</p>
+          <div class="relies" style="margin-top:0">${r.etoiles.map((e, i) => `<button data-mi="${i}">⟡ ${esc(titreCourt(e.l))}</button>`).join('')}</div>
+          ${r.etoiles.length > 1 ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn petit" id="mot-garder">＋ Garder ces liens dans les fiches</button></div>` : ''}`
+        : `<p class="doux" style="font-size:13.5px">Aucun livre de ton ciel n’a « ${esc(mot.label)} » dans ses mots-clés.</p>`;
+    }
+    h += `<div class="sur" style="margin:12px 0 6px">Mots qui reviennent</div><div class="choix">${freq.slice(0, r ? 6 : 14).map(x => `<button class="puce mot" data-mot="${esc(x.label)}" aria-pressed="${mot && mot.cle === x.cle}">${esc(x.label)} <span class="doux" style="font-size:11px">${x.n}</span></button>`).join('') || '<span class="doux" style="font-size:13px">Ajoute des mots-clés à tes fiches pour faire apparaître des fils.</span>'}</div></div>`;
+    c.innerHTML = h; c.classList.add('ouverte');
+    $('#mot-fermer').onclick = quitterMot;
+    const go = () => choisirMot($('#mot-saisie').value);
+    $('#mot-ok').onclick = go; $('#mot-saisie').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); go(); } };
+    $('#mot-saisie').onchange = () => { if (freq.some(x => x.label === $('#mot-saisie').value)) go(); };
+    c.querySelectorAll('[data-mot]').forEach(b => b.onclick = () => choisirMot(b.dataset.mot));
+    c.querySelectorAll('[data-mi]').forEach(b => b.onclick = () => { const e = r.etoiles[+b.dataset.mi]; if (e.groupe) { c.classList.remove('ouverte'); choisir(e); } else Fiche.ouvrir(e.l.id); });
+    const g = $('#mot-garder'); if (g) g.onclick = async () => {
+      const ids = e => e.groupe ? e.groupe[0].id : e.l.id;
+      const n = await Edition.relierLivres(r.aretes.map(([i, j]) => [ids(r.etoiles[i]), ids(r.etoiles[j])]), mot.label);
+      toast(n ? `${n} lien${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} (raison : « ${mot.label} »)` : 'Ces livres étaient déjà reliés');
+    };
+  }
+  function cadrer(liste, zmax = 3, anime = false, basEnPlus = 0){
     if (!liste.length) return;
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     for (const k of liste) { x0 = Math.min(x0, k.c[0] - k.rc); y0 = Math.min(y0, k.c[1] - k.rc); x1 = Math.max(x1, k.c[0] + k.rc); y1 = Math.max(y1, k.c[1] + k.rc); }
-    const haut = 96, bas = 70;
+    const haut = 150, bas = 70 + basEnPlus;
     const z = Math.min(zmax, (L - 60) / (x1 - x0), (H - haut - bas) / (y1 - y0));
     const cible = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - (haut - bas) / 2 / z, z };
     if (anime && !reduitMouvement) animerVers(cible); else { vue = cible; sale = true; }
@@ -670,7 +729,8 @@ const Ciel = (() => {
     const annee = new Date().getFullYear();
     const lumi = allume ? allume.k : null;
     const relies = new Set(choisie ? choisie.l._liens.map(x => modele.parLivre.get(x.id)).filter(Boolean) : []);
-    const alpha = k => lumi ? (k === lumi ? 1 : .12) : 1;
+    const rm = etoilesDuMot();
+    const alpha = k => rm ? .14 : lumi ? (k === lumi ? 1 : .12) : 1;
     const dejaEcran = e => e._s || (e._s = ecran(e.wx, e.wy));
     for (const e of modele.etoiles) e._s = null;
 
@@ -695,6 +755,12 @@ const Ciel = (() => {
         else { ctx.strokeStyle = `rgba(${C.brume},${.22 * a})`; ctx.lineWidth = .9; ctx.stroke(); }
       });
     }
+    // fils d'or du mot : relie les étoiles qui partagent ce mot-clé
+    if (rm) {
+      ctx.strokeStyle = `rgba(${C.or},.75)`; ctx.lineWidth = 1.3;
+      for (const [i, j] of rm.aretes) { const A = dejaEcran(rm.etoiles[i]), B = dejaEcran(rm.etoiles[j]); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2 - Math.hypot(B[0] - A[0], B[1] - A[1]) * .08; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.quadraticCurveTo(mx, my, B[0], B[1]); ctx.stroke(); }
+      for (const e of rm.etoiles) { const [x, y] = dejaEcran(e); ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.strokeStyle = `rgba(${C.or},.55)`; ctx.lineWidth = 1; ctx.stroke(); }
+    }
     // fils d'or des liens personnels de l'étoile choisie
     if (choisie) {
       const A = dejaEcran(choisie);
@@ -706,7 +772,7 @@ const Ciel = (() => {
     const k15 = 1.5 * Math.min(1.3, Math.max(.62, Math.sqrt(z)));   // taille web, suit un peu le zoom pour ne pas saturer les petits écrans
     for (const e of modele.etoiles) {
       const [x, y] = dejaEcran(e); if (x < -30 || y < -30 || x > L + 30 || y > H + 30) continue;
-      let a = alpha(e.k); if (choisie && (e === choisie || relies.has(e))) a = 1;
+      let a = alpha(e.k); if ((choisie && (e === choisie || relies.has(e))) || (rm && rm.set.has(e))) a = 1;
       const l = e.l;
       if (l.statut === 'LU') {
         const fin = l.dateFin ? new Date(l.dateFin).getFullYear() : annee;
@@ -774,7 +840,7 @@ const Ciel = (() => {
     // titres des livres (zoom sémantique, constellation allumée, liens)
     ctx.font = `500 ${z >= 2.5 ? 12 : 11.5}px Manrope, system-ui, sans-serif`;
     for (const e of modele.etoiles) {
-      const montrer = (e.k === lumi) || (choisie && (e === choisie || relies.has(e))) || (!lumi && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
+      const montrer = (rm ? rm.set.has(e) : false) || (e.k === lumi) || (choisie && (e === choisie || relies.has(e))) || (!lumi && !rm && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
       if (!montrer) continue;
       const [x, y] = e._s || ecran(e.wx, e.wy); if (x < 0 || x > L || y < 0 || y > H) continue;
       const tt = titreCourt(e.l); const w = ctx.measureText(tt).width;
@@ -864,6 +930,7 @@ const Ciel = (() => {
     allume = null; if (vueAvantAllumage && !bouge) animerVers(vueAvantAllumage, 500); vueAvantAllumage = null; sale = true;
   }
   function choisir(e){
+    fermerCarteMot();
     fermerTerre();
     choisie = e; sale = true;
     const l = e.l, b = $('#bulle-etoile');
@@ -897,6 +964,7 @@ const Ciel = (() => {
     b.querySelectorAll('.relies button').forEach(x => x.onclick = () => { const e2 = modele.parLivre.get(+x.dataset.id); if (e2) { choisir(e2); animerVers({ x: e2.wx, y: e2.wy, z: Math.max(vue.z, 1.6) }, 500); } });
   }
   function fermerBulle(){ $('#bulle-etoile').classList.remove('ouverte'); }
+  function fermerCarteMot(){ $('#mot-carte').classList.remove('ouverte'); }
   function fermerTerre(){ terre = null; $('#terre').classList.remove('ouverte'); }
   function ouvrirTerre(theme){
     eteindre(); choisie = null; fermerBulle(); terre = theme; sale = true;
@@ -975,13 +1043,14 @@ const Ciel = (() => {
   cv.addEventListener('wheel', e => { e.preventDefault(); anim = null; zoomer(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0018)), e.offsetX, e.offsetY, false); }, { passive:false });
   $('#zoom-plus').onclick = () => zoomer(1.6); $('#zoom-moins').onclick = () => zoomer(1 / 1.6);
   $('#recadrer').onclick = () => { allume = null; choisie = null; fermerBulle(); fermerTerre(); cadrer(modele.consts, 3, true); };
+  $('#ciel-mot').onclick = () => { if (mot && !$('#mot-carte').classList.contains('ouverte')) { choisie = null; fermerBulle(); carteMot(); sale = true; return; } if (mot || $('#mot-carte').classList.contains('ouverte')) { quitterMot(); return; } allume = null; choisie = null; fermerBulle(); fermerTerre(); carteMot(); setTimeout(() => $('#mot-saisie')?.focus(), 50); };
   $('#ciel-banniere').onclick = () => { Chercher.filtre = 'COMPLETER'; Chercher.mode = 'liste'; location.hash = 'chercher'; };
   addEventListener('keydown', e => { if (vueCourante !== 'ciel' || Fiche.estOuverte()) return; if (e.key === 'Escape') clic(-999, -999); if (e.key === '+' || e.key === '=') zoomer(1.4); if (e.key === '-') zoomer(1 / 1.4); });
   new ResizeObserver(() => taille()).observe(cv);
   requestAnimationFrame(boucle);
   if (document.fonts) document.fonts.ready.then(() => { sale = true; });
 
-  return { invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; if (!e.groupe) animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); choisir(e); } } };
+  return { relierParMot(label){ location.hash = 'ciel'; setTimeout(() => { taille(); choisirMot(label); }, 80); }, invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; if (!e.groupe) animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); choisir(e); } } };
 })();
 
 /* =========================================================
@@ -1494,7 +1563,7 @@ const Edition = (() => {
     return `<button class="fermer" aria-label="Fermer" id="e-fermer">✕</button>
       <div style="padding:18px 20px 0"><div class="sur">${nouveau ? 'Nouvelle lecture' : 'Modifier la fiche'}</div><h2 style="margin-top:6px;padding-right:40px">${esc(b.titre || 'Sans titre')}</h2></div>
       <div class="fiche-corps"><form class="form" id="e-form" autocomplete="off">
-        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn petit" id="e-scanner">📷 Scanner</button><button type="button" class="btn petit" id="e-rafale">⚡ En rafale</button></div><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après la BnF, Google Books et Open Library.</div></div>` : ''}
+        ${nouveau ? `<div class="carte" style="padding:14px"><label>ISBN (code-barres)<div style="display:flex;gap:8px"><input class="inp" name="isbnRecherche" inputmode="numeric" placeholder="978…" value="${esc(b.isbn || '')}"><button type="button" class="btn or" id="e-isbn">Chercher</button></div></label><div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button type="button" class="btn petit" id="e-scanner">📷 Scanner</button><button type="button" class="btn petit" id="e-rafale">⚡ En rafale</button><label class="btn petit" style="display:inline-flex;font-size:13px;color:var(--ivoire)">🖼 Par la couverture<input type="file" accept="image/*" capture="environment" id="e-photo-livre" hidden></label></div><div id="e-photo-res"></div><div id="e-isbn-res" class="doux" style="font-size:13px;margin-top:8px">Titre, auteur, pages, 4e de couverture et thème remplis d’après la BnF, Google Books et Open Library.</div></div>` : ''}
         <label>Titre<input class="inp" name="titre" value="${esc(b.titre)}" required></label>
         <label>Auteur<input class="inp" name="auteur" value="${esc(b.auteur)}" placeholder="Prénom Nom, Prénom Nom"></label>
         ${nouveau ? `<div style="margin-top:-4px"><button type="button" class="btn petit" id="e-editions">🔎 Chercher les éditions de ce titre</button><div class="doux" style="font-size:12px;margin-top:6px">Sans ISBN : tape le titre (et l’auteur), puis choisis ton édition dans la liste.</div><div id="e-editions-res"></div></div>` : ''}
@@ -1508,7 +1577,12 @@ const Edition = (() => {
         <label><span style="display:flex;justify-content:space-between;align-items:center">Notes<button type="button" class="btn petit" id="e-dicter" style="font-size:12px;padding:4px 10px">🎙 Dicter</button></span><textarea class="inp" name="notes" style="min-height:140px">${esc(b.notes)}</textarea></label>
         <label>4e de couverture${b.sourceResume ? ` <span style="font-weight:400">· ${esc(b.sourceResume)}</span>` : ''}<textarea class="inp" name="resume">${esc(b.resume)}</textarea></label>
         <div class="deux"><label>ISBN<input class="inp" name="isbn" value="${esc(b.isbn || '')}"></label><label>Prêté à<input class="inp" name="pretA" value="${esc(b.pretA || '')}"></label></div>
-        <div><div class="sur" style="margin-bottom:8px">Couverture</div><div style="display:flex;gap:14px;align-items:center"><div id="e-couv">${imageChoisie ? `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>` : couverture(b, 70)}</div><div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><label class="btn petit" style="display:inline-flex;color:var(--ivoire);font-size:13px">Choisir une image<input type="file" accept="image/*" id="e-image" hidden></label>${imageChoisie || (b.couvertureUrl || '').startsWith('local:') ? '<button type="button" class="btn petit" id="e-recadrer">Recadrer / tourner</button>' : ''}${b.couvertureUrl || imageChoisie ? '<button type="button" class="btn petit" id="e-sans-image">Retirer</button>' : ''}</div></div></div>
+        <div id="e-zone-couv" class="zone-couv"><div class="sur" style="margin-bottom:8px">Couverture</div><div style="display:flex;gap:14px;align-items:flex-start"><div id="e-couv">${imageChoisie ? `<div class="couv" style="--w:70px;width:70px"><img src="${URL.createObjectURL(imageChoisie)}" alt=""></div>` : couverture(b, 70)}</div><div style="display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start;flex:1">
+          <a class="btn petit" id="e-web" href="${esc(lienImages(b, 'google'))}" target="_blank" rel="noopener">🔎 Chercher sur le web</a><a class="btn petit" id="e-web2" href="${esc(lienImages(b, 'ddg'))}" target="_blank" rel="noopener" style="font-weight:500">DuckDuckGo</a>
+          <button type="button" class="btn petit" id="e-coller">📋 Coller l’image</button>
+          <label class="btn petit" style="display:inline-flex;color:var(--ivoire);font-size:13px">Choisir un fichier<input type="file" accept="image/*" id="e-image" hidden></label>${imageChoisie || (b.couvertureUrl || '').startsWith('local:') ? '<button type="button" class="btn petit" id="e-recadrer">Recadrer / tourner</button>' : ''}${b.couvertureUrl || imageChoisie ? '<button type="button" class="btn petit" id="e-sans-image">Retirer</button>' : ''}</div></div>
+          <div class="doux" style="font-size:12px;margin:10px 0 6px">Sur la page d’images : copie l’image (appui long › Copier, ou clic droit › Copier l’image) puis « Coller l’image » ou Ctrl+V ici ; tu peux aussi la glisser sur ce cadre, ou la partager vers Phylactère sur Android.</div>
+          <div style="display:flex;gap:8px"><input class="inp" id="e-url-image" placeholder="ou colle l’adresse de l’image (https://…)" inputmode="url"><button type="button" class="btn petit" id="e-url-ok">Utiliser</button></div></div>
         <div class="barre-actions">${nouveau ? '' : '<button type="button" class="btn danger" id="e-supprimer" style="margin-right:auto">Supprimer</button>'}<button type="button" class="btn" id="e-annuler">Annuler</button><button type="submit" class="btn or">${nouveau ? 'Ajouter' : 'Enregistrer'}</button></div>
       </form><datalist id="liste-themes">${THEMES.map(t => `<option value="${esc(t)}">`).join('')}</datalist></div>`;
   }
@@ -1529,6 +1603,25 @@ const Edition = (() => {
       el.querySelectorAll('[data-champ]').forEach(b => b.onclick = () => { lireForm(f); brouillon[b.dataset.champ] = b.dataset.val; afficherConserve(el); });
       el.querySelectorAll('[data-note]').forEach(b => b.onclick = () => { lireForm(f); brouillon.note = +b.dataset.note; afficherConserve(el); });
       el.querySelector('#e-image').onchange = async e => { const fi = e.target.files[0]; e.target.value = ''; if (!fi) return; try { const bmp = await createImageBitmap(fi); const b2 = await Recadreur.ouvrir(bmp); if (!b2) return; lireForm(f); imageChoisie = b2; retirerImage = false; afficherConserve(el); } catch { toast('Image illisible'); } };
+      // couverture cherchée sur le web, puis importée
+      const enAttente = () => { try { localStorage.setItem('phylactere-couv-attente', JSON.stringify({ id: brouillon.id, titre: f.elements.titre.value.trim() || brouillon.titre, t: Date.now() })); } catch (e) {} };
+      el.querySelectorAll('#e-web, #e-web2').forEach(a => a.addEventListener('click', () => { lireForm(f); a.href = lienImages(brouillon, a.id === 'e-web' ? 'google' : 'ddg'); enAttente(); toast('Copie l’image choisie, puis reviens la coller ici'); }));
+      el.querySelector('#e-coller').onclick = async () => {
+        try {
+          if (!navigator.clipboard?.read) throw new Error('lecture');
+          for (const it of await navigator.clipboard.read()) { const ty = it.types.find(t => t.startsWith('image/')); if (ty) { await appliquerImage(await it.getType(ty)); return; } if (it.types.includes('text/plain')) { const t = (await (await it.getType('text/plain')).text()).trim(); if (/^https:\/\//.test(t)) { appliquerUrl(t); return; } } }
+          toast('Pas d’image dans le presse-papiers');
+        } catch (e) { toast('Utilise Ctrl+V (ou appui long › Coller) dans ce formulaire'); }
+      };
+      el.querySelector('#e-url-ok').onclick = () => { const u = el.querySelector('#e-url-image').value.trim(); if (!/^https?:\/\//.test(u)) { toast('Colle une adresse qui commence par https://'); return; } appliquerUrl(u.replace(/^http:/, 'https:')); };
+      const zone = el.querySelector('#e-zone-couv');
+      zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('survol'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('survol'));
+      zone.addEventListener('drop', async e => { e.preventDefault(); zone.classList.remove('survol');
+        const fi = [...e.dataTransfer.files].find(x => x.type.startsWith('image/')); if (fi) { await appliquerImage(fi); return; }
+        const u = (e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain') || '').split('\n')[0].trim(); if (/^https?:\/\//.test(u)) appliquerUrl(u.replace(/^http:/, 'https:')); });
+      // trouver le livre d'après une photo de sa couverture
+      const pl = el.querySelector('#e-photo-livre'); if (pl) pl.onchange = e => { const fi = e.target.files[0]; e.target.value = ''; if (fi) livreParImage(fi); };
       const si = el.querySelector('#e-sans-image'); if (si) si.onclick = () => { lireForm(f); retirerImage = true; imageChoisie = null; brouillon.couvertureUrl = null; afficherConserve(el); };
       const bi = el.querySelector('#e-isbn'); if (bi) bi.onclick = () => rechercheIsbn(el, f);
       const be = el.querySelector('#e-editions'); if (be) be.onclick = () => rechercheEditions(el, f);
@@ -1542,6 +1635,97 @@ const Edition = (() => {
       if (brouillon.id == null && !brouillon.titre) setTimeout(() => (f.elements.isbnRecherche || f.elements.titre).focus(), 50);
     });
   }
+  function lienImages(b, moteur){
+    const q = [b.titre && !/^isbn\b/i.test(b.titre) ? b.titre : '', (b.auteur || '').split(',')[0].trim(), 'couverture'].filter(Boolean).join(' ');
+    return moteur === 'ddg' ? 'https://duckduckgo.com/?ia=images&iax=images&q=' + encodeURIComponent(q) : 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
+  }
+  async function appliquerImage(blob){
+    const f = $('#e-form'); if (!f) return;
+    try { const bmp = await createImageBitmap(blob); const b2 = await Recadreur.ouvrir(bmp); if (!b2) return; lireForm(f); imageChoisie = b2; retirerImage = false; afficherConserve($('#fiche')); $('#e-zone-couv')?.scrollIntoView({ block: 'center' }); toast('Couverture prête : pense à enregistrer'); }
+    catch (e) { toast('Image illisible'); }
+  }
+  function appliquerUrl(u){ const f = $('#e-form'); if (!f) return; lireForm(f); imageChoisie = null; retirerImage = false; brouillon.couvertureUrl = u; afficherConserve($('#fiche')); $('#e-zone-couv')?.scrollIntoView({ block: 'center' }); toast('Adresse de couverture prête : pense à enregistrer'); }
+  // Ctrl+V d'une image pendant que le formulaire est ouvert
+  addEventListener('paste', e => {
+    if (!$('#e-form') || $('#recadreur')) return;
+    const it = [...(e.clipboardData?.items || [])].find(x => x.type.startsWith('image/'));
+    if (it) { e.preventDefault(); appliquerImage(it.getAsFile()); return; }
+    const t = (e.clipboardData?.getData('text') || '').trim();
+    if (/^https:\/\/\S+\.(jpe?g|png|webp|gif)(\?\S*)?$/i.test(t) && !(e.target && e.target.matches && e.target.matches('input,textarea'))) { e.preventDefault(); appliquerUrl(t); }
+  });
+
+  /* Trouver un livre d'après une photo de sa couverture : code-barres d'abord, sinon lecture du texte */
+  let tesseract = null, lecteurLog = null;
+  async function chargerTesseract(){
+    if (window.Tesseract) return window.Tesseract;
+    await new Promise((ok, ko) => { const sc = document.createElement('script'); sc.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'; sc.onload = ok; sc.onerror = () => ko(new Error('charge')); document.head.appendChild(sc); });
+    return window.Tesseract;
+  }
+  async function livreParImage(fichier){
+    const out = $('#e-photo-res'); if (!out) return;
+    const dire = h => { const o = $('#e-photo-res'); if (o) o.innerHTML = `<div class="carte" style="margin-top:10px;padding:12px;font-size:13.5px">${h}</div>`; };
+    let bmp; try { bmp = await createImageBitmap(fichier); } catch (e) { dire('<span style="color:var(--corail)">Image illisible.</span>'); return; }
+    dire('Recherche d’un code-barres…');
+    try { const codes = await Scanner.lireImage(bmp); const c = (codes[0] || '').replace(/\D/g, ''); if (Scanner.isbnValide(c)) { const f = $('#e-form'); f.elements.isbnRecherche.value = c; dire(`Code-barres trouvé : ${c}`); await rechercheIsbn($('#fiche'), f); return; } } catch (e) {}
+    dire('Lecture du texte de la couverture… 0 %');
+    let lignes = [];
+    try {
+      const T = await chargerTesseract();
+      const f2 = Math.min(1, 1600 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas'); c.width = Math.round(bmp.width * f2); c.height = Math.round(bmp.height * f2); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      lecteurLog = m => { if (m.status === 'recognizing text') dire(`Lecture du texte de la couverture… ${Math.round(m.progress * 100)} %`); else if (/load|initializ/.test(m.status)) dire('Préparation de la lecture (la première fois, quelques secondes)…'); };
+      if (!tesseract) { tesseract = await T.createWorker('fra+eng', 1, { logger: m => lecteurLog && lecteurLog(m) }); await tesseract.setParameters({ tessedit_pageseg_mode: '11' }); }   // texte épars : adapté aux couvertures
+      const r = await tesseract.recognize(c);
+      lignes = (r.data.lines || []).map(l => ({ t: l.text.replace(/[|_~^`*»«"“”]+/g, ' ').replace(/\s+/g, ' ').trim(), h: l.bbox.y1 - l.bbox.y0, y: l.bbox.y0, conf: l.confidence }))
+        .filter(l => l.conf > 30 && (l.t.match(/\p{L}/gu) || []).length >= 3);
+    } catch (e) { console.warn(e); dire('<span style="color:var(--or)">La lecture du texte n’est pas disponible ici (connexion ?). Tape le titre à la main.</span>'); return; }
+    // le titre : la ou les plus grandes lignes, de taille voisine et qui se suivent, dans l'ordre de lecture
+    const parTaille = lignes.slice().sort((a, b) => b.h - a.h), grand = parTaille[0];
+    let titre = '', auteur = '';
+    if (grand) {
+      const ordre = lignes.slice().sort((a, b) => a.y - b.y), i0 = ordre.indexOf(grand), bloc = [grand];
+      for (let i = i0 - 1; i >= 0 && ordre[i].h > grand.h * .7 && bloc[0].y - (ordre[i].y + ordre[i].h) < grand.h * 1.2; i--) bloc.unshift(ordre[i]);
+      for (let i = i0 + 1; i < ordre.length && ordre[i].h > grand.h * .7 && ordre[i].y - (bloc[bloc.length - 1].y + bloc[bloc.length - 1].h) < grand.h * 1.2; i++) bloc.push(ordre[i]);
+      titre = bloc.map(l => l.t).join(' ');
+      const casse = t => t === t.toUpperCase() ? t.toLowerCase().replace(/(^|[\s'’-])\p{L}/gu, m => m.toUpperCase()) : t;
+      titre = casse(titre).replace(/^(\p{L})/u, m => m.toUpperCase());
+      // l'auteur : la plus grande des autres lignes qui ressemble à un nom (2 à 5 mots)
+      const nom = parTaille.find(l => !bloc.includes(l) && /^\p{Lu}/u.test(l.t) && l.t.split(' ').length >= 2 && l.t.split(' ').length <= 5 && !/\d/.test(l.t));
+      auteur = nom ? casse(nom.t) : '';
+      lignes.titreBloc = bloc;
+    }
+    const photoUrl = URL.createObjectURL(fichier);
+    dire(lignes.length ? `<div class="sur" style="margin-bottom:8px">Lu sur la couverture</div>
+      <div style="display:flex;gap:10px;align-items:flex-start"><img src="${photoUrl}" alt="" style="width:54px;border-radius:4px;flex:none"><div style="flex:1;display:grid;gap:8px">
+      <input class="inp" id="lu-titre" value="${esc(titre)}" placeholder="Titre"><input class="inp" id="lu-auteur" value="${esc(auteur)}" placeholder="Auteur"></div></div>
+      <div class="doux" style="font-size:12px;margin-top:6px">Corrige si besoin. Autres lignes lues : ${esc(lignes.filter(l => !(lignes.titreBloc || []).includes(l)).slice(0, 6).map(l => l.t).join(' · ') || '—')}</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button type="button" class="btn or petit" id="lu-chercher">🔎 Chercher les éditions</button><button type="button" class="btn petit" id="lu-couv">Utiliser cette photo comme couverture</button></div>`
+      : `<span style="color:var(--or)">Aucun texte lisible sur cette photo.</span> Essaie une photo plus nette et bien droite, ou tape le titre à la main. <button type="button" class="btn petit" id="lu-couv" style="margin-top:8px">Utiliser cette photo comme couverture</button>`);
+    const bc = $('#lu-couv'); if (bc) bc.onclick = () => appliquerImage(fichier);
+    const bch = $('#lu-chercher'); if (bch) bch.onclick = () => { const f = $('#e-form'); f.elements.titre.value = $('#lu-titre').value.trim(); f.elements.auteur.value = $('#lu-auteur').value.trim(); rechercheEditions($('#fiche'), f); $('#e-editions-res')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+  }
+
+  /* Image partagée depuis une autre appli (Android, site installé) */
+  async function recevoirPartage(){
+    let blob = null, url = '';
+    try { const c = await caches.open('phylactere-partage'); const r = await c.match('./partage-image'); if (r) { blob = await r.blob(); await c.delete('./partage-image'); } const t = await c.match('./partage-texte'); if (t) { url = (await t.text()).trim(); await c.delete('./partage-texte'); } } catch (e) {}
+    if (!blob && !/^https?:\/\//.test(url)) return false;
+    let att = null; try { att = JSON.parse(localStorage.getItem('phylactere-couv-attente') || 'null'); } catch (e) {}
+    if (att && Date.now() - att.t > 3600e3) att = null;
+    const appliquer = async () => { if (blob) await appliquerImage(blob); else appliquerUrl(url.replace(/^http:/, 'https:')); };
+    if ($('#e-form')) { await appliquer(); return true; }
+    if (att && att.id != null && M.parId.has(att.id)) { ouvrir(att.id); await appliquer(); return true; }
+    // sinon : choisir le livre, ceux sans couverture d'abord
+    const ls = M.lectures.slice().sort((a, b) => (!!a.couvertureUrl - !!b.couvertureUrl) || (b.dateAjout || 0) - (a.dateAjout || 0)).slice(0, 60);
+    const d = $('#dialogue');
+    d.innerHTML = `<div class="carte" style="max-width:460px;width:100%;max-height:80vh;display:flex;flex-direction:column"><h2 style="font-size:19px">Image reçue</h2><p class="doux" style="font-size:13.5px;margin:6px 0 10px">Pour quel livre ? Ceux sans couverture sont en premier.</p>
+      <div style="overflow-y:auto;flex:1">${ls.map(l => `<button class="ligne" data-pour="${l.id}" style="padding:6px">${couverture(l, 34)}<div class="infos"><div class="t" style="font-size:15px">${esc(titreCourt(l))}</div><div class="a">${esc(l.auteur || '')}</div></div></button>`).join('')}</div>
+      <div style="display:flex;justify-content:flex-end;margin-top:10px"><button class="btn petit" id="pour-non">Annuler</button></div></div>`;
+    d.classList.add('ouvert');
+    $('#pour-non').onclick = () => d.classList.remove('ouvert');
+    d.querySelectorAll('[data-pour]').forEach(b => b.onclick = async () => { d.classList.remove('ouvert'); ouvrir(+b.dataset.pour); await appliquer(); });
+    return true;
+  }
+
   let editions = [];
   async function rechercheEditions(el, f){
     lireForm(f); const out = el.querySelector('#e-editions-res');
@@ -1666,6 +1850,12 @@ const Edition = (() => {
     if (onglet === 'lecture' && l.statut !== 'LU') return `<div class="carte" style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap"><span class="sur">J’en suis à la page</span><input class="inp" id="p-page" inputmode="numeric" value="${l.pageActuelle ?? ''}" style="width:90px">${l.pagesTotal ? `<span class="doux">/ ${l.pagesTotal}</span>` : ''}<button class="btn petit" id="p-ok">OK</button>${l.statut === 'A_LIRE' ? '<button class="btn or petit" id="p-commencer" style="margin-left:auto">Commencer</button>' : '<button class="btn or petit" id="p-fini" style="margin-left:auto">Terminé ✓</button>'}</div>`;
     return '';
   }
+  async function relierLivres(paires, raison){
+    let n = 0;
+    for (const [a, b] of paires) if (a !== b && !M.liens.some(x => (x.lectureA === a && x.lectureB === b) || (x.lectureA === b && x.lectureB === a))) { M.liens.push({ id: nouvelId(M.liens), lectureA: a, lectureB: b, raison: raison || '', dateAjout: Date.now() }); n++; }
+    if (n) await enregistrer();
+    return n;
+  }
   function relier(a, b, raison){
     if (a === b || M.liens.some(x => (x.lectureA === a && x.lectureB === b) || (x.lectureA === b && x.lectureB === a))) { toast('Ces deux livres sont déjà reliés'); return false; }
     M.liens.push({ id: nouvelId(M.liens), lectureA: a, lectureB: b, raison: raison || '', dateAjout: Date.now() }); return true;
@@ -1744,7 +1934,7 @@ const Edition = (() => {
   $('#nav-ajouter').addEventListener('click', () => nouveau());
   async function ajouterPlusieurs(liste){ for (const o of liste) M.lectures.push({ ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }); await enregistrer(); }
   async function ajouterSimple(o){ const l = { ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }; M.lectures.push(l); await enregistrer(); return l; }
-  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple, ajouterPlusieurs };
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple, ajouterPlusieurs, recevoirPartage, livreParImage, relierLivres };
 })();
 
 /* =========================================================
@@ -1875,7 +2065,8 @@ const Scanner = (() => {
     }
   }
   addEventListener('keydown', e => { if (e.key === 'Escape' && actif) fermer(); });
-  return { ouvrir, fermer, isbnValide };
+  async function lireImage(img){ await preparer(); return lireSource(img, img.width, img.height); }
+  return { ouvrir, fermer, isbnValide, lireImage };
 })();
 
 /* =========================================================
