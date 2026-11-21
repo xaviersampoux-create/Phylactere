@@ -149,6 +149,124 @@ h2{font-size:20px}
 .vide p{color:var(--ivoire-d);line-height:1.6}
 .depot{margin-top:22px;border:1px dashed var(--trait);border-radius:18px;padding:28px 18px}
 .depot.survol{border-color:var(--or);background:rgba(227,182,92,.05)}
+/* Fiche (appli 1.8) */
+.fiche{width:min(560px,100%)}
+.rond{width:44px;height:44px;border-radius:50%;border:1px solid var(--trait);display:grid;place-items:center;font-size:18px;color:var(--ivoire);flex:none}
+.fc-barre{display:flex;align-items:center;gap:8px;padding:8px 12px;flex:none}
+.fc-titre{flex:1;min-width:0;text-align:center;font-size:11px;letter-spacing:2px;color:var(--or);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px}
+.fc-titre.replie{font-family:var(--serif);font-size:17px;letter-spacing:0;color:var(--ivoire);font-weight:400}
+.fc-defile{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding-bottom:calc(32px + var(--safe-b))}
+.fc-entete{display:flex;gap:14px;padding:4px 20px 16px;align-items:flex-start}
+.fc-couv{width:72px;height:108px;border-radius:6px;overflow:hidden;flex:none;background:var(--encre);border:1px solid var(--trait);display:grid;place-items:center}
+.fc-couv img{width:100%;height:100%;object-fit:contain;background:var(--nuit)}
+.fc-couv span{display:grid;place-items:center;gap:2px;font-size:22px;filter:grayscale(1);opacity:.7}
+.fc-couv b{color:var(--or);font-size:11px;filter:none}
+.fc-sous{font-size:11px;letter-spacing:1.5px;color:var(--or);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-h{font-size:24px;line-height:1.2;margin:4px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.fc-aut{font-size:14px;color:var(--ivoire-d);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-note-l{display:flex;margin:2px 0 4px}
+.fc-note-l button{font-size:20px;color:var(--trait);padding:1px 2px;line-height:1}
+.fc-note-l button.on{color:var(--or)}
+.fc-statut{display:inline-flex;align-items:center;gap:6px;border:1px solid currentColor;border-radius:14px;padding:6px 10px;font-size:12.5px;font-weight:600}
+.fc-statut i{width:8px;height:8px;border-radius:50%;border:1px solid currentColor;background:currentColor}
+.fc-statut span{color:var(--brume)}
+.fc-statut.s-LU{color:var(--ivoire)} .fc-statut.s-EN_COURS{color:var(--or)} .fc-statut.s-A_LIRE{color:var(--bleu)} .fc-statut.s-A_LIRE i{background:none}
+.menu-liste.gauche{left:0;right:auto}
+.fc-onglets{position:sticky;top:0;z-index:2;background:var(--nuit);display:flex;gap:20px;padding:0 20px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--trait-d)}
+.fc-onglets::-webkit-scrollbar{display:none}
+.fc-onglets button{padding:6px 0 10px;font-size:14px;font-weight:600;color:var(--brume);white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px}
+.fc-onglets button[aria-selected="true"]{color:var(--ivoire);border-color:var(--or)}
+.fc-page{display:flex;flex-direction:column;gap:16px;padding-top:16px;min-height:60vh}
+.fc-page>*{margin-left:20px;margin-right:20px}
+.fc-page>.fc-etiq,.fc-page>.fc-rub,.fc-page>.fc-lienpage{margin-left:0;margin-right:0}
+.fc-rub{font-size:11px;letter-spacing:2px;color:var(--brume);font-weight:600;padding:4px 20px 0}
+.fc-lab{font-size:11px;letter-spacing:2px;color:var(--brume);font-weight:600}
+.fc-lab.or,.fc-or{color:var(--or)}
+.fc-petit{font-size:12.5px;color:var(--brume)}
+.fc-discret{color:var(--brume);font-size:14px;margin:0 20px !important;line-height:1.5}
+.fc-discret0{color:var(--brume);font-size:14px;margin:0;line-height:1.5}
+.fc-texte{color:var(--ivoire-d);font-size:14px;line-height:1.5;margin:0}
+.fc-erreur{color:var(--corail);font-size:12.5px;margin:0}
+.fc-charge{display:flex;align-items:center;gap:10px;color:var(--brume);font-size:14px}
+.rouet{width:16px;height:16px;border-radius:50%;border:2px solid var(--or);border-right-color:transparent;animation:tourne .8s linear infinite;flex:none}
+@keyframes tourne{to{transform:rotate(360deg)}}
+.fc-lienpage{align-self:flex-start;color:var(--or);font-weight:600;font-size:14px;padding:6px 8px;margin:0 12px !important;border-radius:8px}
+.fc-lienpage:hover{background:var(--encre)}
+.fc-ligne{display:flex;align-items:center}
+.fc-col{display:flex;flex-direction:column;align-items:flex-end}
+.fc-bloc{display:flex;flex-direction:column;gap:10px}
+.fc-etiq{display:flex;gap:6px;overflow-x:auto;padding:0 20px;scrollbar-width:none}
+.fc-etiq::-webkit-scrollbar{display:none}
+.etq{flex:none;font-size:12.5px;font-weight:600;color:var(--ivoire-d);border:1px solid var(--trait-d);border-radius:14px;padding:6px 10px;white-space:nowrap}
+.etq.or{color:var(--or);border-color:var(--or)}
+.fc-gros{display:flex;justify-content:center;align-items:center;background:var(--or);color:var(--nuit);font-weight:700;font-size:15px;border-radius:999px;padding:14px;cursor:pointer}
+.fc-gros.petit{padding:10px;font-size:14px;flex:1}
+.fc-gros:disabled,.fc-gros.off{opacity:.45;pointer-events:none}
+.fc-contour{display:flex;justify-content:center;align-items:center;gap:6px;border:1px solid var(--trait);border-radius:999px;padding:10px;font-weight:600;font-size:14px;color:var(--ivoire);flex:1;cursor:pointer;text-align:center}
+.fc-contour:disabled{color:var(--brume);opacity:.6}
+.fc-contour.large{flex:none}
+.fc-deux{display:flex;gap:10px}
+.fc-txtbtn{color:var(--brume);font-weight:600;font-size:14px;padding:8px 10px;border-radius:8px;white-space:nowrap}
+.fc-txtbtn.or{color:var(--or)}
+.fc-txtbtn:disabled{opacity:.4}
+.fc-txtbtn:hover{background:rgba(154,163,191,.08)}
+.fc-carte{background:var(--encre);border-radius:14px;padding:10px 4px 10px 14px}
+.fc-dates{display:flex;align-items:center;gap:10px}
+.fc-dates>i{width:9px;height:9px;border-radius:50%;flex:none}
+.fc-crayon{color:var(--or);font-size:18px;padding:8px 12px}
+.fc-note{display:grid;gap:6px;text-align:left;background:#080B15;border-radius:14px;padding:14px}
+.fc-extrait{font-size:14px;line-height:1.5;color:var(--ivoire);display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.fc-resume7{font-size:14px;line-height:1.5;color:var(--ivoire-d);display:-webkit-box;-webkit-line-clamp:7;-webkit-box-orient:vertical;overflow:hidden;white-space:pre-line}
+.fc-bandeau{display:flex;align-items:center;border-radius:14px;background:var(--encre);padding:6px 4px 6px 14px}
+.fc-bandeau.or{background:none;border:1px solid var(--or)}
+.fc-prog{display:flex;flex-direction:column;gap:10px;background:var(--encre);border:1px solid var(--or);border-radius:16px;padding:16px}
+.fc-pct{font-family:var(--serif);font-size:22px;color:var(--or)}
+.fc-champ{display:grid;gap:2px;font-size:11px;color:var(--brume);font-weight:600}
+.fc-champ input{width:96px;background:var(--nuit);color:var(--ivoire);border:1px solid var(--trait);border-radius:8px;padding:9px 10px;font:inherit;font-size:15px}
+.fc-plus{border:1px solid var(--trait);border-radius:14px;padding:8px 14px;font-weight:600;font-size:14px}
+.fc-jauge{height:6px;border-radius:3px;background:var(--trait);overflow:hidden}
+.fc-jauge i{display:block;height:100%;background:var(--or)}
+.fc-citation{display:flex;flex-direction:column;background:#080B15;border-radius:14px;border-left:3px solid var(--or);padding:14px 4px 0 14px;cursor:pointer}
+.fc-cit-t{font-family:var(--serif);font-style:italic;font-size:18px;line-height:1.4;color:var(--ivoire)}
+.fc-cit-b{display:flex;align-items:center;justify-content:space-between;font-size:12.5px;color:var(--brume)}
+.fc-cit-b button{color:var(--brume);font-weight:600;padding:10px 12px}
+.fc-sugg{display:flex;align-items:center;gap:12px;background:var(--encre);border-radius:14px;padding:12px;text-decoration:none;color:inherit}
+.fc-sugg img,.fc-sugg-v{width:42px;height:63px;border-radius:4px;object-fit:cover;flex:none;background:#080B15;display:grid;place-items:center;color:var(--bleu)}
+.fc-t16{font-family:var(--serif);font-size:16px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.fc-t18{font-family:var(--serif);font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc-lien{display:flex;align-items:center;gap:12px;background:var(--encre);border:1px solid var(--trait);border-radius:14px;padding:10px 4px 10px 14px;cursor:pointer}
+.fc-raison{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ivoire-d)}
+.fc-4e{font-family:var(--serif);font-size:16px;line-height:1.5;background:#080B15;border-radius:14px;padding:16px;white-space:pre-line}
+.fc-rangee{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.fc-rangee::-webkit-scrollbar{display:none}
+.fc-prop{flex:none;border:1px solid var(--trait);border-radius:16px;padding:8px 12px;font-weight:600;font-size:14px}
+.fc-serie{background:var(--encre);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:10px}
+.fc-tome{flex:none;display:grid;justify-items:center;background:#080B15;border-radius:10px;padding:8px 12px}
+.fc-tome b{font-size:14px} .fc-tome span{font-size:11px;color:var(--brume);width:76px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
+.fc-tome.actuel{background:var(--or);color:var(--nuit)} .fc-tome.actuel span{color:var(--nuit)}
+.fc-infos{border:1px solid var(--trait-d);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px}
+.fc-notes{min-height:240px !important}
+.fc-mini svg{display:block}
+.mini-centre{font-family:var(--serif);font-size:14px;color:var(--or);text-align:center;line-height:1.2;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.mini-t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:12px;font-weight:600;color:var(--ivoire);text-align:center;text-decoration:none;line-height:1.25}
+.li-choix.choisi{background:rgba(227,182,92,.12);outline:1px solid var(--or)}
+.toast-annuler{color:var(--or);font-weight:700;margin-left:10px;pointer-events:auto}
+.toast.vu{pointer-events:auto}
+/* panneau Modifier : monte du bas sur téléphone, fenêtre centrée sur grand écran */
+.feuille-fond{position:fixed;inset:0;z-index:45;background:rgba(5,7,14,0);display:flex;align-items:flex-end;justify-content:center;transition:background .25s}
+.feuille-fond.ouvert{background:rgba(5,7,14,.6)}
+.feuille{background:var(--encre);width:100%;max-height:92vh;border-radius:20px 20px 0 0;display:flex;flex-direction:column;transform:translateY(100%);transition:transform .25s;padding-bottom:var(--safe-b)}
+.feuille-fond.ouvert .feuille{transform:none}
+.feuille-tete{display:flex;align-items:center;padding:14px 8px 4px 20px;font-family:var(--serif);font-size:22px}
+.feuille-tete span{flex:1}
+.feuille-corps{overflow-y:auto;padding:8px 20px;gap:12px}
+@media (min-width:600px){.feuille-fond{align-items:center}.feuille{max-width:560px;width:90%;max-height:90vh;border-radius:20px;transform:scale(.96);opacity:0;transition:.2s}.feuille-fond.ouvert .feuille{transform:none;opacity:1}}
+/* Nouvelle lecture */
+.dialogue .carte.aj{max-width:480px;width:100%;max-height:88vh;display:flex;flex-direction:column;padding:20px 8px 8px 20px}
+.aj-titre{font-size:22px;margin:0 0 10px}
+.aj-corps{overflow-y:auto;padding-right:12px;gap:10px}
+.aj-ed{text-align:left;padding:6px 0;border-bottom:1px solid var(--trait-d)}
+.aj-boutons{display:flex;justify-content:flex-end;gap:6px;padding-top:8px}
 /* Ciel (appli 1.8) */
 .entete{padding:20px 8px 0 24px}
 .entete .et-l1{display:flex;align-items:center}
@@ -321,7 +439,7 @@ h2{font-size:20px}
 .toast.vu{opacity:1;transform:translateX(-50%)}
 .dialogue{position:fixed;inset:0;z-index:50;display:none;place-items:center;background:rgba(5,7,14,.6);padding:20px}
 .dialogue.ouvert{display:grid}
-.dialogue .carte{max-width:420px}
+.dialogue .carte{max-width:420px;min-width:0;max-height:calc(100vh - 40px);overflow-y:auto}
 :focus-visible{outline:2px solid var(--or);outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.fiche{transition:none}}
 </style>
@@ -1654,130 +1772,689 @@ const Chercher = {
 };
 
 /* =========================================================
-   Fiche
+   FICHE — port de FicheScreen.kt, EditionFiche.kt (appli 1.8)
+   En-tête compact, cinq pages à faire glisser : Lecture, Notes, Citations, Le livre, Proches.
    ========================================================= */
+const Dates = (() => {
+  const LONG = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
+  const COURT = ['janv.', 'févr.', 'mars', 'avr.', 'mai', 'juin', 'juil.', 'août', 'sept.', 'oct.', 'nov.', 'déc.'];
+  const auj = () => { const d = new Date(); return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()); };
+  const u = ms => new Date(ms);
+  return {
+    LONG, COURT, aujourdhui: auj,
+    formater: ms => `${u(ms).getUTCDate()} ${LONG[u(ms).getUTCMonth()]} ${u(ms).getUTCFullYear()}`,
+    formaterCourt: ms => { const d = u(ms); return `${d.getUTCDate()} ${COURT[d.getUTCMonth()]}` + (d.getUTCFullYear() === new Date().getFullYear() ? '' : ' ' + d.getUTCFullYear()); },
+    formaterSelon: (ms, p) => p === 2 ? String(u(ms).getUTCFullYear()) : p === 1 ? `${LONG[u(ms).getUTCMonth()]} ${u(ms).getUTCFullYear()}` : `${u(ms).getUTCDate()} ${LONG[u(ms).getUTCMonth()]} ${u(ms).getUTCFullYear()}`,
+    milieuAnnee: a => Date.UTC(a, 6, 1), milieuMois: (a, m) => Date.UTC(a, m - 1, 15),
+    joursEntre: (a, b) => Math.trunc((b - a) / 864e5),
+    versChamp: ms => { if (ms == null) return ''; const d = u(ms); return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}-${String(d.getUTCDate()).padStart(2, '0')}`; },
+    depuisChamp: v => { if (!v) return null; const [a, m, j] = v.split('-').map(Number); return Date.UTC(a, m - 1, j); }
+  };
+})();
+const PRECISION = { JOUR: 0, MOIS: 1, ANNEE: 2 }, INCONNUE = -1;
+const LIB_STATUT = { A_LIRE: 'À lire', EN_COURS: 'En cours', LU: 'Lu' };
+
+/* Series.kt */
+const Series = (() => {
+  const formeBnf = /^(.+?)\.\s+(\d{1,3})\s*(?:[,:]\s*(.+))?$/u;
+  const formeTome = /^(.+?)\s*[-–:,.(]?\s*\b(?:tome|t\.?|vol\.?|volume|livre|épisode|ep\.?)\s*0*(\d{1,3})\)?\s*(?:[-–:,.]\s*(.+))?$/iu;
+  const formeCrochets = /^(.+?)\.?\s*\[([IVXLC]{1,6}|\d{1,3})\]\s*(?:[,:.]\s*(.+))?$/u;
+  function romain(s){ if (/^\d+$/.test(s)) return +s; const v = { I: 1, V: 5, X: 10, L: 50, C: 100 }; let t = 0; for (let i = 0; i < s.length; i++) { const a = v[s[i]]; if (!a) return null; const b = v[s[i + 1]] || 0; t += a < b ? -a : a; } return t > 0 ? t : null; }
+  function nettoyerSerie(b){ if (b == null) return null; const s = b.replace(/^[\p{M}\p{P}\s]+/u, '').trim().replace(/[-–,.: ]+$/, ''); return s.length >= 2 && /\p{L}/u.test(s) ? s : null; }
+  function analyser(t0){
+    const t = String(t0 || '').trim();
+    let m = formeCrochets.exec(t);
+    if (m) { const serie = nettoyerSerie(m[1]), tome = romain(m[2]); if (serie && tome > 0) return { serie, tome, titre: (m[3] || '').trim() || serie }; }
+    for (const f of [formeBnf, formeTome]) {
+      m = f.exec(t); if (!m) continue;
+      const serie = nettoyerSerie(m[1]); if (!serie) continue;
+      const tome = +m[2]; if (!tome) continue;
+      return { serie, tome, titre: (m[3] || '').trim() || serie };
+    }
+    return { serie: null, tome: null, titre: t };
+  }
+  const manquants = tomes => { if (!tomes.length) return []; const mx = Math.max(...tomes), s = new Set(tomes); const r = []; for (let i = 1; i <= mx; i++) if (!s.has(i)) r.push(i); return r; };
+  return { analyser, manquants };
+})();
+
+/* MotsClesAuto.kt */
+const MotsClesAuto = (() => {
+  const VIDES = new Set("a à afin ai aie ainsi alors après assez au aucun aucune aujourd auprès aussi autant autre autres aux avait avaient avant avec avoir bien bientôt c ça car ce ceci cela celle celles celui cent cependant certain certaine certains ces cet cette ceux chacun chaque chez ci comme comment contre d dans de dehors déjà depuis derrière des dès deux devant doit donc dont du elle elles en encore enfin entre est et été être étaient était eux fait faire fois font grâce hors ici il ils j jamais je jusqu jusque l la là laquelle le lequel les lesquels leur leurs lui m ma mais malgré me même mêmes mes moi moins mon n ne ni non nos notre nous on ont or ou où par parce parfois parmi pas pendant peu peut peuvent plus plusieurs pour pourquoi pourtant près puis qu quand que quel quelle quelles quels qui quoi s sa sans se selon ses si sien soi son sont sous souvent sur t ta tant te tel telle tes toi ton tous tout toute toutes très trop tu un une unes uns va vers voici voilà vos votre vous y sera seront serait avez avons suis es fut furent soit devient devenu face jour jours temps fin début an ans année années homme femme vie monde chose choses rien quelque quelques toujours désormais lorsque tandis celui-ci celle-ci seul seule seuls premier première dernier dernière nouveau nouvelle grand grande petit petite jeune vieux vieille ancien ancienne long longue".split(' '));
+  const EDITO = new Set("roman romans livre livres récit récits histoire histoires auteur auteure autrice écrivain lecteur lecteurs lectrice page pages chapitre édition éditions éditeur collection tome tomes album albums série volume prix lauréat goncourt renaudot femina médicis best-seller succès chef-d œuvre oeuvre œuvres texte bouleversant bouleversante magnifique superbe captivant captivante poignant poignante inoubliable remarquable puissant puissante magistral magistrale lumineux lumineuse émouvant émouvante drôle brillant brillante incontournable fascinant fascinante traduit traduction publié publiée paru parue ouvrage ouvrages essai essais bande dessinée dessinateur scénariste illustrations monde presse critique critiques magazine journal figaro libération télérama obs express lire écrit raconte nous plonge signe découvrir découvre suivre entre voici voilà".split(' '));
+  const DET = new Set("le la les un une des du sa son ses leur leurs cette ce ces cet notre votre nos vos au aux mon ma mes ton ta tes chaque".split(' '));
+  const SUFF = ['tion', 'sion', 'ité', 'isme', 'ance', 'ence', 'ude', 'esse', 'ment', 'ure', 'age', 'ie'];
+  const racine = m => { let r = m.normalize('NFD').replace(/\p{M}/gu, ''); if (r.length > 4 && /[sx]$/.test(r)) r = r.slice(0, -1); return r; };
+  function extraire(texte, nombre = 8){
+    if (!texte || !texte.trim()) return [];
+    const phrases = texte.split(/(?<=[.!?…])\s+|\n+/u), cands = new Map(); let pos = 0;
+    for (const ph of phrases) {
+      const mots = ph.split(/[^\p{L}\-’']+/u).filter(x => x.trim()); let prec = '';
+      mots.forEach((brut, i) => {
+        pos++;
+        const bm = brut.toLowerCase(), elide = ["l'", 'l’', "d'", 'd’'].some(p => bm.startsWith(p)), nom = DET.has(prec) || elide; prec = bm;
+        let mot = brut.replace(/^[-'’]+|[-'’]+$/g, ''); mot = mot.slice(mot.lastIndexOf('’') + 1); mot = mot.slice(mot.lastIndexOf("'") + 1);
+        if (mot.length < (nom ? 3 : 4)) return;
+        if (i > 0 && /^\p{Lu}/u.test(mot)) return;
+        const min = mot.toLowerCase();
+        if (VIDES.has(min) || EDITO.has(min)) return;
+        if (!nom && ['aient', 'ait', 'èrent', 'eront', 'erait', 'issent', 'ions', 'ent'].some(s => min.endsWith(s))) return;
+        const k = racine(min); let c = cands.get(k); if (!c) { c = { compte: 0, premiere: Infinity, estNom: false, formes: new Map() }; cands.set(k, c); }
+        c.compte++; if (pos < c.premiere) c.premiere = pos; if (nom) c.estNom = true; c.formes.set(min, (c.formes.get(min) || 0) + 1);
+      });
+    }
+    const propres = new Set();
+    for (const m of texte.matchAll(/(?<!\p{L})\p{Lu}\p{Ll}{3,}/gu)) { const i = m.index; if (i > 1 && texte[i - 1] !== '\n' && !'.!?…\n«'.includes(texte[i - 2])) propres.add(racine(m[0].toLowerCase())); }
+    const total = Math.max(1, pos);
+    return [...cands].filter(([k, c]) => !propres.has(k) || c.compte >= 3).map(([, c]) => {
+      const forme = [...c.formes].sort((a, b) => b[1] - a[1])[0][0];
+      const score = c.compte * (c.estNom ? 2 : .5) * (SUFF.some(s => forme.endsWith(s)) ? 1.3 : 1) * (1 + .5 * (1 - c.premiere / total)) * (1 + (Math.min(12, forme.length) - 4) * .05);
+      return [forme, score];
+    }).sort((a, b) => b[1] - a[1]).slice(0, nombre).map(x => x[0]);
+  }
+  return { extraire };
+})();
+
+/* Suggestions.kt : livres proches en ligne (Open Library puis Google Books), gardés le temps de la visite */
+const Suggestions = (() => {
+  const cache = new Map();
+  const GEN = ["fiction", "general", "literature", "litterature", "novel", "roman", "romans", "american fiction", "english fiction", "french fiction", "fiction in english", "large type", "accessible book", "protected daisy", "in library", "lending library", "open library", "staff picks", "bestseller", "best seller", "award", "prize", "reading level", "translations", "translated", "language materials", "textbooks", "classics", "classic literature", "literary", "fiction, general", "fiction / general", "nyt", "new york times", "long now", "book club", "readers", "english language", "american literature", "french literature", "english literature", "domestic fiction", "litterature americaine", "litterature anglaise", "litterature francaise", "traduction", "roman americain", "roman anglais", "roman francais", "romans, nouvelles", "ouvrages", "etude et enseignement"];
+  const sansAcc = s => s.toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
+  const n = s => sansAcc(String(s || '')).replace(/[^a-z0-9]/g, '');
+  const estGen = s => { const x = sansAcc(s).trim(); return x.length < 4 || x.length > 50 || GEN.some(g => x === g || x.includes(g)) || x.includes('=') || x.includes(':'); };
+  const memeLivre = (a, b) => { const na = n(a), nb = n(b); return !!na && !!nb && (na === nb || na.startsWith(nb) || nb.startsWith(na)); };
+  const memeAuteur = (a, b) => { const nb = n(String(b || '').split(',')[0]); return !!nb && n(a).includes(nb); };
+  const latin = s => { const l = [...s].filter(c => /\p{L}/u.test(c)); return !l.length || l.filter(c => /\p{Script=Latin}/u.test(c)).length * 4 >= l.length * 3; };
+  let recu = false;
+  async function lire(url){ try { const r = await fetch(url, { signal: AbortSignal.timeout(8000) }); if (!r.ok) return null; recu = true; return await r.json(); } catch (e) { return null; } }
+  const tx = a => Array.isArray(a) ? a.filter(x => x && String(x).trim()) : [];
+  async function sujets(l){
+    const urls = []; if (l.isbn) urls.push(`https://openlibrary.org/search.json?isbn=${l.isbn}&fields=subject&limit=1`);
+    urls.push('https://openlibrary.org/search.json?title=' + encodeURIComponent(l.titre) + (l.auteur ? '&author=' + encodeURIComponent(l.auteur.split(',')[0]) : '') + '&fields=subject&limit=3');
+    const s = new Set();
+    for (const u of urls) { const j = await lire(u); if (!j) continue; for (const d of j.docs || []) tx(d.subject).filter(x => !estGen(x)).forEach(x => s.add(x.trim())); if (s.size >= 4) break; }
+    return [...s].slice(0, 4);
+  }
+  async function parSujet(sujet, jeunesse){
+    const j = await lire('https://openlibrary.org/search.json?subject=' + encodeURIComponent(sujet) + '&language=fre&lang=fr&fields=title,author_name,cover_i,subject,editions,editions.title,editions.language&limit=25'); if (!j) return [];
+    return (j.docs || []).map(d => {
+      const ed = d.editions && d.editions.docs && d.editions.docs[0], to = d.title; if (!to) return null;
+      let titre; if (!d.editions) titre = to; else if (ed && tx(ed.language).includes('fre')) titre = ed.title || to; else return null;
+      if (!jeunesse && /juvenile|children|young adult/.test(tx(d.subject).join(' ').toLowerCase())) return null;
+      const auteur = tx(d.author_name).slice(0, 2).join(', ');
+      return { titre, auteur, couvertureUrl: d.cover_i ? `https://covers.openlibrary.org/b/id/${d.cover_i}-M.jpg` : null };
+    }).filter(Boolean);
+  }
+  async function google(q){ const j = await lire('https://www.googleapis.com/books/v1/volumes?q=' + encodeURIComponent(q) + '&printType=books&orderBy=relevance&maxResults=20&langRestrict=fr'); return (j && j.items || []).map(i => i.volumeInfo || {}).filter(v => v.title).map(v => ({ titre: v.title, auteur: tx(v.authors).join(', '), couvertureUrl: v.imageLinks && v.imageLinks.thumbnail ? v.imageLinks.thumbnail.replace('http://', 'https://') : null })); }
+  function ajouter(t, l, cands, memeA){ for (const c of cands) { if (t.length >= 5) return; if (!latin(c.titre) || memeLivre(c.titre, l.titre) || (!memeA && memeAuteur(c.auteur, l.auteur)) || t.some(x => memeLivre(x.titre, c.titre))) continue; t.push(c); } }
+  async function chercher(l){
+    recu = false; const t = []; let criteres = null;
+    const sj = await sujets(l);
+    if (sj.length) {
+      criteres = sj.join(' · ');
+      const jeunesse = /jeunesse/i.test(l.theme || ''), scores = new Map();
+      for (const s of sj) for (const c of await parSujet(s, jeunesse)) { const k = n(c.titre), a = scores.get(k); scores.set(k, [a ? a[0] : c, (a ? a[1] : 0) + 1]); }
+      const min = sj.length >= 2 ? 2 : 1;
+      ajouter(t, l, [...scores.values()].filter(x => x[1] >= min).sort((a, b) => b[1] - a[1] || (!!b[0].couvertureUrl - !!a[0].couvertureUrl)).map(x => x[0]));
+    }
+    if (t.length < 5 && l.auteur) { const av = t.length; ajouter(t, l, await google(`inauthor:"${l.auteur.split(',')[0].trim()}"`), true); if (!criteres && t.length > av) criteres = 'Du même auteur'; }
+    return { criteres, livres: t.slice(0, 5), erreurReseau: !recu };
+  }
+  const cle = l => `${l.id}|${l.titre}|${l.auteur}|${l.isbn}`;
+  async function pour(l){ const k = cle(l); if (cache.has(k)) return cache.get(k); const r = await chercher(l); if (!r.erreurReseau) cache.set(k, r); return r; }
+  return { pour, oublier: l => cache.delete(cle(l)), memeLivre };
+})();
+
+const Liens = {
+  babelio: (t, a = '') => 'https://duckduckgo.com/?q=' + encodeURIComponent(`!ducky site:babelio.com/livres ${t} ${String(a).split(',')[0].trim()}`.trim()),
+  bedetheque: s => 'https://duckduckgo.com/?q=' + encodeURIComponent('!ducky site:bedetheque.com serie ' + s),
+  literatureMap: a => 'https://www.literature-map.com/' + String(a).split(',')[0].trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '').replace(/[^a-z0-9 ]/g, ' ').trim().split(/\s+/).join('+')
+};
+const entreGuillemets = t => '« ' + String(t).trim().replace(/^[«»"“”„‹›\s  ]+|[«»"“”„‹›\s  ]+$/g, '').trim() + ' »';
+const estSynthese = notes => ['personnages :', 'époque et cadre :', 'thèmes :', 'portée :', 'style :', 'limites :'].filter(r => notes.toLowerCase().replace(/ /g, ' ').includes(r)).length >= 2;
+
+/* Modification annulable (comme le bandeau « Annuler » de l'appli) */
+function annulable(l, avant, msg){
+  const t = $('#toast'); t.innerHTML = `${esc(msg)} <button class="toast-annuler">Annuler</button>`; t.classList.add('vu');
+  t.querySelector('button').onclick = async () => { Object.assign(l, avant); t.classList.remove('vu'); await Edition.sauver(); Fiche.rafraichir(); };
+  clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('vu'), 4500);
+}
+
 const Fiche = (() => {
-  let ouverte = false, livre = null, onglet = null;
   const el = $('#fiche'), voile = $('#voile');
-  function proches(l){
-    const exclus = new Set([l.id, ...l._liens.map(x => x.id)]);
-    const res = [];
-    for (const o of M.lectures) {
-      if (exclus.has(o.id)) continue;
-      if (l.serie && o.serie && norm(l.serie) === norm(o.serie)) continue;
-      const communs = l._mots.filter(w => o._motsN.has(norm(w)));
-      let score = communs.length * 2, raisons = [];
-      if (premierAuteur(l) && norm(premierAuteur(l)) === norm(premierAuteur(o))) { score += 3; raisons.push('même auteur'); }
-      if (communs.length && l._theme && l._theme === o._theme) score += 1;
-      if (communs.length) raisons.push((communs.length > 1 ? 'mots partagés : ' : 'mot partagé : ') + communs.slice(0, 4).join(', '));
-      if (score >= 3) res.push({ o, score, raison: raisons.join(' · ') });
-    }
-    return res.sort((a, b) => b.score - a.score).slice(0, 5);
+  const ONGLETS = ['Lecture', 'Notes', 'Citations', 'Le livre', 'Proches'];
+  let ouverte = false, livre = null, page = 0, menuOuvert = false;
+  const etat = new Map();   // par livre : 4e en modification, messages, suggestions…
+  const E = id => { if (!etat.has(id)) etat.set(id, { modif4e: false, msg4e: null, rech4e: false, sugg: undefined, essai: 0, auto: false, erreur: null }); return etat.get(id); };
+  const citationsDe = id => M.citations.filter(c => c.lectureId === id);
+  const auteurPremier = l => String(l.auteur || '').split(',')[0];
+
+  /* ---------- actions (LecturesViewModel.kt) ---------- */
+  const copie = l => JSON.parse(JSON.stringify(Object.fromEntries(Object.entries(l).filter(([k]) => !k.startsWith('_')))));
+  async function sauver(){ await Edition.sauver(); }
+  async function changerStatut(l, s){
+    if (s === l.statut) return; const avant = copie(l), auj = Dates.aujourdhui();
+    if (s === 'EN_COURS') { if (l.dateDebut == null) l.precisionDates = 0; l.dateDebut = l.dateDebut ?? auj; l.dateFin = null; }
+    else if (s === 'LU') l.dateFin = l.dateFin ?? auj;
+    else { l.dateDebut = null; l.dateFin = null; l.pageActuelle = null; l.precisionDates = 0; }
+    l.statut = s; await sauver(); rendre(); annulable(l, avant, `« ${l.titre} » : ${LIB_STATUT[s].toLowerCase()}`);
   }
-  function memeSerie(l){ if (!l.serie) return []; return M.lectures.filter(o => o.id !== l.id && o.serie && norm(o.serie) === norm(l.serie)).sort((a, b) => (a.tome ?? 99) - (b.tome ?? 99)); }
-  function texteNotes(t){
-    // « [Spoiler] … » jusqu'à la fin de la ligne : flouté, révélé au toucher
-    return esc(t).replace(/\[Spoiler\]([^\n]*)/gi, (_, s) => `<span class="doux">[Spoiler]</span><span class="spoil" title="Toucher pour révéler">${s}</span>`);
+  async function terminer(l){ const avant = copie(l); l.statut = 'LU'; l.dateFin = l.dateFin ?? Dates.aujourdhui(); l.pageActuelle = l.pagesTotal ?? l.pageActuelle; await sauver(); rendre(); annulable(l, avant, `« ${l.titre} » : terminé`); }
+  async function relire(l){ const avant = copie(l); Object.assign(l, { statut: 'EN_COURS', relectures: (l.relectures || 0) + 1, dateDebut: Dates.aujourdhui(), dateFin: null, precisionDates: 0, pageActuelle: 0 }); await sauver(); rendre(); annulable(l, avant, `« ${l.titre} » : relecture commencée`); }
+  async function rendreLivre(l){ const avant = copie(l); l.pretA = null; l.pretDepuis = null; await sauver(); rendre(); annulable(l, avant, `« ${l.titre} » : rendu`); }
+  async function completer(l){
+    toast('Recherche de la fiche…');
+    try {
+      let isbn = l.isbn ? String(l.isbn).replace(/[^0-9X]/gi, '') : null;
+      if (!isbn) { const eds = await Edition.chercherEditions(l.titre, l.auteur).catch(() => []); isbn = (eds.find(e => e.isbn && Suggestions.memeLivre(e.titre, l.titre)) || {}).isbn; }
+      const r = isbn ? await Edition.chercherIsbn(isbn) : null;
+      if (!r) { toast('Rien trouvé en ligne : complète-la à la main (✎)'); return; }
+      const prov = titreProvisoire(l.titre);
+      if (prov && r.titre) l.titre = r.sousTitre && r.titre.length < 25 ? `${r.titre} : ${r.sousTitre}` : r.titre;
+      if (!l.auteur) l.auteur = r.auteur || ''; if (!l.isbn) l.isbn = isbn; if (!l.couvertureUrl) l.couvertureUrl = r.couvertureUrl || null;
+      if (!l.theme) l.theme = r.theme || null; if (!l.pagesTotal) l.pagesTotal = r.pagesTotal || null; if (!l.motsCles && r.motsCles?.length) l.motsCles = r.motsCles.join(', ');
+      if (!l.resume && r.resume) { l.resume = r.resume; l.sourceResume = r.source; } if (r.estBd) l.type = 'BD';
+      l.aCompleter = false; await sauver(); rendre(); toast('Fiche complétée · ' + r.source);
+    } catch (e) { toast('Recherche impossible pour l’instant'); }
   }
-  const ligneLivre = (o, r) => `<button class="proche" data-livre="${o.id}">${couverture(o, 40)}<div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:15.5px">${esc(titreCourt(o))}</div><div class="doux" style="font-size:12.5px">${esc(o.auteur)}</div>${r ? `<div class="r">${esc(r)}</div>` : ''}</div></button>`;
-  function corps(l, nom){
-    if (nom === 'lecture') {
-      const p = l.pagesTotal && l.pageActuelle != null ? Math.min(100, Math.round(l.pageActuelle / l.pagesTotal * 100)) : null;
-      const duree = l.dateDebut && l.dateFin ? Math.max(1, Math.round((l.dateFin - l.dateDebut) / 864e5)) : null;
-      return `${p != null ? `<div class="bloc"><span class="sur">Progression</span><div class="barre"><i style="width:${p}%"></i></div><div class="doux" style="font-size:13px">Page ${l.pageActuelle} sur ${l.pagesTotal} · ${p} %</div></div>` : ''}
-        <dl class="grille-info bloc">
-          <dt>Statut</dt><dd>${pastille(l.statut)}</dd>
-          ${l.note ? `<dt>Note</dt><dd>${etoilesNote(l.note)}</dd>` : ''}
-          ${l.dateDebut ? `<dt>Commencé</dt><dd>${date(l.dateDebut)}</dd>` : ''}
-          ${l.dateFin ? `<dt>Terminé</dt><dd>${date(l.dateFin)}${duree ? ` <span class="doux">· ${duree} jour${duree > 1 ? 's' : ''}</span>` : ''}</dd>` : ''}
-          ${l.relectures ? `<dt>Relectures</dt><dd>${l.relectures}</dd>` : ''}
-          ${l.pretA ? `<dt>Prêté à</dt><dd>${esc(l.pretA)}${l.pretDepuis ? ` <span class="doux">depuis le ${date(l.pretDepuis)}</span>` : ''}</dd>` : ''}
-          <dt>Ajouté</dt><dd>${date(l.dateAjout) || '—'}</dd>
-        </dl>`;
-    }
-    if (nom === 'notes') return l.notes ? `<div class="texte">${texteNotes(l.notes)}</div>` : `<p class="doux">Pas encore de notes sur ce livre.</p>`;
-    if (nom === 'citations') {
-      const cs = M.citations.filter(c => c.lectureId === l.id).sort((a, b) => (a.page ?? 1e9) - (b.page ?? 1e9) || a.dateAjout - b.dateAjout);
-      return cs.length ? cs.map(c => `<blockquote class="citation">« ${esc(c.texte)} »<small>${c.page ? 'p. ' + c.page + ' · ' : ''}${date(c.dateAjout)} <button class="mini-x" data-supcit="${c.id}" aria-label="Supprimer la citation">✕</button></small></blockquote>`).join('') : `<p class="doux">Aucune citation gardée pour ce livre.</p>`;
-    }
-    if (nom === 'livre') {
-      const a = premierAuteur(l), ddg = q => 'https://duckduckgo.com/?q=' + encodeURIComponent(q);
-      return `${l.resume ? `<div class="bloc"><span class="sur">4e de couverture${l.sourceResume ? ' · ' + esc(l.sourceResume) : ''}</span><div class="texte">${esc(l.resume)}</div></div>` : ''}
-        ${l._mots.length ? `<div class="bloc"><span class="sur">Mots-clés</span><div style="display:flex;flex-wrap:wrap;gap:6px">${l._mots.map(w => `<button class="puce mot" data-mot="${esc(norm(w))}" data-label="${esc(w)}">${esc(w)}</button>`).join('')}</div></div>` : ''}
-        <dl class="grille-info bloc">
-          <dt>Type</dt><dd>${l.type === 'BD' ? 'Bande dessinée' : 'Livre'}</dd>
-          ${l._theme ? `<dt>Thème</dt><dd>${esc(l._theme)}</dd>` : ''}
-          ${l.serie ? `<dt>Série</dt><dd>${esc(l.serie)}${l.tome ? ' · tome ' + l.tome : ''}</dd>` : ''}
-          ${l.pagesTotal ? `<dt>Pages</dt><dd>${l.pagesTotal}</dd>` : ''}
-          ${l.isbn ? `<dt>ISBN</dt><dd>${esc(l.isbn)}</dd>` : ''}
-        </dl>
-        <div class="bloc"><span class="sur">Ailleurs</span><div class="liens-ext">
-          <a class="btn petit" href="${ddg('!ducky site:babelio.com/livres ' + l.titre + ' ' + a)}" target="_blank" rel="noopener">Babelio ↗</a>
-          ${l.type === 'BD' ? `<a class="btn petit" href="${ddg('!ducky site:bedetheque.com ' + (l.serie || l.titre) + ' ' + a)}" target="_blank" rel="noopener">Bédéthèque ↗</a>` : ''}
-          ${a ? `<a class="btn petit" href="https://www.literature-map.com/${encodeURIComponent(a.toLowerCase()).replace(/%20/g, '+')}" target="_blank" rel="noopener">Literature-Map ↗</a>` : ''}
-        </div></div>`;
-    }
-    if (nom === 'proches') {
-      const liens = l._liens.map(x => ({ o: M.parId.get(x.id), r: x.raison })).filter(x => x.o);
-      const serie = memeSerie(l), pr = proches(l);
-      let h = '';
-      if (liens.length) h += `<div class="bloc"><span class="sur">Tes liens · ${liens.length}</span>${liens.map(x => `<div style="display:flex;gap:4px;align-items:center">${ligneLivre(x.o, x.r).replace('class="proche"', 'class="proche" style="flex:1"')}<button class="mini-x" data-delier="${x.o.id}" aria-label="Retirer ce lien" style="margin-bottom:8px">✕</button></div>`).join('')}</div>`;
-      if (serie.length) h += `<div class="bloc"><span class="sur">Même série</span>${serie.map(o => ligneLivre(o, o.tome ? 'tome ' + o.tome : '')).join('')}</div>`;
-      if (pr.length) h += `<div class="bloc"><span class="sur">Dans ta bibliothèque</span>${pr.map(x => `<div style="display:flex;gap:8px;align-items:center">${ligneLivre(x.o, x.raison).replace('class="proche"', 'class="proche" style="flex:1"')}<button class="btn petit" data-relier="${x.o.id}" data-raison="${esc(x.raison)}" style="margin-bottom:8px">＋ Relier</button></div>`).join('')}</div>`;
-      if (!h) h = `<p class="doux">Aucun livre relié pour l’instant.</p>`;
-      if (Ciel && M.parId.get(l.id)?._manques.length === 0) h += `<button class="btn petit" id="voir-ciel" style="margin-top:6px">✦ Voir dans le ciel</button>`;
-      return h;
-    }
-    return '';
+
+  /* ---------- livres proches dans ta bibliothèque (FicheScreen.livresProches) ---------- */
+  function livresProches(l){
+    const deja = new Set(l._liens.map(x => x.id)), mes = new Set(CC.motsCles(l).map(CC.normaliserMot)), monA = CC.normaliserMot(auteurPremier(l)), maS = l.serie && l.serie.trim() ? CC.normaliserMot(l.serie) : null;
+    return M.lectures.filter(a => a.id !== l.id && !deja.has(a.id) && !a._manques.length).filter(a => maS == null || !a.serie || !a.serie.trim() || CC.normaliserMot(a.serie) !== maS).map(a => {
+      const vus = new Set(), communs = CC.motsCles(a).filter(m => { const k = CC.normaliserMot(m); if (!mes.has(k) || vus.has(k)) return false; vus.add(k); return true; });
+      const memeA = !!monA && CC.normaliserMot(auteurPremier(a)) === monA;
+      const score = communs.length * 2 + (memeA ? 3 : 0) + (communs.length && a.theme && a.theme === l.theme ? 1 : 0);
+      if (score < 3) return null;
+      return [a, score, [memeA ? 'même auteur' : '', communs.slice(0, 3).join(', ')].filter(Boolean).join(' · ')];
+    }).filter(Boolean).sort((a, b) => b[1] - a[1]).slice(0, 5).map(x => [x[0], x[2]]);
   }
-  function ordre(l){
-    const nbCit = l._cit, base = { A_LIRE:['livre','proches','notes','citations','lecture'], EN_COURS:['lecture','citations','notes','livre','proches'], LU:['citations','notes','proches','livre','lecture'] }[l.statut] || ['livre','notes','citations','proches','lecture'];
-    return base;
+
+  /* ---------- petits blocs ---------- */
+  const rub = t => `<div class="fc-rub">${t}</div>`;
+  const discret = t => `<p class="fc-discret">${t}</p>`;
+  const chargement = t => `<div class="fc-charge"><i class="rouet"></i>${t}</div>`;
+  const lienPage = (t, o) => `<button class="fc-lienpage" data-aller="${o}">${t}</button>`;
+  function etiquettes(l){
+    const th = l.theme && l.theme.trim(), mots = CC.motsCles(l);
+    if (!th && !mots.length) return '';
+    return `<div class="fc-etiq">${th ? `<span class="etq or">${esc(th)}</span>` : ''}${mots.map(m => `<button class="etq" data-mot="${esc(m)}">${esc(m)}</button>`).join('')}</div>`;
   }
-  const NOMS = { lecture:'Lecture', notes:'Notes', citations:'Citations', livre:'Le livre', proches:'Proches' };
-  function plein(l, nom){ if (nom === 'notes') return !!l.notes; if (nom === 'citations') return l._cit > 0; if (nom === 'livre') return true; if (nom === 'proches') return l._liens.length > 0 || !!l.serie; return true; }
+  function blocDates(l){
+    const p = l.precisionDates || 0; let t;
+    if (l.statut === 'EN_COURS') t = l.dateDebut == null ? 'Commencé à une date inconnue' : p !== 0 ? `Commencé en ${Dates.formaterSelon(l.dateDebut, p)}` : (() => { const j = Math.max(1, Dates.joursEntre(l.dateDebut, Dates.aujourdhui())); return `Commencé le ${Dates.formater(l.dateDebut)} · depuis ${j} jour${j > 1 ? 's' : ''}`; })();
+    else t = l.dateFin != null && p !== 0 ? `Lu en ${Dates.formaterSelon(l.dateFin, p)}` : l.dateDebut != null && l.dateFin != null ? (() => { const j = Math.max(1, Dates.joursEntre(l.dateDebut, l.dateFin)); return `Lu du ${Dates.formaterCourt(l.dateDebut)} au ${Dates.formaterCourt(l.dateFin)} · ${j} jour${j > 1 ? 's' : ''}`; })() : l.dateFin != null ? `Fini le ${Dates.formater(l.dateFin)}` : 'Date de lecture inconnue';
+    return `<div class="fc-carte fc-dates"><i style="background:${l.statut === 'EN_COURS' ? 'var(--or)' : 'var(--ivoire)'}"></i><div style="flex:1"><div class="fc-lab">TA LECTURE</div><div>${t}</div>${l.relectures > 0 ? `<div class="fc-petit">Lu ${l.relectures + 1} fois</div>` : ''}</div><button class="fc-crayon" data-a="modifier">✎</button></div>`;
+  }
+  function derniereNote(notes, debut){
+    if (!notes || !notes.trim()) return '';
+    const n = notes.trim(), ex = debut ? n : n.slice(n.lastIndexOf('\n\n') + (n.includes('\n\n') ? 2 : 0)).trim();
+    return `<button class="fc-note" data-aller="1">${debut ? '' : '<div class="fc-lab">DERNIÈRE NOTE</div>'}<div class="fc-extrait">${esc(ex)}</div><div class="fc-or">Tout lire →</div></button>`;
+  }
+  function carteCitation(c){
+    return `<div class="fc-citation" data-cit="${c.id}"><div class="fc-cit-t">${esc(entreGuillemets(c.texte))}</div><div class="fc-cit-b"><span>${c.page ? 'p. ' + c.page : ''}</span><button data-supcit="${c.id}">Supprimer</button></div></div>`;
+  }
+  function carteSugg(s){
+    return `<a class="fc-sugg" href="${esc(Liens.babelio(s.titre, s.auteur))}" target="_blank" rel="noopener">${s.couvertureUrl ? `<img src="${esc(s.couvertureUrl)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : '<span class="fc-sugg-v">✦</span>'}<div style="flex:1;min-width:0"><div class="fc-t16">${esc(s.titre)}</div>${s.auteur ? `<div class="fc-petit">${esc(s.auteur)}</div>` : ''}</div><span class="fc-or" style="font-size:12.5px">Babelio ↗</span></a>`;
+  }
+  const carteProche = (a, pq) => `<div class="fc-lien" data-livre="${a.id}"><span style="color:var(--brume)">✦</span><div style="flex:1;min-width:0"><div class="fc-t16">${esc(a.titre)}</div>${a.auteur ? `<div class="fc-petit">${esc(a.auteur)}</div>` : ''}<div class="fc-petit" style="color:var(--or)">${esc(pq)}</div></div><button class="fc-txtbtn or" data-relier="${a.id}" data-raison="${esc(pq)}">＋ Relier</button></div>`;
+  function miniConstellation(l, ps){
+    const W = 340, H = 230, R = 88, cx = W / 2, cy = H / 2 + 30, ang = ps.length === 1 ? [-90] : ps.length === 2 ? [-150, -30] : [-150, -90, -30];
+    const pts = ang.slice(0, ps.length).map(a => [cx + R * Math.cos(a * Math.PI / 180), cy + R * Math.sin(a * Math.PI / 180)]);
+    return `<div class="fc-mini"><svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="xMidYMid meet"><defs><radialGradient id="mgO"><stop offset="0" stop-color="#E3B65C" stop-opacity=".45"/><stop offset="1" stop-color="#E3B65C" stop-opacity="0"/></radialGradient><radialGradient id="mgI"><stop offset="0" stop-color="#F3EBDD" stop-opacity=".3"/><stop offset="1" stop-color="#F3EBDD" stop-opacity="0"/></radialGradient></defs>
+      <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="rgba(154,163,191,.18)" stroke-dasharray="6 8"/>${pts.map(p => `<line x1="${cx}" y1="${cy}" x2="${p[0]}" y2="${p[1]}" stroke="rgba(154,163,191,.3)"/>`).join('')}
+      <circle cx="${cx}" cy="${cy}" r="34" fill="url(#mgO)"/><circle cx="${cx}" cy="${cy}" r="7" fill="#E3B65C"/><circle cx="${cx}" cy="${cy}" r="12" fill="none" stroke="#E3B65C" stroke-width="1.2"/>
+      ${pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="18" fill="url(#mgI)"/><circle cx="${p[0]}" cy="${p[1]}" r="5" fill="#F3EBDD"/>`).join('')}
+      <foreignObject x="${cx - 80}" y="${cy + 18}" width="160" height="40"><div xmlns="http://www.w3.org/1999/xhtml" class="mini-centre">${esc(l.titre)}</div></foreignObject>
+      ${ps.map((s, i) => `<foreignObject x="${pts[i][0] - 62}" y="${pts[i][1] + 10}" width="124" height="40"><a xmlns="http://www.w3.org/1999/xhtml" class="mini-t" href="${esc(Liens.babelio(s.titre, s.auteur))}" target="_blank" rel="noopener">${esc(s.titre)}</a></foreignObject>`).join('')}</svg></div>`;
+  }
+
+  /* ---------- pages ---------- */
+  function pageLecture(l, st){
+    let h = '';
+    if (l.aCompleter) h += `<div class="fc-bandeau or"><div style="flex:1"><div class="fc-lab or">À COMPLÉTER</div><div class="fc-petit" style="color:var(--ivoire-d)">Ajoutée en rafale ou par import : vérifie-la ou laisse Internet la compléter.</div></div><div class="fc-col"><button class="fc-txtbtn or" data-a="completer">Compléter</button><button class="fc-txtbtn" data-a="modifier">✎ Vérifier</button></div></div>`;
+    if (l.pretA) h += `<div class="fc-bandeau"><div style="flex:1"><div class="fc-lab" style="color:var(--bleu)">PRÊTÉ</div><div>À ${esc(l.pretA)}${l.pretDepuis ? ' depuis le ' + Dates.formater(l.pretDepuis) : ''}</div></div><button class="fc-txtbtn or" data-a="rendu">Rendu</button></div>`;
+    if (l.statut === 'A_LIRE') {
+      h += etiquettes(l) + `<button class="fc-gros" data-a="commencer">Commencer la lecture  ✦</button>`;
+      h += `<div class="fc-bloc"><div class="fc-lab">4e DE COUVERTURE</div>${!l.resume || !l.resume.trim() ? `<p class="fc-discret0">Pas encore de 4e : la page « Le livre » peut la chercher ou la photographier.</p>${lienPage('Aller à « Le livre » →', 3)}` : `<div class="fc-resume7">${esc(l.resume.trim())}</div><div class="fc-ligne">${l.sourceResume ? `<span class="fc-lab" style="letter-spacing:0;flex:1">Source : ${esc(l.sourceResume)}</span>` : '<span style="flex:1"></span>'}${lienPage('Lire la suite →', 3)}</div>`}</div>`;
+      h += rub('DANS LA MÊME VEINE');
+      const s = st.sugg, pr = livresProches(l);
+      if (s === undefined || s === null) h += chargement('Recherche de livres proches…');
+      else if (!s.livres.length && pr.length) h += pr.slice(0, 3).map(([a, q]) => carteProche(a, q)).join('');
+      else if (!s.livres.length) h += discret('Pas de suggestion trouvée pour ce livre pour l’instant.');
+      else h += s.livres.slice(0, 3).map(carteSugg).join('') + lienPage('Voir tous les livres proches →', 4);
+    } else if (l.statut === 'EN_COURS') {
+      h += blocProgression(l);
+      h += `<div class="fc-deux"><button class="fc-contour" data-a="dicter-note">🎙  Dicter une note</button><label class="fc-contour">📷  Citation<input type="file" accept="image/*" capture="environment" data-photo-cit hidden></label></div>`;
+      if (st.erreur) h += `<p class="fc-erreur">${esc(st.erreur)}</p>`;
+      h += derniereNote(l.notes) + blocDates(l) + etiquettes(l);
+    } else {
+      h += blocDates(l);
+      const c = citationsDe(l.id)[0];
+      if (c) h += rub('LA CITATION') + carteCitation(c);
+      h += rub(l.notes && l.notes.trim() && estSynthese(l.notes) ? 'SYNTHÈSE DU LIVRE' : 'TON AVIS');
+      h += !l.notes || !l.notes.trim() ? lienPage('Écrire ce que tu en as pensé →', 1) : derniereNote(l.notes, true);
+      const nb = l._liens.length; if (nb) h += lienPage(`Relié à ${nb} livre${nb > 1 ? 's' : ''} : les voir →`, 4);
+      h += etiquettes(l) + `<button class="fc-contour large" data-a="relire">Relire ce livre</button>`;
+    }
+    return h;
+  }
+  function blocProgression(l){
+    const p = l.pageActuelle, t = l.pagesTotal > 0 ? l.pagesTotal : null, fr = p != null && t ? Math.min(1, Math.max(0, p / t)) : null;
+    let est = null;
+    if (l.dateDebut != null && p != null && p > 0 && t && p < t) {
+      const j = Dates.joursEntre(l.dateDebut, Dates.aujourdhui());
+      if (j < 3) est = 'Rythme et date de fin estimée : dans quelques jours';
+      else { const pj = p / j, reste = Math.ceil((t - p) / pj); est = `${pj < 1 ? 'moins d’une page par jour' : '≈ ' + Math.trunc(pj) + ' pages par jour'} · fin estimée vers le ${Dates.formaterCourt(Dates.aujourdhui() + reste * 864e5)}`; }
+    }
+    return `<div class="fc-prog"><div class="fc-ligne"><span class="fc-lab or" style="flex:1">PROGRESSION</span>${fr != null ? `<span class="fc-pct">${Math.trunc(fr * 100)} %</span>` : ''}</div>
+      <div class="fc-ligne" style="gap:8px"><label class="fc-champ"><span>Page</span><input inputmode="numeric" data-prog="page" value="${p ?? ''}"></label><span style="color:var(--brume);font-size:20px">/</span><label class="fc-champ"><span>Pages</span><input inputmode="numeric" data-prog="total" value="${l.pagesTotal ?? ''}"></label></div>
+      <div class="fc-ligne" style="gap:8px">${[5, 10, 25, 50].map(n => `<button class="fc-plus" data-plus="${n}">+${n}</button>`).join('')}</div>
+      ${fr != null ? `<div class="fc-jauge"><i style="width:${fr * 100}%"></i></div>` : ''}${est ? `<div class="fc-petit" style="color:var(--ivoire-d)">${est}</div>` : ''}
+      ${!t ? '<div class="fc-petit">Indique le nombre de pages pour suivre ta progression.</div>' : ''}${fr != null && fr >= 1 ? '<button class="fc-gros" style="margin:0" data-a="terminer">Je l’ai terminé  ✦</button>' : ''}</div>`;
+  }
+  function pageNotes(l){
+    return `<div class="fc-bloc"><textarea class="inp fc-notes" id="fc-notes" placeholder="Tes réflexions, impressions, idées…">${esc(l.notes || '')}</textarea>
+      <div class="fc-ligne"><span class="fc-petit" style="flex:1" id="fc-notes-etat">Enregistrement automatique</span><button class="fc-txtbtn or" id="fc-dicter-notes">🎙 Dicter</button></div></div>`;
+  }
+  function pageCitations(l, st){
+    const cs = citationsDe(l.id);
+    return `<div class="fc-bloc"><div class="fc-deux"><label class="fc-gros petit">📷  Photo<input type="file" accept="image/*" capture="environment" data-photo-cit hidden></label><button class="fc-contour" data-a="saisir-cit">✍️  Saisir</button></div>
+      ${st.erreur ? `<p class="fc-erreur">${esc(st.erreur)}</p>` : ''}${cs.length ? '' : '<p class="fc-discret0">Aucune citation pour l’instant. Photographie un passage qui t’a marqué : le texte sera lu automatiquement.</p>'}</div>${cs.map(carteCitation).join('')}`;
+  }
+  function pageLivre(l, st){
+    const r = l.resume || '', dejaPris = new Set(String(l.motsCles || '').split(/[,;/]/).map(CC.normaliserMot)), proposes = MotsClesAuto.extraire(r).filter(m => !dejaPris.has(CC.normaliserMot(m)));
+    let h = `<div class="fc-bloc">`;
+    if (st.rech4e) h += chargement('Recherche de la 4e : BnF, Google Books, Open Library…');
+    if (st.lec4e) h += chargement(esc(st.lec4e));
+    if (st.msg4e) h += `<p class="fc-erreur">${esc(st.msg4e)}</p>`;
+    if (!r.trim()) h += `<p class="fc-texte">La 4e de couverture présente l’œuvre : c’est une mine de mots-clés. Cherche-la en ligne, ou photographie-la.</p>`;
+    else {
+      h += `<div class="fc-ligne"><span class="fc-lab" style="flex:1;letter-spacing:1.5px">SOURCE : ${esc((l.sourceResume || 'saisie').toUpperCase())}</span><button class="fc-txtbtn or" data-a="modif4e">${st.modif4e ? 'Terminé' : 'Modifier'}</button></div>`;
+      h += st.modif4e ? `<div style="position:relative"><textarea class="inp" id="fc-4e" style="min-height:150px">${esc(r)}</textarea><button class="fc-txtbtn or" id="fc-dicter-4e" style="position:absolute;right:4px;bottom:4px">🎙</button></div>` : `<div class="fc-4e">${esc(r)}</div>`;
+      if (proposes.length) h += `<div class="fc-lab or">MOTS-CLÉS PROPOSÉS</div><div class="fc-petit">Touche ceux qui sont vraiment centraux pour les ajouter.</div><div class="fc-rangee">${proposes.map(m => `<button class="fc-prop" data-ajmot="${esc(m)}">＋ ${esc(m)}</button>`).join('')}</div>`;
+    }
+    const occ = st.rech4e || st.lec4e;
+    h += `<div class="fc-deux"><label class="fc-gros petit${occ ? ' off' : ''}">📷  Photographier<input type="file" accept="image/*" capture="environment" data-photo-4e hidden ${occ ? 'disabled' : ''}></label><button class="fc-contour" data-a="chercher4e" ${occ ? 'disabled' : ''}>Chercher en ligne</button></div>`;
+    if (r.trim()) h += `<button class="fc-txtbtn" data-a="effacer4e" style="align-self:flex-start">Effacer ce résumé</button>`;
+    h += `</div>`;
+    const d = !l.serie || !l.serie.trim() ? Series.analyser(l.titre) : null;
+    if (d && d.serie) h += `<div class="fc-bandeau or"><div style="flex:1;color:var(--ivoire-d);font-size:13px;white-space:pre-line">Série détectée : ${esc(d.serie)} · tome ${d.tome}\nTitre de l’album : « ${esc(d.titre)} »</div><button class="fc-txtbtn or" data-a="appliquer-serie" data-s="${esc(d.serie)}" data-t="${d.tome}" data-ti="${esc(d.titre)}">Appliquer</button></div>`;
+    const sa = (l.serie || '').trim();
+    if (sa) {
+      const k = CC.normaliserMot(sa), tomes = M.lectures.filter(x => x.serie && x.serie.trim() && CC.normaliserMot(x.serie) === k).sort((a, b) => (a.tome ?? 1e9) - (b.tome ?? 1e9) || (a.titre < b.titre ? -1 : 1));
+      const nums = tomes.map(x => x.tome).filter(x => x != null), mq = Series.manquants(nums);
+      h += `<div class="fc-serie"><div class="fc-ligne"><div style="flex:1;min-width:0"><div class="fc-lab">SÉRIE</div><div class="fc-t18">${esc(sa)}</div></div><a class="fc-txtbtn or" href="${esc(Liens.bedetheque(sa))}" target="_blank" rel="noopener">Bédéthèque ↗</a></div>
+        <div class="fc-rangee">${tomes.map(t => `<button class="fc-tome${t.id === l.id ? ' actuel' : ''}" ${t.id === l.id ? 'disabled' : `data-livre="${t.id}"`}><b>${t.tome != null ? 'T' + t.tome : '—'}</b><span>${esc(t.titre)}</span></button>`).join('')}</div>
+        <div class="fc-petit" style="color:${mq.length ? 'var(--or)' : 'var(--ivoire-d)'}">${!nums.length ? `${tomes.length} album${tomes.length > 1 ? 's' : ''} de cette série dans ta bibliothèque.` : !mq.length ? `Tu as tous les tomes du 1 au ${Math.max(...nums)}.` : 'Il te manque : ' + mq.map(x => 'T' + x).join(', ')}</div></div>`;
+    }
+    const lignes = [l.theme && l.theme.trim() ? ['Thème', l.theme] : null, ['Type', l.type === 'BD' ? 'BD' : 'Livre'], l.pagesTotal ? ['Pages', l.pagesTotal] : null, l.isbn ? ['ISBN', l.isbn] : null, ['Ajouté le', Dates.formater(l.dateAjout || Date.now())]].filter(Boolean);
+    h += `<div class="fc-infos"><div class="fc-ligne"><span class="fc-lab" style="flex:1">FICHE</span><button class="fc-txtbtn or" data-a="modifier" style="font-size:12.5px">✎ Modifier</button></div>${lignes.map(([k, v]) => `<div class="fc-ligne"><span class="fc-petit" style="width:90px">${k}</span><span style="font-size:13px">${esc(v)}</span></div>`).join('')}</div>`;
+    return h;
+  }
+  function pageProches(l, st){
+    const liens = M.liens.filter(x => x.lectureA === l.id || x.lectureB === l.id);
+    let h = `<div class="fc-bloc"><div class="fc-ligne"><span class="fc-lab or" style="flex:1">TES LIENS</span><button class="fc-txtbtn or" data-a="nouveau-lien" ${M.lectures.length > 1 ? '' : 'disabled'}>＋ Relier à un autre livre</button></div>${liens.length ? '' : '<p class="fc-discret0">Ce livre t’a fait penser à un autre ? Relie-les : le lien apparaîtra dans ton ciel.</p>'}</div>`;
+    h += liens.map(x => { const a = M.parId.get(x.lectureA === l.id ? x.lectureB : x.lectureA); if (!a) return ''; return `<div class="fc-lien" data-livre="${a.id}"><span style="color:var(--or);font-size:20px">↔</span><div style="flex:1;min-width:0"><div class="fc-t16">${esc(a.titre)}</div>${a.auteur ? `<div class="fc-petit">${esc(a.auteur)}</div>` : ''}${x.raison ? `<div class="fc-raison">« ${esc(x.raison)} »</div>` : ''}</div><button class="fc-txtbtn" data-delier="${x.id}">Délier</button></div>`; }).join('');
+    const pr = livresProches(l);
+    h += rub('DANS TA BIBLIOTHÈQUE') + (pr.length ? pr.map(([a, q]) => carteProche(a, q)).join('') : discret('Aucun autre de tes livres ne partage ses mots-clés ou son auteur. Ajoute des mots-clés dans « Le livre » pour le relier.'));
+    h += rub('À DÉCOUVRIR');
+    const s = st.sugg;
+    if (s === undefined || s === null) h += chargement('Recherche de livres proches en ligne…');
+    else if (!s.livres.length) h += `<div class="fc-bloc"><p class="fc-discret0">${s.erreurReseau ? 'Pas de réponse des services en ligne (connexion absente ou trop lente).' : 'Aucun livre proche trouvé en ligne : les catalogues ouverts (Open Library, Google Books) connaissent mal les éditions françaises. Literature Map, plus bas, reste une belle porte d’entrée.'}</p>${s.erreurReseau ? '<button class="fc-txtbtn or" data-a="reessayer">↻  Réessayer</button>' : ''}</div>`;
+    else h += `<div class="fc-bloc">${miniConstellation(l, s.livres.slice(0, 3))}${s.criteres ? `<div class="fc-petit">D’après : ${esc(s.criteres)}</div>` : ''}</div>` + s.livres.map(carteSugg).join('');
+    h += rub('EXPLORER AILLEURS') + `<div class="fc-deux"><a class="fc-contour" href="${esc(Liens.babelio(l.titre, l.auteur))}" target="_blank" rel="noopener">Babelio ↗</a>${l.auteur ? `<a class="fc-contour" href="${esc(Liens.literatureMap(l.auteur))}" target="_blank" rel="noopener">Literature Map</a>` : '<button class="fc-contour" disabled>Literature Map</button>'}</div>`;
+    if ((l.serie || '').trim()) h += `<a class="fc-contour large" href="${esc(Liens.bedetheque(l.serie.trim()))}" target="_blank" rel="noopener">La série sur Bédéthèque ↗</a>`;
+    return h;
+  }
+
+  /* ---------- rendu ---------- */
   function rendre(){
-    const l = livre; const ord = ordre(l);
-    if (!onglet || !ord.includes(onglet)) onglet = ord.find(n => plein(l, n)) || ord[0];
-    el.innerHTML = `<button class="fermer" aria-label="Fermer">✕</button><button class="modif" id="modifier">✎ Modifier</button>
-      <div class="fiche-tete">${couverture(l, 112)}<div style="min-width:0;padding-right:30px">
-        <div class="sur">${esc(l._theme || 'Sans thème')}</div>
-        <h2 style="margin-top:6px">${esc(l.titre || 'Sans titre')}</h2>
-        <div class="a">${esc(l.auteur || 'Auteur inconnu')}</div>
-        ${l.serie ? `<div class="doux" style="font-size:13px;margin-top:4px">${esc(l.serie)}${l.tome ? ' · tome ' + l.tome : ''}</div>` : ''}
-        <div class="meta">${pastille(l.statut)}${etoilesNote(l.note)}${l.type === 'BD' ? '<span>BD</span>' : ''}</div>
-        ${l._manques.length ? `<div style="color:var(--or);font-size:12.5px;margin-top:8px">Manque : ${l._manques.join(', ')}</div>` : ''}
-      </div></div>
-      <div class="onglets" role="tablist">${ord.map(n => `<button class="onglet" role="tab" data-onglet="${n}" aria-selected="${n === onglet}">${NOMS[n]}${n === 'citations' && l._cit ? `<sup>${l._cit}</sup>` : n === 'proches' && l._liens.length ? `<sup>${l._liens.length}</sup>` : ''}</button>`).join('')}</div>
-      <div class="fiche-corps" role="tabpanel">${corps(l, onglet)}${Edition.complement(l, onglet)}</div>`;
-    el.querySelector('#modifier').onclick = () => Edition.ouvrir(l.id);
-    Edition.brancher(el, l, onglet);
-    el.querySelector('.fermer').onclick = () => fermer();
-    el.querySelectorAll('[data-onglet]').forEach(b => b.onclick = () => { onglet = b.dataset.onglet; rendre(); });
-    el.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => ouvrir(+b.dataset.livre));
-    el.querySelectorAll('.spoil').forEach(s => s.onclick = () => s.classList.add('vu'));
-    el.querySelectorAll('[data-mot]').forEach(b => b.onclick = () => { Chercher.limite = { mot: b.dataset.mot, titre: b.dataset.label }; Chercher.mode = 'liste'; Chercher.filtre = 'TOUS'; Chercher.requete = ''; fermer(false); location.hash = 'chercher'; if (vueCourante === 'chercher') Chercher.rendre(); });
-    const vc = el.querySelector('#voir-ciel'); if (vc) vc.onclick = () => { const id = l.id; fermer(false); location.hash = 'ciel'; setTimeout(() => Ciel.choisirLivre(id), 60); };
+    const l = livre, st = E(l.id), nbCit = l._cit;
+    const sousTitre = l.serie && l.serie.trim() ? l.serie + (l.tome != null ? ' · Tome ' + l.tome : '') : null;
+    const couv = srcCouverture(l);
+    const defAvant = el.querySelector('.fc-defile')?.scrollTop || 0;
+    el.innerHTML = `<div class="fc-barre"><button class="rond" data-a="retour" aria-label="Retour">←</button><div class="fc-titre" id="fc-titre">CONSTELLATION ${esc(CC.nomConstellation(l).toUpperCase())}</div><button class="rond" data-a="modifier" aria-label="Modifier la fiche">✎</button>
+        <div class="menu-wrap"><button class="rond" data-a="menu" aria-label="Plus d’options">⋯</button><div class="menu-liste" ${menuOuvert ? '' : 'hidden'}><button data-a="modifier">Modifier la fiche</button><button data-a="${l.pretA ? 'rendu' : 'preter'}">${l.pretA ? 'Il m’a été rendu' : 'Prêter ce livre'}</button><button data-a="partager">Partager mes notes</button><button data-a="couverture">Changer la couverture</button><button data-a="supprimer" style="color:var(--corail)">Supprimer ce livre</button></div></div></div>
+      <div class="fc-defile"><div class="fc-entete" id="fc-entete">
+        <button class="fc-couv" data-a="couverture" aria-label="Couverture — toucher pour la changer">${couv ? `<img src="${esc(couv)}" alt="" referrerpolicy="no-referrer">` : `<span>${l.type === 'BD' ? '💬' : '📖'}<b>＋</b></span>`}</button>
+        <div style="flex:1;min-width:0">${sousTitre ? `<div class="fc-sous">${esc(sousTitre.toUpperCase())}</div>` : ''}<h2 class="fc-h">${esc(l.titre)}</h2>${l.auteur ? `<div class="fc-aut">${esc(l.auteur)}</div>` : ''}
+          <div class="fc-note-l">${[1, 2, 3, 4, 5].map(i => `<button data-note="${i}" class="${i <= l.note ? 'on' : ''}" aria-label="${i} sur 5">${i <= l.note ? '✦' : '✧'}</button>`).join('')}</div>
+          <div class="fc-ligne" style="gap:6px"><div class="menu-wrap"><button class="fc-statut s-${l.statut}" data-a="statut"><i></i>${LIB_STATUT[l.statut]}<span>  ▾</span></button><div class="menu-liste gauche" hidden id="fc-menu-statut">${['A_LIRE', 'EN_COURS', 'LU'].map(s => `<button data-statut="${s}">${s === l.statut ? '✓  ' : '     '}${LIB_STATUT[s]}</button>`).join('')}</div></div><span class="fc-petit">${l.type === 'BD' ? 'BD' : 'Livre'}</span>${l.relectures > 0 ? `<span class="fc-petit">· relu ${l.relectures} fois</span>` : ''}</div>
+        </div></div>
+        <div class="fc-onglets" role="tablist">${ONGLETS.map((o, i) => `<button role="tab" data-onglet="${i}" aria-selected="${i === page}">${o === 'Citations' && nbCit ? `Citations · ${nbCit}` : o}</button>`).join('')}</div>
+        <div class="fc-page" role="tabpanel">${[pageLecture, pageNotes, pageCitations, pageLivre, pageProches][page](l, st)}</div></div>`;
+    brancher();
+    const d = el.querySelector('.fc-defile'); d.scrollTop = defAvant; suivreTitre();
   }
+  function suivreTitre(){
+    const d = el.querySelector('.fc-defile'), t = $('#fc-titre'), e = $('#fc-entete'); if (!d || !t || !e) return;
+    const replie = d.scrollTop >= e.offsetHeight; t.classList.toggle('replie', replie);
+    t.textContent = replie ? livre.titre : 'CONSTELLATION ' + CC.nomConstellation(livre).toUpperCase();
+  }
+  function allerA(i){
+    page = i; const d = el.querySelector('.fc-defile'), e = $('#fc-entete'); const garde = Math.min(d.scrollTop, e.offsetHeight);
+    rendre(); el.querySelector('.fc-defile').scrollTop = garde; suivreTitre();
+  }
+  let minuteNotes = null;
+  function brancher(){
+    const l = livre, st = E(l.id), q = s => el.querySelectorAll(s), on = (s, f) => q(s).forEach(b => b.onclick = f.bind(null, b));
+    el.querySelector('.fc-defile').addEventListener('scroll', suivreTitre, { passive: true });
+    on('[data-onglet]', b => allerA(+b.dataset.onglet));
+    on('[data-aller]', b => allerA(+b.dataset.aller));
+    on('[data-livre]', (b, e) => { if (e.target.closest('button,a') && e.target.closest('button,a') !== b) return; ouvrir(+b.dataset.livre); });
+    on('[data-note]', async b => { const n = +b.dataset.note; l.note = l.note === n ? 0 : n; await sauver(); rendre(); });
+    on('[data-statut]', b => changerStatut(l, b.dataset.statut));
+    on('[data-mot]', b => { fermer(false); Ciel.relierParMot(b.dataset.mot); });
+    on('[data-supcit]', (b, e) => { e.stopPropagation(); confirmer('Supprimer la citation ?', '', 'Supprimer', async () => { M.citations = M.citations.filter(c => c.id !== +b.dataset.supcit); await sauver(); rendre(); }); });
+    on('[data-cit]', (b, e) => { if (e.target.closest('[data-supcit]')) return; editeurCitation(l, M.citations.find(c => c.id === +b.dataset.cit)); });
+    on('[data-relier]', async (b, e) => { e.stopPropagation(); await Edition.relierLivres([[l.id, +b.dataset.relier]], b.dataset.raison); rendre(); });
+    on('[data-delier]', (b, e) => { e.stopPropagation(); confirmer('Défaire ce lien ?', 'Les deux livres restent dans ta bibliothèque, seul le lien disparaît.', 'Défaire', async () => { M.liens = M.liens.filter(x => x.id !== +b.dataset.delier); await sauver(); rendre(); }); });
+    on('[data-ajmot]', async b => { const a = String(l.motsCles || '').trim().replace(/,+$/, ''); l.motsCles = a ? `${a}, ${b.dataset.ajmot}` : b.dataset.ajmot; await sauver(); rendre(); });
+    on('[data-plus]', async b => { const n = +b.dataset.plus, t = l.pagesTotal || null, v = (l.pageActuelle || 0) + n; l.pageActuelle = t ? Math.min(v, t) : v; await sauver(); rendre(); });
+    q('[data-prog]').forEach(i => i.onchange = async () => { const v = parseInt(i.value.replace(/\D/g, '').slice(0, 5), 10); if (i.dataset.prog === 'page') l.pageActuelle = Number.isFinite(v) ? v : null; else l.pagesTotal = Number.isFinite(v) && v > 0 ? v : null; await sauver(); rendre(); });
+    q('[data-photo-cit]').forEach(i => i.onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; st.erreur = null; const t = await Edition.lireTexteImage(f, 'Citation', 'Encadre le passage à garder.', m => toast(m)); if (t == null) return; if (!t) { st.erreur = 'Aucun texte lu. Réessaie avec plus de lumière, la page bien à plat.'; rendre(); return; } editeurCitation(l, null, t); });
+    q('[data-photo-4e]').forEach(i => i.onchange = async e => { const f = e.target.files[0]; e.target.value = ''; if (!f) return; st.msg4e = null; st.lec4e = 'Lecture du texte de la photo…'; rendre();
+      const t = await Edition.lireTexteImage(f, '4e de couverture', 'Encadre le texte du résumé.', m => { st.lec4e = m; const z = el.querySelector('.fc-charge'); if (z) z.lastChild.textContent = m; });
+      st.lec4e = null; if (t == null) { rendre(); return; } if (!t) st.msg4e = 'Aucun texte lu. Réessaie avec plus de lumière, la 4e bien à plat.'; else { l.resume = t; l.sourceResume = 'Ta photo'; await sauver(); } rendre(); });
+    const notes = $('#fc-notes');
+    if (notes) {
+      notes.oninput = () => { clearTimeout(minuteNotes); $('#fc-notes-etat').textContent = 'Enregistrement automatique'; minuteNotes = setTimeout(async () => { l.notes = notes.value; await sauver(); const e = $('#fc-notes-etat'); if (e) e.textContent = 'Enregistré'; }, 800); };
+      Dictee.brancher($('#fc-dicter-notes'), notes);
+    }
+    const r4 = $('#fc-4e'); if (r4) { r4.oninput = () => { clearTimeout(minuteNotes); minuteNotes = setTimeout(async () => { l.resume = r4.value; if (!l.sourceResume) l.sourceResume = 'Saisie'; await sauver(); }, 800); }; Dictee.brancher($('#fc-dicter-4e'), r4); }
+    on('[data-a]', async (b, e) => {
+      const a = b.dataset.a;
+      if (a !== 'menu' && a !== 'statut') { q('.menu-liste').forEach(m => m.hidden = true); menuOuvert = false; }
+      switch (a) {
+        case 'retour': enregistrerEnCours(); fermer(); break;
+        case 'menu': e.stopPropagation(); menuOuvert = !menuOuvert; b.nextElementSibling.hidden = !menuOuvert; break;
+        case 'statut': e.stopPropagation(); $('#fc-menu-statut').hidden = !$('#fc-menu-statut').hidden; break;
+        case 'modifier': enregistrerEnCours(); panneauModifier(l); break;
+        case 'preter': dialoguePret(l); break;
+        case 'rendu': rendreLivre(l); break;
+        case 'partager': partager(l); break;
+        case 'couverture': enregistrerEnCours(); Edition.ouvrir(l.id, { couverture: true }); break;
+        case 'supprimer': confirmer('Supprimer ce livre ?', `« ${l.titre} », ses notes et ses ${l._cit} citation(s) seront définitivement supprimés.`, 'Supprimer', async () => { await Edition.supprimerDirect(l.id); fermer(); }); break;
+        case 'completer': completer(l); break;
+        case 'commencer': changerStatut(l, 'EN_COURS'); break;
+        case 'terminer': terminer(l); break;
+        case 'relire': relire(l); break;
+        case 'dicter-note': allerA(1); setTimeout(() => { const bt = $('#fc-dicter-notes'); if (bt && !bt.hidden) bt.click(); else $('#fc-notes')?.focus(); }, 50); break;
+        case 'saisir-cit': editeurCitation(l, null); break;
+        case 'modif4e': st.modif4e = !st.modif4e; if (!st.modif4e && $('#fc-4e')) { l.resume = $('#fc-4e').value; await sauver(); } rendre(); break;
+        case 'effacer4e': l.resume = ''; l.sourceResume = null; await sauver(); rendre(); break;
+        case 'chercher4e': chercher4e(l); break;
+        case 'appliquer-serie': l.titre = b.dataset.ti; l.serie = b.dataset.s; l.tome = +b.dataset.t; await sauver(); rendre(); break;
+        case 'nouveau-lien': dialogueLien(l); break;
+        case 'reessayer': st.essai++; st.sugg = null; Suggestions.oublier(l); rendre(); chargerSuggestions(l); break;
+      }
+    });
+    // glisser d'une page à l'autre, comme dans l'appli
+    const zone = el.querySelector('.fc-page'); let d0 = null;
+    zone.addEventListener('touchstart', e => { if (e.touches.length === 1 && !e.target.closest('.fc-rangee,textarea,input')) d0 = [e.touches[0].clientX, e.touches[0].clientY]; }, { passive: true });
+    zone.addEventListener('touchend', e => { if (!d0) return; const t = e.changedTouches[0], dx = t.clientX - d0[0], dy = t.clientY - d0[1]; d0 = null; if (Math.abs(dx) > 70 && Math.abs(dx) > 2 * Math.abs(dy)) { const n = page + (dx < 0 ? 1 : -1); if (n >= 0 && n < ONGLETS.length) allerA(n); } }, { passive: true });
+  }
+  document.addEventListener('click', e => { if (!ouverte || e.target.closest('.menu-wrap')) return; el.querySelectorAll('.menu-liste').forEach(m => m.hidden = true); menuOuvert = false; });
+  function enregistrerEnCours(){
+    const l = livre; if (!l) return; let ch = false;
+    const n = $('#fc-notes'); if (n && n.value !== (l.notes || '')) { l.notes = n.value; ch = true; }
+    const r = $('#fc-4e'); if (r && r.value !== (l.resume || '')) { l.resume = r.value; ch = true; }
+    clearTimeout(minuteNotes); if (ch) sauver();
+  }
+  async function chercher4e(l){
+    const st = E(l.id); st.rech4e = true; st.msg4e = null; rendre();
+    let r = null; try { if (l.isbn) r = await Edition.chercherIsbn(String(l.isbn).replace(/[^0-9X]/gi, '')); } catch (e) {}
+    st.rech4e = false;
+    if (r && r.resume) { l.resume = r.resume; l.sourceResume = r.source; await sauver(); }
+    else st.msg4e = !l.isbn ? 'Pas d’ISBN pour ce livre : photographie la 4e de couverture.' : 'Aucune 4e trouvée en ligne. Photographie-la : c’est la méthode la plus sûre.';
+    if (livre && livre.id === l.id) rendre();
+  }
+  async function chargerSuggestions(l){
+    const st = E(l.id); if (st.sugg) return;
+    st.sugg = null; const r = await Suggestions.pour(l); st.sugg = r;
+    if (ouverte && livre && livre.id === l.id && (page === 0 || page === 4)) rendre();
+  }
+  async function auto(l){
+    const st = E(l.id); if (st.auto) return; st.auto = true;
+    if (l.isbn && (!String(l.motsCles || '').trim() || !String(l.resume || '').trim())) {
+      try { const r = await Edition.chercherIsbn(String(l.isbn).replace(/[^0-9X]/gi, '')); let ch = false;
+        if (r && !String(l.motsCles || '').trim() && r.motsCles?.length) { l.motsCles = r.motsCles.join(', '); ch = true; }
+        if (r && !String(l.resume || '').trim() && r.resume) { l.resume = r.resume; l.sourceResume = r.source; ch = true; }
+        if (ch) { await sauver(); if (ouverte && livre && livre.id === l.id) rendre(); } } catch (e) {}
+    }
+  }
+
+  /* ---------- fenêtres ---------- */
+  function dialogue(html, brancherD){ const d = $('#dialogue'); d.innerHTML = `<div class="carte" style="max-width:460px;width:100%">${html}</div>`; d.classList.add('ouvert'); const f = () => d.classList.remove('ouvert'); brancherD(d, f); return f; }
+  function dialoguePret(l){
+    dialogue(`<h2 style="font-size:19px">Prêter « ${esc(l.titre)} »</h2><label class="form" style="margin:14px 0"><span style="font-size:12.5px;color:var(--brume)">À qui ?</span><input class="inp" id="pr-qui" autocapitalize="words"></label><div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn petit" id="pr-non">Annuler</button><button class="btn or petit" id="pr-oui" disabled>Prêter</button></div>`, (d, f) => {
+      const i = d.querySelector('#pr-qui'), ok = d.querySelector('#pr-oui'); i.focus();
+      i.oninput = () => ok.disabled = !i.value.trim(); d.querySelector('#pr-non').onclick = f;
+      ok.onclick = async () => { l.pretA = i.value.trim() || null; l.pretDepuis = Dates.aujourdhui(); f(); await sauver(); rendre(); };
+    });
+  }
+  function dialogueLien(l){
+    const deja = new Set(l._liens.map(x => x.id)), cands = M.lectures.filter(a => a.id !== l.id && !deja.has(a.id)).sort((a, b) => cleTitre(a) < cleTitre(b) ? -1 : 1);
+    let choix = null;
+    dialogue(`<h2 style="font-size:19px">Relier « ${esc(l.titre)} »</h2><p class="doux" style="font-size:13px;margin:4px 0 10px">à un autre livre de ta bibliothèque</p><input class="inp" id="li-cherche" placeholder="Chercher un titre ou un auteur"><div id="li-liste" style="max-height:38vh;overflow-y:auto;margin:8px 0"></div><input class="inp" id="li-raison" placeholder="Pourquoi ? (facultatif)"><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn petit" id="li-non">Annuler</button><button class="btn or petit" id="li-oui" disabled>Relier</button></div>`, (d, f) => {
+      const liste = d.querySelector('#li-liste'), ok = d.querySelector('#li-oui');
+      const montrer = () => { const t = norm(d.querySelector('#li-cherche').value); liste.innerHTML = cands.filter(a => !t || norm(a.titre + ' ' + a.auteur).includes(t)).slice(0, 60).map(a => `<button class="ligne li-choix${choix === a.id ? ' choisi' : ''}" data-id="${a.id}" style="padding:6px">${couverture(a, 30)}<div class="infos"><div class="t" style="font-size:15px">${esc(a.titre)}</div><div class="a">${esc(a.auteur || '')}</div></div></button>`).join('') || '<p class="doux" style="font-size:13px">Aucun livre.</p>';
+        liste.querySelectorAll('[data-id]').forEach(b => b.onclick = () => { choix = +b.dataset.id; ok.disabled = false; montrer(); }); };
+      d.querySelector('#li-cherche').oninput = montrer; montrer(); d.querySelector('#li-cherche').focus();
+      d.querySelector('#li-non').onclick = f;
+      ok.onclick = async () => { f(); await Edition.relierLivres([[l.id, choix]], d.querySelector('#li-raison').value.trim()); rendre(); };
+    });
+  }
+  function editeurCitation(l, c, texteLu){
+    dialogue(`<h2 style="font-size:19px">${c ? 'Modifier la citation' : 'Nouvelle citation'}</h2>${texteLu != null ? '<p class="doux" style="font-size:12.5px;margin:4px 0 0">Texte lu sur ta photo : corrige-le si besoin.</p>' : ''}<textarea class="inp" id="ci-texte" style="min-height:150px;margin-top:10px" placeholder="Le passage, sans guillemets">${esc(c ? c.texte : texteLu || '')}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center"><input class="inp" id="ci-page" inputmode="numeric" placeholder="Page" style="width:96px" value="${c && c.page ? c.page : ''}"><button type="button" class="btn petit" id="ci-dicter">🎙 Dicter</button></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button class="btn petit" id="ci-non">Annuler</button><button class="btn or petit" id="ci-oui">Enregistrer</button></div>`, (d, f) => {
+      const t = d.querySelector('#ci-texte'); t.focus(); Dictee.brancher(d.querySelector('#ci-dicter'), t);
+      d.querySelector('#ci-non').onclick = () => { Dictee.arreter(); f(); };
+      d.querySelector('#ci-oui').onclick = async () => { Dictee.arreter(); const v = t.value.trim().replace(/^[«"“]\s*|\s*[»"”]$/g, ''); if (!v) return; const p = parseInt(d.querySelector('#ci-page').value, 10);
+        if (c) { c.texte = v; c.page = p > 0 ? p : null; } else M.citations.push({ id: M.citations.reduce((m, x) => Math.max(m, x.id || 0), 0) + 1, lectureId: l.id, texte: v, page: p > 0 ? p : null, dateAjout: Date.now() });
+        f(); await sauver(); rendre(); };
+    });
+  }
+  async function partager(l){
+    const cs = citationsDe(l.id).slice().sort((a, b) => (a.page ?? 1e9) - (b.page ?? 1e9) || a.dateAjout - b.dateAjout);
+    const lec = l.dateFin != null ? 'Lu ' + ((l.precisionDates || 0) === 0 ? 'le ' + Dates.formater(l.dateFin) : 'en ' + Dates.formaterSelon(l.dateFin, l.precisionDates)) : l.dateDebut != null ? 'Commencé le ' + Dates.formater(l.dateDebut) : LIB_STATUT[l.statut];
+    let t = `## ${l.titre}${l.auteur ? ' — ' + l.auteur : ''}\n*${lec}${l.note > 0 ? ' · ' + '★'.repeat(l.note) : ''}*\n\n`;
+    if (l.notes && l.notes.trim()) t += `### Notes\n${l.notes.trim()}\n\n`;
+    if (cs.length) t += '### Citations\n' + cs.map(c => `> « ${c.texte.trim()} »${c.page ? ` (p. ${c.page})` : ''}\n`).join('\n');
+    try { if (navigator.share) { await navigator.share({ title: 'Mes notes : ' + l.titre, text: t }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(t); toast('Notes copiées : colle-les où tu veux'); } catch (e) { toast('Partage indisponible ici'); }
+  }
+
+  /* ---------- panneau « Modifier » (EditionFiche.kt) ---------- */
+  function panneauModifier(l){
+    const s = { titre: l.titre, auteur: l.auteur || '', serie: l.serie || '', tome: l.tome != null ? String(l.tome) : '', theme: l.theme || '', type: l.type || 'LIVRE', statut: l.statut, mots: l.motsCles || '', total: l.pagesTotal != null ? String(l.pagesTotal) : '', page: l.pageActuelle != null ? String(l.pageActuelle) : '', relectures: l.relectures || 0,
+      precision: l.dateDebut == null && l.dateFin == null && l.statut === 'LU' ? INCONNUE : (l.precisionDates || 0), debut: l.dateDebut, fin: l.dateFin };
+    const ref = l.statut === 'LU' ? l.dateFin : l.dateDebut, dref = ref != null ? new Date(ref) : null;
+    s.annee = String(dref ? dref.getUTCFullYear() : new Date().getFullYear()); s.mois = dref ? dref.getUTCMonth() + 1 : new Date().getMonth() + 1;
+    const fond = document.createElement('div'); fond.className = 'feuille-fond'; document.body.appendChild(fond);
+    const puce = (attr, val, lib, sel) => `<button type="button" class="puce" data-${attr}="${val}" aria-pressed="${sel}">${lib}</button>`;
+    function lire(){ const f = fond.querySelector('form'); if (!f) return; for (const k of ['titre', 'auteur', 'serie', 'tome', 'theme', 'mots', 'total', 'page', 'annee']) if (f.elements[k]) s[k] = f.elements[k].value; if (f.elements.debut) s.debut = Dates.depuisChamp(f.elements.debut.value); if (f.elements.fin) s.fin = Dates.depuisChamp(f.elements.fin.value); }
+    function afficher(){
+      const sc = fond.querySelector('.feuille-corps')?.scrollTop || 0;
+      const choixP = [[0, 'Date précise'], [1, 'Un mois'], [2, 'Une année']].concat(s.statut === 'LU' ? [[INCONNUE, 'Inconnue']] : []);
+      fond.innerHTML = `<div class="feuille" role="dialog" aria-label="Modifier la fiche"><div class="feuille-tete"><span>Modifier la fiche</span><button type="button" class="fc-txtbtn" data-x>Annuler</button></div>
+        <form class="feuille-corps form" autocomplete="off">
+          <div class="fc-lab or">LE LIVRE</div>
+          <label>Titre<textarea class="inp" name="titre" rows="2" style="min-height:0">${esc(s.titre)}</textarea></label>
+          <label>Auteur<input class="inp" name="auteur" value="${esc(s.auteur)}"></label>
+          <div class="trois"><label>Série<input class="inp" name="serie" value="${esc(s.serie)}"></label><label>Tome<input class="inp" name="tome" inputmode="numeric" value="${esc(s.tome)}"></label></div>
+          <label>Thème<input class="inp" name="theme" list="liste-themes-m" value="${esc(s.theme)}" placeholder="Choisis dans la liste ou écris le tien"></label><datalist id="liste-themes-m">${THEMES.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+          <div class="choix">${puce('type', 'LIVRE', 'Livre', s.type === 'LIVRE')}${puce('type', 'BD', 'BD', s.type === 'BD')}</div>
+          <label>Mots-clés<textarea class="inp" name="mots" style="min-height:64px">${esc(s.mots)}</textarea><span class="fc-petit" style="font-weight:400">Séparés par des virgules. Ils relient les livres dans le ciel.</span></label>
+          <div class="fc-lab or" style="margin-top:6px">TA LECTURE</div>
+          <div class="choix">${['A_LIRE', 'EN_COURS', 'LU'].map(x => puce('st', x, LIB_STATUT[x], s.statut === x)).join('')}</div>
+          ${s.statut === 'A_LIRE' ? '<div class="fc-petit">Un livre à lire n’a pas encore de dates.</div>' : `<div style="font-weight:600;font-size:14px">${s.statut === 'LU' ? 'Lu quand ?' : 'Commencé quand ?'}</div>
+            <div class="choix">${choixP.map(([v, lib]) => puce('prec', v, lib, s.precision === v)).join('')}</div>
+            ${s.precision === 0 ? `<div class="deux"><label>Début<input class="inp" type="date" name="debut" value="${Dates.versChamp(s.debut)}"></label>${s.statut === 'LU' ? `<label>Fin<input class="inp" type="date" name="fin" value="${Dates.versChamp(s.fin)}"></label>` : ''}</div>`
+              : s.precision === 1 || s.precision === 2 ? `<label style="width:130px">Année<input class="inp" name="annee" inputmode="numeric" value="${esc(s.annee)}"></label>${s.precision === 1 ? `<div class="choix">${Dates.COURT.map((m, i) => puce('mois', i + 1, m, s.mois === i + 1)).join('')}</div>` : ''}`
+              : '<div class="fc-petit">Le livre reste dans ta bibliothèque, sans place sur le fil du temps.</div>'}`}
+          <div class="fc-ligne" style="gap:8px">${s.statut === 'EN_COURS' ? `<label style="width:110px">Page<input class="inp" name="page" inputmode="numeric" value="${esc(s.page)}"></label><span style="color:var(--brume);font-size:20px;margin-top:18px">/</span>` : ''}<label style="width:110px">Pages<input class="inp" name="total" inputmode="numeric" value="${esc(s.total)}"></label></div>
+          ${s.statut !== 'A_LIRE' || s.relectures > 0 ? `<div class="fc-ligne"><span style="flex:1;font-weight:600;font-size:14px">Relectures</span><button type="button" class="fc-txtbtn or" data-rel="-1" style="font-size:20px">−</button><span style="font-size:16px;min-width:20px;text-align:center">${s.relectures}</span><button type="button" class="fc-txtbtn or" data-rel="1" style="font-size:20px">+</button></div>` : ''}
+        </form><button type="button" class="fc-gros" data-ok style="margin:12px 20px" ${s.titre.trim() ? '' : 'disabled'}>Enregistrer</button></div>`;
+      fond.querySelector('.feuille-corps').scrollTop = sc;
+      const f = fond.querySelector('form');
+      f.elements.titre.oninput = () => { fond.querySelector('[data-ok]').disabled = !f.elements.titre.value.trim(); };
+      fond.querySelectorAll('[data-type]').forEach(b => b.onclick = () => { lire(); s.type = b.dataset.type; afficher(); });
+      fond.querySelectorAll('[data-st]').forEach(b => b.onclick = () => { lire(); s.statut = b.dataset.st; if (s.statut !== 'LU' && s.precision === INCONNUE) s.precision = 0; afficher(); });
+      fond.querySelectorAll('[data-prec]').forEach(b => b.onclick = () => { lire(); s.precision = +b.dataset.prec; afficher(); });
+      fond.querySelectorAll('[data-mois]').forEach(b => b.onclick = () => { lire(); s.mois = +b.dataset.mois; afficher(); });
+      fond.querySelectorAll('[data-rel]').forEach(b => b.onclick = () => { lire(); s.relectures = Math.max(0, s.relectures + +b.dataset.rel); afficher(); });
+      fond.querySelector('[data-x]').onclick = fermerP;
+      fond.querySelector('[data-ok]').onclick = async () => { lire(); construire(); fermerP(); await sauver(); rendre(); toast('Fiche enregistrée'); };
+    }
+    function construire(){
+      const a = Math.min(2100, Math.max(1900, parseInt(s.annee, 10))), aOk = Number.isFinite(parseInt(s.annee, 10));
+      const approx = s.precision === 2 ? (aOk ? Dates.milieuAnnee(a) : null) : s.precision === 1 ? (aOk ? Dates.milieuMois(a, s.mois) : null) : null;
+      let d, f, p;
+      if (s.statut === 'A_LIRE' || s.precision === INCONNUE) [d, f, p] = [null, null, 0];
+      else if (s.precision === 0) [d, f, p] = [s.debut, s.statut === 'LU' ? s.fin : null, 0];
+      else if (s.statut === 'LU') [d, f, p] = [null, approx, s.precision];
+      else [d, f, p] = [approx, null, s.precision];
+      const ent = v => { const n = parseInt(String(v).replace(/\D/g, ''), 10); return Number.isFinite(n) ? n : null; };
+      Object.assign(l, { titre: s.titre.trim() || l.titre, auteur: s.auteur.trim(), serie: s.serie.trim() || null, tome: ent(s.tome), theme: s.theme.trim() || null, type: s.type, statut: s.statut, motsCles: s.mots.trim(),
+        pagesTotal: ent(s.total) > 0 ? ent(s.total) : null, pageActuelle: s.statut === 'EN_COURS' ? ent(s.page) : l.pageActuelle, dateDebut: d, dateFin: f, precisionDates: p, relectures: s.relectures });
+    }
+    function fermerP(){ fond.classList.remove('ouvert'); setTimeout(() => fond.remove(), 250); }
+    fond.addEventListener('click', e => { if (e.target === fond) fermerP(); });
+    afficher(); requestAnimationFrame(() => fond.classList.add('ouvert'));
+  }
+
+  /* ---------- ouverture ---------- */
   function ouvrir(id, maj = true){
     const l = M.parId.get(id); if (!l) return;
-    if (livre?.id !== id) onglet = null;
-    livre = l; ouverte = true; rendre();
+    if (livre?.id !== id) { page = 0; menuOuvert = false; }
+    enregistrerEnCours();
+    livre = l; ouverte = true; rendre(); el.querySelector('.fc-defile').scrollTop = 0; suivreTitre();
     el.classList.add('ouverte'); el.setAttribute('aria-hidden', 'false'); voile.classList.add('ouvert');
-    el.querySelector('.fiche-corps').scrollTop = 0;
-    if (maj && location.hash !== '#fiche-' + id) { history.pushState(null, '', '#fiche-' + id); }
+    if (maj && location.hash !== '#fiche-' + id) history.pushState(null, '', '#fiche-' + id);
+    chargerSuggestions(l); auto(l);
   }
   function fermer(maj = true){
-    if (!ouverte) return; ouverte = false;
+    if (!ouverte) return; enregistrerEnCours(); Dictee.arreter(); ouverte = false;
     el.classList.remove('ouverte'); el.setAttribute('aria-hidden', 'true'); voile.classList.remove('ouvert');
     if (maj && /^#fiche-/.test(location.hash)) history.pushState(null, '', '#' + (vueCourante === 'vide' ? 'ciel' : vueCourante));
   }
   voile.onclick = () => fermer();
-  addEventListener('keydown', e => { if (e.key === 'Escape' && ouverte) fermer(); });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && ouverte && !$('#dialogue').classList.contains('ouvert') && !document.querySelector('.feuille-fond')) fermer(); });
   addEventListener('popstate', () => { if (!/^#fiche-/.test(location.hash)) fermer(false); });
-  function rafraichir(){ if (!ouverte || !livre) return; const l = M.parId.get(livre.id); if (!l) { fermer(); return; } livre = l; const sc = el.querySelector('.fiche-corps')?.scrollTop || 0; rendre(); el.querySelector('.fiche-corps').scrollTop = sc; }
-  function montrer(html, brancher){ ouverte = true; el.innerHTML = html; el.classList.add('ouverte'); el.setAttribute('aria-hidden', 'false'); voile.classList.add('ouvert'); brancher(el); }
+  function rafraichir(){ if (!ouverte || !livre) return; const l = M.parId.get(livre.id); if (!l) { fermer(); return; } livre = l; if (el.querySelector('.fc-defile')) rendre(); }
+  function montrer(html, brancherM){ ouverte = true; el.innerHTML = html; el.classList.add('ouverte'); el.setAttribute('aria-hidden', 'false'); voile.classList.add('ouvert'); brancherM(el); }
   return { ouvrir, fermer, rafraichir, montrer, estOuverte: () => ouverte, livreId: () => livre?.id };
+})();
+
+/* =========================================================
+   NOUVELLE LECTURE — port d'AjoutDialog.kt (+ recherche par la couverture, propre au site)
+   ========================================================= */
+const Ajout = (() => {
+  let s = null, photoCouv = null;
+  const neuf = () => ({ titre: '', auteur: '', isbn: '', couverture: null, theme: '', mots: '', resume: '', sourceResume: null, serie: '', tome: '', pages: null, type: 'LIVRE', statut: 'A_LIRE', fini: 'inconnue', annee: '', chargement: false, message: null, info: false, resultats: null, rechTitre: false, lu: null });
+  const d = () => $('#dialogue');
+  function lire(){ const f = $('#aj-form'); if (!f) return; for (const k of ['isbn', 'titre', 'auteur', 'serie', 'tome', 'theme', 'annee']) if (f.elements[k]) s[k] = f.elements[k].value; }
+  function afficher(){
+    const sc = d().querySelector('.aj-corps')?.scrollTop || 0;
+    const puce = (attr, v, lib, sel) => `<button type="button" class="puce" data-${attr}="${v}" aria-pressed="${sel}">${lib}</button>`;
+    const couv = photoCouv ? URL.createObjectURL(photoCouv) : s.couverture;
+    d().innerHTML = `<div class="carte aj" role="dialog" aria-label="Nouvelle lecture"><h2 class="aj-titre">Nouvelle lecture</h2><form class="aj-corps form" id="aj-form" autocomplete="off">
+      <button type="button" class="btn or" data-a="scanner" style="width:100%">📷  Scanner</button>
+      <div class="deux"><button type="button" class="btn petit" data-a="rafale">⚡  En rafale</button><label class="btn petit" style="display:inline-flex;justify-content:center;color:var(--ivoire)">🖼  Par la couverture<input type="file" accept="image/*" capture="environment" id="aj-photo" hidden></label></div>
+      <div class="fc-ligne" style="gap:6px"><label style="flex:1">ISBN<input class="inp" name="isbn" inputmode="numeric" value="${esc(s.isbn)}"></label><button type="button" class="fc-txtbtn or" data-a="isbn" style="margin-top:18px" ${s.isbn.trim() && !s.chargement ? '' : 'disabled'}>Chercher</button></div>
+      ${s.chargement ? '<div class="fc-charge"><i class="rouet"></i>Recherche de la fiche…</div>' : ''}
+      ${s.message ? `<div class="fc-petit" style="color:${s.info ? 'var(--brume)' : 'var(--corail)'}">${esc(s.message)}</div>` : ''}
+      ${s.lu ? s.lu : ''}
+      ${couv ? `<img src="${esc(couv)}" alt="Couverture" referrerpolicy="no-referrer" style="height:140px;object-fit:contain;width:100%">` : ''}
+      <label>Titre<textarea class="inp" name="titre" rows="2" style="min-height:0">${esc(s.titre)}</textarea></label>
+      <label>Auteur<input class="inp" name="auteur" value="${esc(s.auteur)}"></label>
+      ${!s.isbn.trim() ? `<button type="button" class="fc-txtbtn or" data-a="titre" style="align-self:flex-start" ${s.titre.trim() && !s.rechTitre ? '' : 'disabled'}>${s.rechTitre ? 'Recherche des éditions…' : '🔎  Chercher ce titre (BnF, Google, Open Library)'}</button>` : ''}
+      ${s.resultats ? (!s.resultats.length ? '<div class="fc-petit">Aucune édition trouvée. Essaie un titre plus court, ou le seul nom de l’auteur.</div>' : `<div style="font-weight:600;font-size:14px">Choisis ton édition :</div>${s.resultats.slice(0, 8).map((r, i) => `<button type="button" class="aj-ed" data-ed="${i}"><div style="font-size:14px">${esc(r.titre)}</div><div class="fc-petit">${esc([r.auteur, r.editeur, r.annee, r.pagesTotal ? r.pagesTotal + ' p.' : ''].filter(Boolean).join(' · '))}</div></button>`).join('')}`) : ''}
+      <div style="font-weight:600;font-size:14px">Statut</div><div class="choix">${['A_LIRE', 'EN_COURS', 'LU'].map(x => puce('st', x, LIB_STATUT[x], s.statut === x)).join('')}</div>
+      ${s.statut === 'LU' ? `<div style="font-weight:600;font-size:14px">Fini quand ?</div><div class="choix">${puce('fini', 'inconnue', 'Inconnue', s.fini === 'inconnue')}${puce('fini', 'annee', 'Une année', s.fini === 'annee')}${puce('fini', 'auj', 'Aujourd’hui', s.fini === 'auj')}</div>
+        ${s.fini === 'annee' ? `<label style="width:160px">Année de lecture<input class="inp" name="annee" inputmode="numeric" value="${esc(s.annee)}"></label>` : ''}${s.fini === 'inconnue' ? '<div class="fc-petit">Tu pourras indiquer les dates plus tard depuis la fiche.</div>' : ''}` : ''}
+      <div style="font-weight:600;font-size:14px">Type</div><div class="choix">${puce('type', 'LIVRE', 'Livre', s.type === 'LIVRE')}${puce('type', 'BD', 'BD', s.type === 'BD')}</div>
+      <div class="trois"><label>Série<input class="inp" name="serie" value="${esc(s.serie)}"></label><label>Tome<input class="inp" name="tome" inputmode="numeric" value="${esc(s.tome)}"></label></div>
+      <label>Thème<input class="inp" name="theme" list="liste-themes-a" value="${esc(s.theme)}" placeholder="Choisis dans la liste ou écris le tien"></label><datalist id="liste-themes-a">${THEMES.map(t => `<option value="${esc(t)}">`).join('')}</datalist>
+      </form><div class="aj-boutons"><button class="fc-txtbtn" data-a="annuler">Annuler</button><button class="fc-txtbtn or" data-a="ajouter" ${s.titre.trim() && !s.chargement ? '' : 'disabled'}>Ajouter</button></div></div>`;
+    d().classList.add('ouvert');
+    const corps = d().querySelector('.aj-corps'); corps.scrollTop = sc;
+    const f = $('#aj-form');
+    f.elements.isbn.oninput = () => { s.isbn = f.elements.isbn.value; d().querySelector('[data-a=isbn]').disabled = !s.isbn.trim() || s.chargement; };
+    f.elements.isbn.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); lire(); rechercher(s.isbn); } };
+    f.elements.titre.oninput = () => { s.titre = f.elements.titre.value; d().querySelector('[data-a=ajouter]').disabled = !s.titre.trim() || s.chargement; const bt = d().querySelector('[data-a=titre]'); if (bt) bt.disabled = !s.titre.trim() || s.rechTitre; };
+    f.onsubmit = e => e.preventDefault();
+    d().querySelectorAll('[data-st]').forEach(b => b.onclick = () => { lire(); s.statut = b.dataset.st; afficher(); });
+    d().querySelectorAll('[data-fini]').forEach(b => b.onclick = () => { lire(); s.fini = b.dataset.fini; afficher(); });
+    d().querySelectorAll('[data-type]').forEach(b => b.onclick = () => { lire(); s.type = b.dataset.type; afficher(); });
+    d().querySelectorAll('[data-ed]').forEach(b => b.onclick = () => { lire(); const r = s.resultats[+b.dataset.ed]; s.titre = r.titre; if (r.auteur) s.auteur = r.auteur; s.pages = r.pagesTotal || null; if (r.estBd) s.type = 'BD'; if (r.couvertureUrl && !photoCouv) s.couverture = r.couvertureUrl; s.resultats = null; if (r.isbn) rechercher(r.isbn); else afficher(); });
+    $('#aj-photo').onchange = e => { const fi = e.target.files[0]; e.target.value = ''; if (fi) parCouverture(fi); };
+    const luC = d().querySelector('[data-lu-chercher]'); if (luC) luC.onclick = () => { lire(); s.titre = $('#lu-titre').value.trim(); s.auteur = $('#lu-auteur').value.trim(); s.lu = null; parTitre(); };
+    d().querySelectorAll('[data-a]').forEach(b => b.onclick = () => {
+      lire();
+      switch (b.dataset.a) {
+        case 'annuler': fermer(); break;
+        case 'scanner': Scanner.ouvrir({ surIsbn: code => { s.isbn = code; afficher(); rechercher(code); } }); break;
+        case 'rafale': fermer(); Scanner.ouvrir({ rafale: true }); break;
+        case 'isbn': rechercher(s.isbn); break;
+        case 'titre': parTitre(); break;
+        case 'ajouter': valider(); break;
+      }
+    });
+  }
+  async function rechercher(code){
+    const p = String(code || '').toUpperCase().replace(/[^0-9X]/g, ''); s.isbn = p;
+    s.message = M.lectures.some(l => l.isbn && String(l.isbn).replace(/[^0-9X]/gi, '') === p) ? '⚠️ Ce livre est déjà dans ta liste.' : null; s.info = false;
+    s.chargement = true; afficher();
+    let r = null; try { r = await Edition.chercherIsbn(p); } catch (e) { if (!s.message) s.message = 'Recherche en ligne impossible pour l’instant. Tu peux remplir à la main.'; }
+    s.chargement = false;
+    if (r) {
+      s.titre = r.titre ? (r.sousTitre && r.titre.length < 25 ? `${r.titre} : ${r.sousTitre}` : r.titre) : s.titre; s.auteur = r.auteur || s.auteur;
+      if (!photoCouv) s.couverture = r.couvertureUrl || s.couverture; if (r.theme) s.theme = r.theme; s.mots = (r.motsCles || []).join(', ');
+      const a = Series.analyser(s.titre); if (a.serie && !s.serie) { s.serie = a.serie; s.tome = String(a.tome); }
+      s.pages = r.pagesTotal || s.pages; if (r.estBd) s.type = 'BD'; if (r.resume) { s.resume = r.resume; s.sourceResume = r.source; }
+    } else if (!s.message) s.message = 'Aucune fiche trouvée pour cet ISBN. Tu peux remplir à la main.';
+    afficher();
+  }
+  async function parTitre(){
+    s.rechTitre = true; s.resultats = null; afficher();
+    try { s.resultats = await Edition.chercherEditions(s.titre.trim(), s.auteur.trim()); } catch (e) { s.resultats = []; }
+    s.rechTitre = false; afficher();
+  }
+  async function parCouverture(fichier){
+    s.message = 'Recherche d’un code-barres…'; s.info = true; afficher();
+    let bmp; try { bmp = await createImageBitmap(fichier); } catch (e) { s.message = 'Image illisible.'; s.info = false; afficher(); return; }
+    try { const codes = await Scanner.lireImage(bmp); const c = (codes[0] || '').replace(/\D/g, ''); if (Scanner.isbnValide(c)) { s.message = null; rechercher(c); return; } } catch (e) {}
+    s.message = 'Lecture du texte de la couverture…'; afficher();
+    const r = await Edition.ocrCouverture(bmp, m => { s.message = m; const z = d().querySelector('.aj-corps .fc-petit'); if (z) z.textContent = m; });
+    s.message = null;
+    const url = URL.createObjectURL(fichier);
+    s.lu = r && r.lignes.length ? `<div class="fc-carte" style="display:grid;gap:8px"><div class="fc-lab">LU SUR LA COUVERTURE</div><div style="display:flex;gap:10px"><img src="${url}" alt="" style="width:54px;border-radius:4px"><div style="flex:1;display:grid;gap:6px"><input class="inp" id="lu-titre" value="${esc(r.titre)}" placeholder="Titre"><input class="inp" id="lu-auteur" value="${esc(r.auteur)}" placeholder="Auteur"></div></div><div class="fc-petit">Corrige si besoin, puis cherche les éditions.</div><div class="fc-ligne" style="gap:8px;flex-wrap:wrap"><button type="button" class="btn or petit" data-lu-chercher>🔎 Chercher les éditions</button><label class="btn petit" style="display:inline-flex">Garder la photo comme couverture<input type="checkbox" id="lu-garder" style="margin-left:6px"></label></div></div>`
+      : `<div class="fc-petit" style="color:var(--or)">${r ? 'Aucun texte lisible sur cette photo : essaie une photo plus nette et bien droite, ou tape le titre.' : 'La lecture du texte n’est pas disponible ici (connexion ?). Tape le titre à la main.'}</div>`;
+    afficher();
+    const g = $('#lu-garder'); if (g) g.onchange = async () => { if (g.checked) { const b = await Recadreur.ouvrir(bmp); if (b) { photoCouv = b; s.couverture = null; } else g.checked = false; } else photoCouv = null; };
+  }
+  async function valider(){
+    if (!s.titre.trim()) return;
+    const auj = Dates.aujourdhui(), an = parseInt(s.annee, 10), anOk = an >= 1900 && an <= 2100;
+    const l = await Edition.ajouterSimple({
+      titre: s.titre.trim(), auteur: s.auteur.trim(), type: s.type, statut: s.statut, isbn: s.isbn.trim() || null, couvertureUrl: s.couverture, theme: s.theme.trim() || null,
+      motsCles: s.mots, resume: s.resume, sourceResume: s.sourceResume, serie: s.serie.trim() || null, tome: parseInt(s.tome, 10) || null, pagesTotal: s.pages,
+      dateDebut: s.statut === 'EN_COURS' ? auj : null,
+      dateFin: s.statut !== 'LU' ? null : s.fini === 'auj' ? auj : s.fini === 'annee' && anOk ? Dates.milieuAnnee(an) : null,
+      precisionDates: s.statut === 'LU' && s.fini === 'annee' && anOk ? 2 : 0
+    });
+    if (photoCouv) { await Edition.poserCouverture(l, photoCouv); await Edition.sauver(); }
+    fermer();
+    const fiche = M.parId.get(l.id);
+    toast(fiche._manques.length ? `Ajouté · manque : ${fiche._manques.join(', ')}` : `« ${titreCourt(fiche)} » rejoint ton ciel`);
+    Fiche.ouvrir(l.id);
+  }
+  function fermer(){ d().classList.remove('ouvert'); photoCouv = null; }
+  async function ouvrir(){ await Edition.assurerRacine(); s = neuf(); photoCouv = null; afficher(); setTimeout(() => $('#aj-form')?.elements.isbn.focus(), 60); }
+  return { ouvrir };
 })();
 
 /* =========================================================
@@ -2352,7 +3029,56 @@ const Edition = (() => {
       await enregistrer(); Fiche.fermer(); toast('Livre supprimé');
     });
   }
-  function ouvrir(id){ const l = M.parId.get(id); if (!l) return; brouillon = propre(l); imageChoisie = null; retirerImage = false; afficher(); }
+  function ouvrir(id, o = {}){ const l = M.parId.get(id); if (!l) return; brouillon = propre(l); imageChoisie = null; retirerImage = false; afficher(); if (o.couverture) setTimeout(() => $('#e-zone-couv')?.scrollIntoView({ block: 'start' }), 60); }
+  async function assurerRacine(){ if (!M.racine) { await Base.remplacer({ application:'Phylactère', version:4, date:Date.now(), lectures:[], citations:[], liens:[], galaxies:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; } }
+  async function supprimerDirect(id){
+    const l = M.parId.get(id); if (!l) return;
+    M.lectures = M.lectures.filter(x => x.id !== id); M.citations = M.citations.filter(c => c.lectureId !== id); M.liens = M.liens.filter(x => x.lectureA !== id && x.lectureB !== id);
+    if ((l.couvertureUrl || '').startsWith('local:')) Base.supprimerCouverture(l.couvertureUrl.slice(6)).catch(() => {});
+    await enregistrer(); toast('Livre supprimé');
+  }
+  /* Lire le texte d'une photo (citation, 4e) : recadrage puis lecture ; null = annulé, '' = rien de lisible */
+  async function lireTexteImage(fichier, titre, aide, etat = () => {}){
+    let bmp; try { bmp = await createImageBitmap(fichier); } catch (e) { return ''; }
+    const morceau = await Recadreur.ouvrir(bmp, titre, aide); if (!morceau) return null;
+    try {
+      const T = await chargerTesseract();
+      lecteurLog = m => { if (m.status === 'recognizing text') etat(`Lecture du texte… ${Math.round(m.progress * 100)} %`); else if (/load|initializ/.test(m.status)) etat('Préparation de la lecture (la première fois, quelques secondes)…'); };
+      const w = await lecteur(T, '3');
+      const img = await createImageBitmap(morceau), c = document.createElement('canvas'), f2 = Math.min(2, 2000 / Math.max(img.width, img.height));
+      c.width = Math.round(img.width * f2); c.height = Math.round(img.height * f2); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      const r = await w.recognize(c);
+      const ok = (r.data.lines || []).map(l => ({ t: l.text.replace(/\s+/g, ' ').trim(), c: l.confidence })).filter(l => l.t && l.c >= 55 && (l.t.match(/\p{L}/gu) || []).length / l.t.replace(/\s/g, '').length >= .6 && (l.t.match(/\p{L}{3,}/gu) || []).length >= 1);
+      let t = '';
+      for (const l of ok) { if (!t) t = l.t; else if (/\p{L}-$/u.test(t) && /^\p{Ll}/u.test(l.t)) t = t.slice(0, -1) + l.t; else t += (/[.!?»…]$/.test(t) && /^[\p{Lu}«—-]/u.test(l.t) ? '\n\n' : ' ') + l.t; }
+      t = t.replace(/ ([,.])/g, '$1').trim();
+      return t.replace(/[^\p{L}]/gu, '').length < 20 ? '' : t;
+    } catch (e) { console.warn(e); toast('La lecture du texte n’est pas disponible ici (connexion ?)'); return null; }
+    finally { lecteurLog = null; }
+  }
+  /* Titre et auteur lus sur une couverture ; null si la lecture est indisponible */
+  async function ocrCouverture(bmp, etat = () => {}){
+    let lignes = [];
+    try {
+      const T = await chargerTesseract();
+      const f2 = Math.min(1, 1600 / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas'); c.width = Math.round(bmp.width * f2); c.height = Math.round(bmp.height * f2); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      lecteurLog = m => { if (m.status === 'recognizing text') etat(`Lecture du texte de la couverture… ${Math.round(m.progress * 100)} %`); else if (/load|initializ/.test(m.status)) etat('Préparation de la lecture (la première fois, quelques secondes)…'); };
+      await lecteur(T, '11');
+      const r = await tesseract.recognize(c);
+      lignes = (r.data.lines || []).map(l => ({ t: l.text.replace(/[|_~^`*»«"“”]+/g, ' ').replace(/\s+/g, ' ').trim(), h: l.bbox.y1 - l.bbox.y0, y: l.bbox.y0, conf: l.confidence })).filter(l => l.conf > 30 && (l.t.match(/\p{L}/gu) || []).length >= 3);
+    } catch (e) { console.warn(e); return null; } finally { lecteurLog = null; }
+    const parTaille = lignes.slice().sort((a, b) => b.h - a.h), grand = parTaille[0]; let titre = '', auteur = '';
+    if (grand) {
+      const ordre = lignes.slice().sort((a, b) => a.y - b.y), i0 = ordre.indexOf(grand), bloc = [grand];
+      for (let i = i0 - 1; i >= 0 && ordre[i].h > grand.h * .7 && bloc[0].y - (ordre[i].y + ordre[i].h) < grand.h * 1.2; i--) bloc.unshift(ordre[i]);
+      for (let i = i0 + 1; i < ordre.length && ordre[i].h > grand.h * .7 && ordre[i].y - (bloc[bloc.length - 1].y + bloc[bloc.length - 1].h) < grand.h * 1.2; i++) bloc.push(ordre[i]);
+      const casse = t => t === t.toUpperCase() ? t.toLowerCase().replace(/(^|[\s'’-])\p{L}/gu, m => m.toUpperCase()) : t;
+      titre = casse(bloc.map(l => l.t).join(' ')).replace(/^(\p{L})/u, m => m.toUpperCase());
+      const nom = parTaille.find(l => !bloc.includes(l) && /^\p{Lu}/u.test(l.t) && l.t.split(' ').length >= 2 && l.t.split(' ').length <= 5 && !/\d/.test(l.t));
+      auteur = nom ? casse(nom.t) : '';
+    }
+    return { lignes, titre, auteur };
+  }
   async function nouveau(){
     if (!M.racine) { await Base.remplacer({ application:'Phylactère', version:3, date:Date.now(), lectures:[], citations:[], liens:[], importeLe:Date.now(), fichierSource:'nouvelle bibliothèque' }, []); await charger(); Ciel.invalider(); location.hash = 'ciel'; }
     brouillon = modele(); imageChoisie = null; retirerImage = false; afficher();
@@ -2470,10 +3196,10 @@ const Edition = (() => {
     } catch (e) { console.error(e); toast('Export impossible : ' + (e.message || e)); }
   }
 
-  $('#nav-ajouter').addEventListener('click', () => nouveau());
+  $('#nav-ajouter').addEventListener('click', () => Ajout.ouvrir());
   async function ajouterPlusieurs(liste){ for (const o of liste) M.lectures.push({ ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }); await enregistrer(); }
   async function ajouterSimple(o){ const l = { ...modele(), ...o, id: nouvelId(M.lectures), dateAjout: Date.now() }; M.lectures.push(l); await enregistrer(); return l; }
-  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, ajouterDepuisIsbn, ajouterSimple, ajouterPlusieurs, recevoirPartage, livreParImage, relierLivres };
+  return { ouvrir, nouveau, complement, brancher, exporter, nonExporte, construireExport, chercherIsbn, chercherEditions, ajouterDepuisIsbn, ajouterSimple, ajouterPlusieurs, recevoirPartage, livreParImage, relierLivres, sauver: enregistrer, poserCouverture, supprimerDirect, assurerRacine, lireTexteImage, ocrCouverture };
 })();
 
 /* =========================================================
@@ -2636,11 +3362,11 @@ const Dictee = (() => {
    Recadrer et tourner une couverture
    ========================================================= */
 const Recadreur = (() => {
-  function ouvrir(bitmap){
+  function ouvrir(bitmap, titre = 'Couverture', aide = 'Fais glisser le cadre ou ses coins, tourne si besoin.'){
     return new Promise(resoudre => {
       let src = document.createElement('canvas'); src.width = bitmap.width; src.height = bitmap.height; src.getContext('2d').drawImage(bitmap, 0, 0);
       const o = document.createElement('div'); o.id = 'recadreur';
-      o.innerHTML = `<div class="sc-haut"><div><div class="sur" style="color:var(--or)">Couverture</div><div class="doux" style="font-size:13.5px;margin-top:4px">Fais glisser le cadre ou ses coins, tourne si besoin.</div></div></div>
+      o.innerHTML = `<div class="sc-haut"><div><div class="sur" style="color:var(--or)">${esc(titre)}</div><div class="doux" style="font-size:13.5px;margin-top:4px">${esc(aide)}</div></div></div>
         <div class="rc-scene" id="rc-scene"><div class="rc-boite" id="rc-boite"><canvas id="rc-img"></canvas><div class="rc-cadre" id="rc-cadre"><i data-c="nw"></i><i data-c="ne"></i><i data-c="sw"></i><i data-c="se"></i></div></div></div>
         <div class="sc-bas"><div style="display:flex;gap:8px"><button class="rond" id="rc-g" aria-label="Tourner à gauche">↺</button><button class="rond" id="rc-d" aria-label="Tourner à droite">↻</button></div><div style="display:flex;gap:8px"><button class="btn" id="rc-non">Annuler</button><button class="btn or" id="rc-oui">Valider</button></div></div>`;
       document.body.appendChild(o);
