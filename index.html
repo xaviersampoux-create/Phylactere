@@ -149,27 +149,105 @@ h2{font-size:20px}
 .vide p{color:var(--ivoire-d);line-height:1.6}
 .depot{margin-top:22px;border:1px dashed var(--trait);border-radius:18px;padding:28px 18px}
 .depot.survol{border-color:var(--or);background:rgba(227,182,92,.05)}
-/* Ciel */
-#ciel{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;display:block}
-#ciel.tire{cursor:grabbing}
-.ciel-tete{position:absolute;left:0;right:0;top:0;padding:16px 20px;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:linear-gradient(var(--nuit) 30%,transparent)}
-.ciel-tete>*{pointer-events:auto}
-.ciel-tete h1{font-size:24px}
-.banniere[hidden]{display:none}
-.banniere{display:inline-block;margin-top:8px;padding:6px 12px;border-radius:999px;border:1px solid rgba(227,182,92,.5);color:var(--or);font-size:12.5px;font-weight:600}
-.ciel-outils{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px}
-.rond{width:42px;height:42px;border-radius:50%;background:var(--encre);border:1px solid var(--trait);display:grid;place-items:center;font-size:18px;color:var(--ivoire-d)}
-.rond:hover{color:var(--ivoire);border-color:var(--brume)}
-.legende{position:absolute;left:20px;bottom:18px;display:flex;gap:14px;font-size:12px;color:var(--brume);pointer-events:none}
-.bulle-etoile{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(440px,calc(100% - 32px));display:none;z-index:3}
-.bulle-etoile.ouverte{display:block}
-.bulle-etoile .carte{display:flex;gap:14px;align-items:flex-start;box-shadow:0 12px 40px rgba(0,0,0,.5)}
-.bulle-etoile h3{font-size:18px;line-height:1.2}
-.relies{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.relies button{font-size:12.5px;color:var(--or);border:1px solid rgba(227,182,92,.35);border-radius:999px;padding:4px 10px}
-.terre{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);width:min(480px,calc(100% - 32px));display:none;z-index:3}
-.terre.ouverte{display:block}
-@media (max-width:820px){.legende{display:none}.ciel-outils{bottom:14px;right:12px}}
+/* Ciel (appli 1.8) */
+.entete{padding:20px 8px 0 24px}
+.entete .et-l1{display:flex;align-items:center}
+.entete .et-marque{font-size:11px;letter-spacing:3px;color:var(--or);font-weight:600;padding:6px 0}
+.entete .et-reglages{margin-left:auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:var(--or)}
+.entete h1{font-size:30px;margin-top:4px;line-height:1.15}
+.entete h1 em{color:var(--brume)}
+.page .entete{padding:0 0 4px}
+.ciel-col{display:flex;flex-direction:column;height:100%}
+.ciel-banniere{margin:6px 0 0 14px;padding:6px 10px;border-radius:12px;color:var(--or);font-size:12.5px}
+.ciel-banniere:hover{background:var(--encre)}
+.onglets-ciel{display:flex;gap:20px;overflow-x:auto;padding:10px 24px 0;scrollbar-width:none;flex:none}
+.onglets-ciel::-webkit-scrollbar{display:none}
+.onglet-ciel{font-size:14.5px;font-weight:600;color:var(--brume);white-space:nowrap;max-width:200px;overflow:hidden;text-overflow:ellipsis;padding:6px 0;border-bottom:2px solid transparent}
+.onglet-ciel[aria-selected="true"]{color:var(--or);border-color:var(--or)}
+.petit-brume{font-size:12.5px;color:var(--brume)}
+.legende-ciel{display:flex;align-items:center;gap:14px;padding:10px 24px 0;font-size:12.5px;color:var(--ivoire-d);flex:none}
+.legende-ciel span{display:inline-flex;align-items:center;gap:6px}
+.legende-ciel i{display:inline-grid;place-items:center;width:5px;height:5px;border-radius:50%}
+.lg-lu{background:var(--ivoire)} .lg-al{border:.75px solid var(--bleu)}
+.legende-ciel i.lg-ec{width:10px;height:10px;border:.75px solid rgba(227,182,92,.6)} .lg-ec b{width:5px;height:5px;border-radius:50%;background:var(--or)}
+.panneau-mot{padding-top:8px;flex:none}
+.pm-invite{display:flex;gap:4px;padding-left:12px}
+.pm-invite button{color:var(--or);font-size:14px;font-weight:600;padding:10px 12px;border-radius:20px}
+.pm-invite button:hover{background:var(--encre)}
+.pm-mots{display:flex;flex-wrap:wrap;gap:6px;padding:0 16px;align-items:center}
+.pm-plus,.pm-mot,.pm-effacer{font-size:12.5px;font-weight:600;border-radius:999px;padding:4px 10px}
+.pm-plus{color:var(--or);border:1px solid rgba(227,182,92,.7)}
+.pm-mot{color:var(--or);background:rgba(227,182,92,.16);border:1px solid rgba(227,182,92,.55);padding-right:8px}
+.pm-mot span{font-size:10px;opacity:.7}
+.pm-effacer{color:var(--brume)}
+.pm-mode{display:inline-flex;margin:8px 16px 0;border:1px solid var(--trait);border-radius:999px;overflow:hidden}
+.pm-mode button{font-size:12.5px;font-weight:600;color:var(--brume);padding:4px 12px;border-radius:999px}
+.pm-mode button[aria-pressed="true"]{background:var(--ivoire);color:var(--nuit)}
+.pm-bilan{font-size:12.5px;color:var(--brume);padding:6px 16px 2px}
+.pm-bilan.or{color:rgba(227,182,92,.9)}
+.pm-galaxie{margin:6px 16px 2px;font-size:12.5px;font-weight:600;color:var(--or);border:1px solid rgba(227,182,92,.6);border-radius:999px;padding:5px 12px}
+.pm-saisie{display:flex;gap:6px;align-items:center;padding:6px 16px 0}
+.pm-saisie .inp{border-radius:28px;padding:13px 16px}
+.pm-saisie button{color:var(--or);font-weight:600;padding:10px 12px}
+.pm-seuil{display:flex;align-items:center;gap:8px;padding:6px 24px;font-size:12.5px;color:var(--ivoire-d)}
+.pm-seuil button{width:34px;height:34px;border-radius:50%;border:1px solid var(--trait);font-weight:600}
+.pm-seuil button[aria-pressed="true"]{background:var(--or);border-color:var(--or);color:var(--nuit)}
+.pm-freq{display:flex;gap:8px;overflow-x:auto;padding:8px 16px;scrollbar-width:none}
+.pm-freq::-webkit-scrollbar{display:none}
+.pm-freq button{border:1px solid var(--trait);border-radius:16px;padding:8px 14px;font-size:14px;font-weight:600;white-space:nowrap}
+.pm-freq button:hover{border-color:var(--brume)}
+.gal-tete{display:flex;align-items:center;padding:8px 12px 0 24px}
+.gal-nom{font-family:var(--serif);font-size:22px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.menu-wrap{position:relative}
+.gal-menu{font-size:22px;color:var(--brume);padding:4px 12px;border-radius:50%}
+.menu-liste{position:absolute;right:0;top:100%;background:var(--encre-c);border:1px solid var(--trait);border-radius:10px;z-index:5;min-width:200px;padding:6px 0;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+.menu-liste button{display:block;width:100%;text-align:left;padding:10px 16px;font-size:14px}
+.menu-liste button:hover{background:var(--encre)}
+.pt{padding:6px 12px 0 24px}
+.pt-l1{display:flex;align-items:flex-end;gap:10px}
+.pt-date{font-family:var(--serif);font-size:24px;color:var(--or);flex:1}
+.pt-curseur{width:calc(100% - 12px);accent-color:var(--or);margin:10px 0 4px}
+.pt-l3{display:flex;align-items:center}
+.pt-l3 button{padding:8px 12px;font-weight:600;color:var(--or)}
+.ciel-vide{white-space:pre-line;text-align:center;color:var(--brume);font-size:16px;line-height:1.5;padding:32px;margin:auto}
+.ciel-zone{position:relative;flex:1;min-height:200px;overflow:hidden}
+#ciel{position:absolute;inset:0;width:100%;height:100%;touch-action:none;display:block}
+.astuce-ciel{position:absolute;left:16px;top:10px;font-size:12px;color:rgba(154,163,191,.85);pointer-events:none}
+.astuce-ciel[hidden]{display:none}
+.mire{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:50%;background:rgba(11,14,26,.75);border:1px solid rgba(227,182,92,.5);display:grid;place-items:center;z-index:2}
+.mire[hidden]{display:none}
+.ciel-bas{position:absolute;left:0;right:0;bottom:0;z-index:3;transform:translateY(50%);opacity:0;pointer-events:none;transition:transform .3s,opacity .3s}
+.ciel-bas.ouverte{transform:none;opacity:1;pointer-events:auto}
+.cartouche{margin:10px 12px;border-radius:16px;background:rgba(20,26,44,.42);border:1px solid var(--trait);padding:4px 4px 10px 16px;-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px)}
+.cartouche.en-cours{border-color:var(--or)}
+.cartouche *{text-shadow:0 1px 3px rgba(11,14,26,.95)}
+.ct-l1{display:flex;align-items:center}
+.ct-titre{flex:1;min-width:0;text-align:left;font-family:var(--serif);font-size:21px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-x{width:40px;height:40px;border-radius:50%;color:var(--brume);flex:none}
+.ct-l2{display:flex;align-items:center;gap:8px;padding-right:12px;font-size:12.5px}
+.ct-aut{flex:1;min-width:0;color:var(--brume);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ct-note{color:var(--or);font-size:10px;letter-spacing:1px}
+.ct-etat{font-size:11px;letter-spacing:1px;font-weight:700;color:var(--or);white-space:nowrap}
+.ct-etat.bleu{color:var(--bleu)}
+.ct-barre{height:3px;border-radius:2px;background:var(--trait);margin:6px 12px 0 0;overflow:hidden}
+.ct-barre i{display:block;height:100%;background:var(--or)}
+.ct-detail{font-size:12.5px;color:var(--or);padding:4px 12px 0 0;line-height:1.45}
+.ct-l3{display:flex;align-items:center;margin-top:4px}
+.ct-lies{flex:1;font-size:11px;letter-spacing:1.5px;color:var(--brume);font-weight:600}
+.ct-fiche{color:var(--or);font-weight:700;font-size:14px;padding:6px 12px;border-radius:8px}
+.ct-rangee{display:flex;gap:8px;overflow-x:auto;padding:2px 12px 2px 0;scrollbar-width:none}
+.ct-rangee::-webkit-scrollbar{display:none}
+.ct-rangee button{flex:none;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px;color:var(--or);border:1px solid rgba(227,182,92,.45);border-radius:999px;padding:7px 12px;background:rgba(11,14,26,.35)}
+.terre-carte{margin:16px;border-radius:18px;background:rgba(20,26,44,.42);border:1px solid var(--or);padding:8px 8px 14px 18px;max-height:min(460px,70vh);overflow-y:auto;-webkit-backdrop-filter:blur(1.5px);backdrop-filter:blur(1.5px)}
+.terre-carte *{text-shadow:0 1px 3px rgba(11,14,26,.95)}
+.tc-l1{display:flex;align-items:center;justify-content:space-between}
+.tc-titre{font-size:24px;margin:2px 10px 4px 0}
+.tc-txt{color:var(--brume);font-size:14px;margin:4px 10px 4px 0;line-height:1.45}
+.tc-livre{display:flex;gap:6px;align-items:flex-start;padding-top:8px}
+.tc-t{font-family:var(--serif);font-size:17px;line-height:1.25}
+.tc-a{font-size:12.5px;color:var(--ivoire-d)} .tc-p{font-size:12.5px;color:var(--brume)}
+.tc-aj{color:var(--or);font-weight:600;white-space:nowrap;padding:8px 12px;border-radius:20px}
+.tc-aj.fait{color:var(--brume)}
 /* Chercher */
 .recherche{display:flex;gap:10px;align-items:center;margin:16px 0 14px}
 .champ{flex:1;display:flex;align-items:center;gap:10px;background:var(--encre);border:1px solid var(--trait);border-radius:999px;padding:0 16px}
@@ -252,24 +330,30 @@ h2{font-size:20px}
 <div class="app">
   <nav class="rail" aria-label="Navigation">
     <div class="logo" aria-hidden="true"><svg width="40" height="40" viewBox="0 0 48 48"><path d="M8 10h32a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H22l-9 7v-7H8a4 4 0 0 1-4-4V14a4 4 0 0 1 4-4z" fill="#F3EBDD"/><path d="M24 14.5l2.3 4.9 5.2.6-3.9 3.6 1.1 5.2-4.7-2.7-4.7 2.7 1.1-5.2-3.9-3.6 5.2-.6z" fill="#E3B65C"/></svg><span>Phylactère</span></div>
-    <button class="nav-b" data-vue="ciel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="7" r="1.6" fill="currentColor"/><circle cx="12" cy="4" r="1.6" fill="currentColor"/><circle cx="18" cy="10" r="1.6" fill="currentColor"/><circle cx="9" cy="17" r="1.6" fill="currentColor"/><circle cx="19" cy="19" r="1.2" fill="currentColor"/><path d="M5 7l7-3 6 6-9 7-4-10" stroke-opacity=".55"/></svg>Ciel</button>
-    <button class="nav-b" data-vue="fil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18"/><circle cx="12" cy="6" r="2" fill="currentColor"/><path d="M14 10h6v4h-6zM4 15h6v4H4z"/></svg>Fil</button>
-    <button class="nav-b" data-vue="chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h3v14H4zM9 5h3v14H9zM14.2 5.6l2.9-.8 3.6 13.5-2.9.8z"/></svg>Chercher</button>
-    <button class="nav-b nav-plus" id="nav-ajouter" aria-label="Ajouter un livre"><span class="plus-or">+</span>Ajouter</button>
-    <button class="nav-b" data-vue="carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h11a2 2 0 0 1 2 2v16H8a2 2 0 0 1-2-2z"/><path d="M6 19a2 2 0 0 1 2-2h11M10 8h5M10 11h3"/></svg>Carnet</button>
-    <button class="nav-b" data-vue="reglages"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>Réglages</button>
+    <button class="nav-b" data-vue="ciel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3.5l2.4 5.1 5.6.6-4.2 3.8 1.2 5.5L12 15.7l-5 2.8 1.2-5.5L4 9.2l5.6-.6z"/></svg>Ciel</button>
+    <button class="nav-b" data-vue="fil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 3v18"/><circle cx="12" cy="7" r="1.8" fill="currentColor"/><circle cx="12" cy="13" r="1.8" fill="currentColor"/><circle cx="12" cy="19" r="1.2" fill="currentColor"/></svg>Fil</button>
+    <button class="nav-b nav-plus" id="nav-ajouter" aria-label="Nouvelle lecture"><span class="plus-or">+</span></button>
+    <button class="nav-b" data-vue="carnet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 17c2.5-1 4-3 4-6.5H5V6h5v4.5C10 15 8 17.5 5 18.5zM14 17c2.5-1 4-3 4-6.5h-4V6h5v4.5c0 4.5-2 7-5 8z"/></svg>Carnet</button>
+    <button class="nav-b" data-vue="chercher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg>Chercher</button>
   </nav>
   <main>
     <section class="vue" id="vue-vide"></section>
-    <section class="vue" id="vue-ciel">
-      <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
-      <div class="ciel-tete"><div><h1>Ton ciel</h1><div class="doux" id="ciel-resume" style="font-size:13px;margin-top:4px"></div><button class="banniere" id="ciel-banniere" hidden></button><div><button class="banniere mot-btn" id="ciel-mot">✦ Relier par un mot</button> <span class="astuce" id="ciel-astuce">✦ Appui long sur le ciel pour l’éclairer</span></div></div></div>
-      <div class="legende"><span>✦ Toucher un thème l’allume</span><span>· Toucher une étoile ou son titre ouvre le livre</span><span>· Molette ou pincement pour zoomer</span></div>
-      <div class="ciel-outils"><button class="rond" id="zoom-plus" aria-label="Zoomer">+</button><button class="rond" id="zoom-moins" aria-label="Dézoomer">−</button><button class="rond" id="recadrer" aria-label="Recadrer le ciel">◎</button></div>
-      <div class="bulle-etoile" id="bulle-etoile"></div>
-      <div class="terre" id="terre"></div>
-      <div class="terre" id="mot-carte"></div>
-    </section>
+    <section class="vue" id="vue-ciel"><div class="ciel-col">
+      <div id="ciel-entete"></div>
+      <div id="ciel-banniere-zone"></div>
+      <div id="ciel-onglets" class="onglets-ciel" hidden></div>
+      <div id="ciel-bilan" class="petit-brume" style="padding:6px 24px 0"></div>
+      <div id="ciel-legende" class="legende-ciel"><span><i class="lg-lu"></i>Lu</span><span><i class="lg-ec"><b></b></i>En cours</span><span><i class="lg-al"></i>À lire</span><span style="flex:1"></span><span class="petit-brume">taille = note</span></div>
+      <div id="ciel-panneau" class="panneau-mot"></div>
+      <p id="ciel-vide" class="ciel-vide" hidden></p><p id="ciel-galaxie-vide" class="ciel-vide" hidden></p>
+      <div id="ciel-zone" class="ciel-zone">
+        <canvas id="ciel" aria-label="Ciel des lectures : chaque étoile est un livre, chaque constellation un thème"></canvas>
+        <span class="astuce-ciel" id="ciel-astuce">✦  Appui long sur le ciel pour l’éclairer</span>
+        <button class="mire" id="ciel-mire" hidden aria-label="Recentrer le ciel"><svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="#E3B65C" stroke-width="1.4" stroke-linecap="round"><circle cx="10" cy="10" r="6.4"/><circle cx="10" cy="10" r="1.6" fill="#E3B65C" stroke="none"/><path d="M10 0v1.6M10 18.4V20M0 10h1.6M18.4 10H20"/></svg></button>
+        <div id="ciel-terre" class="ciel-bas"></div>
+        <div id="ciel-cartouche" class="ciel-bas"></div>
+      </div>
+    </div></section>
     <section class="vue" id="vue-fil"><div class="page" id="fil" style="max-width:none"></div></section>
     <section class="vue" id="vue-chercher"><div class="page" id="chercher"></div></section>
     <section class="vue" id="vue-carnet"><div class="page" id="carnet"></div></section>
@@ -335,6 +419,14 @@ const PORTES = {
 const U = 150;              // taille d'une case de l'atlas (px du monde)
 
 /* ---------------- Utilitaires ---------------- */
+const ROUE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>';
+function enTete(titre, suite, reglages = true){
+  return `<div class="entete"><div class="et-l1"><button class="et-marque" data-apropos>PHYLACTÈRE · 1.8  ⓘ</button>${reglages ? `<button class="et-reglages" data-reglages aria-label="Réglages">${ROUE}</button>` : ''}</div><h1>${titre} <em>${suite}</em></h1></div>`;
+}
+document.addEventListener('click', e => {
+  if (e.target.closest('[data-reglages]')) location.hash = 'reglages';
+  else if (e.target.closest('[data-apropos]')) confirmer('Phylactère · 1.8', 'Version web de Phylactère, alignée sur l’appli Android 1.8 : ciel par thèmes, relier par plusieurs mots (tous / l’un d’eux), galaxies, voyage dans le temps, lampe de poche, séries repliées.', 'Fermer', () => {});
+});
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const norm = s => String(s ?? '').normalize('NFD').replace(/\p{M}/gu,'').toLowerCase().trim();
@@ -428,6 +520,8 @@ async function importerSauvegarde(fichier){
     const type = /\.png$/i.test(nom) ? 'image/png' : /\.webp$/i.test(nom) ? 'image/webp' : 'image/jpeg';
     fichiers.push([nom, new Blob([await zip.lire(e)], { type })]);
   }
+  // comme l'appli : une sauvegarde sans galaxies (format 3 ou moins) ne les efface pas
+  if (!Array.isArray(racine.galaxies)) { const avant = await Base.lire(); racine.galaxies = (avant && avant.galaxies) || []; }
   racine.importeLe = Date.now(); racine.fichierSource = fichier.name;
   await Base.remplacer(racine, fichiers);
   return { lectures: (racine.lectures || []).length, citations: (racine.citations || []).length, liens: (racine.liens || []).length, couvertures: fichiers.length };
@@ -439,7 +533,7 @@ const M = { racine:null, lectures:[], parId:new Map(), citations:[], liens:[], u
 function themeDe(l){ return (l.theme && l.theme.trim()) || (l.type === 'BD' ? 'Bande dessinée' : ''); }
 function titreProvisoire(t){ const s = (t || '').trim(); return !s || /^isbn\b/i.test(s) || /^[\d\s-]{8,}$/.test(s); }
 function manques(l){ const m = []; if (titreProvisoire(l.titre)) m.push('titre'); if (!(l.auteur || '').trim()) m.push('auteur'); if (!themeDe(l)) m.push('thème'); return m; }
-function motsDe(l){ return (l.motsCles || '').split(',').map(s => s.trim()).filter(Boolean); }
+function motsDe(l){ return (l.motsCles || '').split(/[,;/]/).map(s => s.trim()).filter(Boolean); }
 function titreCourt(l){ let t = (l.titre || '').split(/\s[:–—]\s|\s:\s?/)[0].trim() || l.titre; if (l.tome) t += ` · t. ${l.tome}`; return t; }
 function titreComplet(l){ return l.tome && l.serie ? `${l.titre}` : l.titre; }
 const ARTICLES = /^(le |la |les |l'|l’|un |une |des |du |the |a |an )/i;
@@ -545,512 +639,911 @@ async function lancerImport(f){
 /* =========================================================
    Le ciel
    ========================================================= */
-try { if (+(localStorage.getItem('phylactere-lampe') || 0) >= 3) document.getElementById('ciel-astuce').hidden = true; } catch (e) {}
-const Ciel = (() => {
-  const cv = $('#ciel'); const ctx = cv.getContext('2d');
-  let L = 0, H = 0, dpr = 1;
-  let vue = { x:0, y:0, z:1 };          // écran = (monde - x) * z + centre
-  let modele = null, sale = true, anim = null, allume = null, choisie = null, terre = null, lampe = null, minuterieLampe = null, mot = null;
-  let vueAvantAllumage = null, bouge = false;
-  const C = { nuit:'11,14,26', nuitHex:'#0B0E1A', ivoire:'243,235,221', or:'227,182,92', bleu:'135,146,188', brume:'154,163,191' };
+/* =========================================================
+   LE CIEL — port fidèle de CielCalcul.kt et CielScreen.kt (appli 1.8)
+   1 px web = 1 dp de l'appli ; tailles de texte en px = sp.
+   ========================================================= */
+const PORTES_APP = {"Roman": [["L’Étranger", "Albert Camus", "Un roman bref et limpide, qui pose sans détour la question du sens."], ["Madame Bovary", "Gustave Flaubert", "Le roman moderne en un livre : le désir, l’ennui, le style."], ["La Vie devant soi", "Émile Ajar (Romain Gary)", "Une voix d’enfant inoubliable, drôle et bouleversante."], ["Du côté de chez Swann", "Marcel Proust", "L’entrée dans la Recherche : la mémoire, le temps, la madeleine."]], "Roman historique": [["Mémoires d’Hadrien", "Marguerite Yourcenar", "Un empereur romain médite sur sa vie : l’histoire vue de l’intérieur."], ["Le Nom de la rose", "Umberto Eco", "Une enquête dans une abbaye du XIVe siècle, savante et haletante."], ["L’Œuvre au noir", "Marguerite Yourcenar", "Un alchimiste de la Renaissance, entre science, foi et liberté."], ["Le Roi de fer", "Maurice Druon", "Le premier des Rois maudits : intrigues de cour, rythme de feuilleton."]], "Policier & thriller": [["Le Chien des Baskerville", "Arthur Conan Doyle", "Sherlock Holmes face à une légende de lande anglaise."], ["Le Crime de l’Orient-Express", "Agatha Christie", "Le huis clos parfait, et une fin restée célèbre."], ["Pietr-le-Letton", "Georges Simenon", "La première enquête de Maigret : l’atmosphère avant l’énigme."], ["Les hommes qui n’aimaient pas les femmes", "Stieg Larsson", "Le thriller nordique moderne, ancré dans la société."]], "Science-fiction": [["Fondation", "Isaac Asimov", "L’avenir d’une civilisation prédit par les mathématiques."], ["Dune", "Frank Herbert", "Écologie, pouvoir et mystique sur une planète désertique."], ["1984", "George Orwell", "La dystopie de référence, toujours d’actualité."], ["La Main gauche de la nuit", "Ursula K. Le Guin", "Une SF humaniste qui interroge le genre et l’altérité."]], "Fantasy": [["Le Hobbit", "J. R. R. Tolkien", "La porte d’entrée de la Terre du Milieu, légère et merveilleuse."], ["Le Sorcier de Terremer", "Ursula K. Le Guin", "Un roman d’apprentissage sur le pouvoir des noms et l’ombre en soi."], ["L’Apprenti assassin", "Robin Hobb", "Une fantasy intime, centrée sur un personnage attachant."], ["Le Nom du vent", "Patrick Rothfuss", "Un héros raconte sa propre légende, avec une langue soignée."]], "Fantastique & horreur": [["Le Horla", "Guy de Maupassant", "Le fantastique à la française : le doute qui ronge."], ["Frankenstein", "Mary Shelley", "La créature et son créateur : un mythe moderne."], ["Dracula", "Bram Stoker", "Le roman fondateur du vampire, raconté par lettres et journaux."], ["Shining", "Stephen King", "L’horreur qui naît de l’isolement et de la folie."]], "Nouvelles": [["Fictions", "Jorge Luis Borges", "Des labyrinthes de l’esprit en quelques pages chacun."], ["Le Joueur d’échecs", "Stefan Zweig", "Une nouvelle tendue comme une partie, sur l’obsession."], ["La Dame au petit chien", "Anton Tchekhov", "L’art de tout dire par petites touches."], ["Contes de la bécasse", "Guy de Maupassant", "Des récits courts, vifs, souvent cruels, de la Normandie."]], "Poésie": [["Lettres à un jeune poète", "Rainer Maria Rilke", "Plus que de la poésie : une manière de vivre en écrivant."], ["Les Fleurs du mal", "Charles Baudelaire", "Le recueil qui fait entrer la poésie dans la modernité."], ["Alcools", "Guillaume Apollinaire", "Une poésie libre, musicale, entre mélancolie et ville."], ["Le Prophète", "Khalil Gibran", "Des poèmes en prose sur l’amour, le travail, la mort."]], "Théâtre": [["Cyrano de Bergerac", "Edmond Rostand", "Panache, tendresse et vers éblouissants."], ["Antigone", "Jean Anouilh", "Le mythe grec repensé : dire non au pouvoir."], ["En attendant Godot", "Samuel Beckett", "L’attente et le vide, avec un humour étrange."], ["Le Misanthrope", "Molière", "La sincérité contre les conventions sociales."]], "Bande dessinée": [["Persepolis", "Marjane Satrapi", "L’Iran raconté en noir et blanc par une enfant devenue femme."], ["Maus", "Art Spiegelman", "La Shoah racontée par un fils à partir du témoignage de son père."], ["La Ballade de la mer salée", "Hugo Pratt", "La première aventure de Corto Maltese, poétique et libre."], ["L’Arabe du futur", "Riad Sattouf", "Une enfance entre France, Libye et Syrie, drôle et lucide."]], "Manga": [["Quartier lointain", "Jirô Taniguchi", "Un homme revit son adolescence : nostalgie et délicatesse."], ["L’Homme qui marche", "Jirô Taniguchi", "Presque sans paroles, l’art de regarder le quotidien."], ["Gen d’Hiroshima", "Keiji Nakazawa", "La bombe et ses suites, vécues par un enfant."], ["Monster", "Naoki Urasawa", "Un thriller psychologique ample, sur le bien et le mal."]], "Littérature jeunesse": [["Le Petit Prince", "Antoine de Saint-Exupéry", "Un conte pour tous les âges sur l’essentiel invisible."], ["Les Royaumes du Nord", "Philip Pullman", "Le premier tome d’À la croisée des mondes : aventure et pensée."], ["Matilda", "Roald Dahl", "L’humour féroce et la magie des livres."], ["Harry Potter à l’école des sorciers", "J. K. Rowling", "La porte d’entrée d’une saga devenue universelle."]], "Humour": [["Le Guide du voyageur galactique", "Douglas Adams", "L’absurde cosmique et la réponse « 42 »."], ["Trois hommes dans un bateau", "Jerome K. Jerome", "Une croisière sur la Tamise, comique de bout en bout."], ["Exercices de style", "Raymond Queneau", "Une même anecdote racontée de 99 façons."], ["Le Petit Nicolas", "René Goscinny et Jean-Jacques Sempé", "L’enfance vue à hauteur d’enfant, tendrement drôle."]], "Philosophie": [["Lettre à Ménécée", "Épicure", "Quelques pages sur le bonheur et la mort, d’une clarté rare."], ["Pensées pour moi-même", "Marc Aurèle", "Le carnet intime d’un empereur stoïcien."], ["Le Mythe de Sisyphe", "Albert Camus", "L’absurde, et comment vivre malgré tout."], ["Petit traité des grandes vertus", "André Comte-Sponville", "Une philosophie morale accessible, vertu par vertu."]], "Spiritualité & ésotérisme": [["Siddhartha", "Hermann Hesse", "Un roman de quête spirituelle, sur les pas du Bouddha."], ["L’Alchimiste", "Paulo Coelho", "Une fable initiatique sur la légende personnelle."], ["Le Livre tibétain de la vie et de la mort", "Sogyal Rinpoché", "La vision bouddhiste tibétaine de la mort et de l’esprit."], ["Le Pouvoir du moment présent", "Eckhart Tolle", "Une invitation à quitter le mental pour l’instant présent."]], "Religion & mythologie": [["L’Épopée de Gilgamesh", "Anonyme", "Le plus ancien récit connu : l’amitié, la mort, l’immortalité."], ["Les Métamorphoses", "Ovide", "Le grand répertoire des mythes grecs et romains."], ["Le Héros aux mille et un visages", "Joseph Campbell", "Ce que tous les mythes du monde ont en commun."], ["La Bhagavad-Gîtâ", "Anonyme", "Le dialogue sacré de l’Inde sur l’action et le détachement."]], "Psychologie": [["Découvrir un sens à sa vie", "Viktor E. Frankl", "Un psychiatre rescapé des camps sur la quête de sens."], ["Un merveilleux malheur", "Boris Cyrulnik", "La résilience, ou comment renaître de ses blessures."], ["L’homme qui prenait sa femme pour un chapeau", "Oliver Sacks", "Des récits cliniques qui révèlent l’étrangeté du cerveau."], ["Système 1 / Système 2", "Daniel Kahneman", "Les deux vitesses de la pensée et nos biais."]], "Sciences": [["Une brève histoire du temps", "Stephen Hawking", "Du Big Bang aux trous noirs, pour les non-spécialistes."], ["L’Ordre du temps", "Carlo Rovelli", "Ce que la physique dit du temps, écrit comme un poème."], ["Cosmos", "Carl Sagan", "L’univers et notre place en lui, avec émerveillement."], ["Le Gène égoïste", "Richard Dawkins", "L’évolution vue depuis les gènes : un livre qui a changé le regard."]], "Histoire": [["Sapiens", "Yuval Noah Harari", "Une brève histoire de l’humanité, vaste et stimulante."], ["Les Croisades vues par les Arabes", "Amin Maalouf", "Le même événement, raconté depuis l’autre rive."], ["L’Étrange Défaite", "Marc Bloch", "Un historien analyse 1940, peu avant d’être fusillé."], ["Montaillou, village occitan", "Emmanuel Le Roy Ladurie", "La vie quotidienne d’un village médiéval, comme si on y était."]], "Société & politique": [["De la démocratie en Amérique", "Alexis de Tocqueville", "Ce que la démocratie fait aux sociétés, vu dès 1835."], ["Le Deuxième Sexe", "Simone de Beauvoir", "« On ne naît pas femme, on le devient. »"], ["La Société du spectacle", "Guy Debord", "Une critique radicale du monde des images."], ["Le Capital au XXIe siècle", "Thomas Piketty", "Les inégalités sur deux siècles, chiffres à l’appui."]], "Essai": [["Essais", "Michel de Montaigne", "L’essai inventé : penser librement, à partir de soi."], ["Une chambre à soi", "Virginia Woolf", "Ce qu’il faut à une femme pour écrire."], ["Éloge de la fuite", "Henri Laborit", "Un biologiste sur la liberté, le pouvoir et l’imaginaire."], ["Mythologies", "Roland Barthes", "Les mythes cachés dans les objets du quotidien."]], "Biographie & mémoires": [["Le Monde d’hier", "Stefan Zweig", "Les souvenirs d’un Européen, de la Belle Époque à l’exil."], ["Si c’est un homme", "Primo Levi", "Le témoignage d’Auschwitz, sobre et essentiel."], ["La Promesse de l’aube", "Romain Gary", "Une mère, un fils, une vie à la hauteur d’une promesse."], ["Les Mots", "Jean-Paul Sartre", "Une enfance racontée par un philosophe, entre ironie et lucidité."]], "Arts & musique": [["Lettres à son frère Théo", "Vincent van Gogh", "La peinture vécue de l’intérieur, lettre après lettre."], ["Histoire de l’art", "Ernst Gombrich", "La grande histoire de l’art, claire et vivante."], ["Du spirituel dans l’art", "Vassily Kandinsky", "Le peintre de l’abstraction sur la nécessité intérieure."], ["Musicophilia", "Oliver Sacks", "La musique et le cerveau, à travers des histoires vraies."]], "Nature & écologie": [["Walden ou la Vie dans les bois", "Henry David Thoreau", "Deux ans dans une cabane : la simplicité choisie."], ["L’Homme qui plantait des arbres", "Jean Giono", "Une courte fable sur la patience et le soin du monde."], ["Printemps silencieux", "Rachel Carson", "Le livre qui a fait naître l’écologie moderne."], ["La Vie secrète des arbres", "Peter Wohlleben", "Les arbres communiquent, s’entraident, se souviennent."]], "Voyage & aventure": [["L’Usage du monde", "Nicolas Bouvier", "Le récit de voyage par excellence, de Genève à la passe de Khyber."], ["Sur la route", "Jack Kerouac", "L’Amérique traversée dans l’urgence de vivre."], ["Into the Wild", "Jon Krakauer", "Un jeune homme part seul vers l’Alaska : enquête et vertige."], ["Le Tour du monde en quatre-vingts jours", "Jules Verne", "Le grand pari de Phileas Fogg, toujours aussi entraînant."]], "Développement personnel": [["Les Quatre Accords toltèques", "Don Miguel Ruiz", "Quatre règles simples pour vivre plus librement."], ["Méditer, jour après jour", "Christophe André", "Une initiation à la pleine conscience, illustrée par la peinture."], ["Cessez d’être gentil, soyez vrai !", "Thomas d’Ansembourg", "Apprendre à dire ce qu’on vit, sans agresser."], ["Les 7 habitudes de ceux qui réalisent tout ce qu’ils entreprennent", "Stephen R. Covey", "Un classique de l’efficacité fondée sur des principes."]], "Cuisine": [["Physiologie du goût", "Jean Anthelme Brillat-Savarin", "Le grand classique de la gastronomie, plein d’esprit."], ["Le Festin de Babette", "Karen Blixen", "Une nouvelle où un repas devient une grâce."], ["Kitchen Confidential", "Anthony Bourdain", "Les coulisses des cuisines de restaurant, sans fard."], ["Le Répertoire de la cuisine", "Louis Saulnier", "L’abrégé de référence des recettes classiques françaises."]]};
 
-  function invalider(){ modele = null; allume = null; choisie = null; fermerBulle(); sale = true; }
+/* ---------- Calcul (CielCalcul.kt) ---------- */
+const CC = (() => {
+  const normaliserMot = s => String(s ?? '').trim().toLowerCase().normalize('NFD').replace(/\p{M}/gu, '');
+  const lettresChiffres = s => [...s].filter(c => /[\p{L}\p{N}]/u.test(c)).join('');
+  function hashJava(s){ let h = 0; for (let i = 0; i < s.length; i++) h = (Math.imul(31, h) + s.charCodeAt(i)) | 0; return h; }
+  const floorMod = (a, n) => ((a % n) + n) % n;
 
-  function construire(){
-    const portrait = H > L * 1.05;
-    const fx = portrait ? 0.62 : 1, fy = portrait ? 1.4 : 1;
-    const livres = M.lectures.filter(l => l._manques.length === 0);
-    const groupes = new Map();
-    for (const l of livres) { if (!groupes.has(l._theme)) groupes.set(l._theme, []); groupes.get(l._theme).push(l); }
-    const consts = [];
-    for (const [theme, ls] of groupes) {
-      let h = ATLAS[theme];
-      if (!h) { const a = hash(norm(theme)) * Math.PI * 2; h = [Math.cos(a) * 4.55, Math.sin(a) * 4.55]; }
-      const rc = 16 * Math.sqrt(ls.length) + 22;
-      consts.push({ theme, livres: ls, maison:[h[0] * U * fx, h[1] * U * fy], c:[h[0] * U * fx, h[1] * U * fy], rc, etoiles:[], aretes:[] });
+  const ATLAS_BRUT = [
+    ["Roman", 0, 0], ["Nouvelles", .6, -1.5], ["Poésie", -.5, -2.3], ["Théâtre", .9, -2.7], ["Arts & musique", -1.7, -2.6],
+    ["Science-fiction", 1.8, -1.1], ["Fantasy", 2.9, -.5], ["Fantastique & horreur", 2.6, -1.9], ["Policier & thriller", 1.7, .7],
+    ["Bande dessinée", 3.1, .8], ["Manga", 4.0, .1], ["Littérature jeunesse", 3.7, 1.7], ["Humour", 2.6, 1.9],
+    ["Roman historique", .6, 1.5], ["Histoire", -.6, 2.3], ["Biographie & mémoires", .3, 3.0], ["Voyage & aventure", 1.9, 3.0],
+    ["Essai", -1.4, .1], ["Société & politique", -1.6, 1.4], ["Sciences", -2.7, -1.6], ["Nature & écologie", -2.8, 2.1],
+    ["Cuisine", -3.8, 2.8], ["Philosophie", -2.5, -.5], ["Spiritualité & ésotérisme", -3.7, -1.2], ["Religion & mythologie", -3.8, .1],
+    ["Psychologie", -2.7, .8], ["Développement personnel", -3.9, 1.4]
+  ];
+  const ATLAS = new Map(ATLAS_BRUT.map(([n, x, y]) => [normaliserMot(n), [x, y]]));
+  const NOMS_ATLAS = new Map(THEMES.map(t => [normaliserMot(t), t]));
+  const RAYON_COURONNE = 4.55, PORTRAIT_X = .72, PORTRAIT_Y = 1.3, UNITE_DP = 220, RAYON_DISQUE = .42;
+
+  function placeAtlas(nom){
+    const cle = normaliserMot(nom);
+    let p = ATLAS.get(cle);
+    if (!p) { const angle = floorMod(hashJava(cle), 3600) / 10 * Math.PI / 180; p = [RAYON_COURONNE * Math.cos(angle), RAYON_COURONNE * Math.sin(angle)]; }
+    return [p[0] * PORTRAIT_X, p[1] * PORTRAIT_Y];
+  }
+  const apparition = l => Math.min(...[l.dateDebut, l.dateFin, l.dateAjout].filter(x => x != null));
+  function statutA(l, instant){
+    if (instant == null) return l.statut;
+    if (apparition(l) > instant) return null;
+    if (l.dateDebut == null && l.dateFin == null) return l.statut;
+    if (l.dateFin != null && l.dateFin <= instant) return 'LU';
+    if (l.dateDebut != null && l.dateDebut <= instant) return 'EN_COURS';
+    return 'A_LIRE';
+  }
+  const motsCles = l => String(l.motsCles || '').split(/[,;/]/).map(s => s.trim()).filter(Boolean);
+  function porteMot(motCle, cherche){
+    const k = normaliserMot(motCle);
+    if (k.startsWith(cherche)) return true;
+    if (cherche.includes(' ')) return false;
+    const racine = cherche.length >= 8 ? cherche.slice(0, cherche.length - 3) : cherche;
+    return k.split(/[^a-z0-9]+/).some(w => w.startsWith(racine));
+  }
+  function compterMot(texte, cherche){
+    if (!texte || !String(texte).trim()) return 0;
+    const t = normaliserMot(texte);
+    if (cherche.includes(' ')) { let n = 0; for (let i = 0; i + cherche.length <= t.length; i++) if (t.substr(i, cherche.length) === cherche) n++; return n; }
+    return t.split(/[^a-z0-9]+/).filter(w => w.startsWith(cherche)).length;
+  }
+  function evaluerMot(l, mot, seuil, texteCitations){
+    const cherche = normaliserMot(mot);
+    if (!cherche) return { relie: false };
+    if (motsCles(l).some(m => porteMot(m, cherche))) return { relie: true, detail: 'mot-clé du livre' };
+    if (compterMot(l.theme, cherche) > 0) return { relie: true, detail: 'thème du livre' };
+    if (compterMot(l.titre, cherche) > 0) return { relie: true, detail: 'dans le titre' };
+    const perso = compterMot(l.notes, cherche) + compterMot(texteCitations, cherche);
+    const quatrieme = compterMot(l.resume, cherche);
+    if (perso + quatrieme < seuil) return { relie: false };
+    const m = [];
+    if (quatrieme > 0) m.push(`${quatrieme} fois dans la 4e de couverture`);
+    if (perso > 0) m.push(`${perso} fois dans tes notes et citations`);
+    return { relie: true, detail: m.join(' · ') };
+  }
+  function lireRequete(s){
+    const t = String(s ?? '').trim();
+    if (!t) return { mots: [], tous: true, vide: true, multiple: false };
+    const tous = !t.includes('|');
+    const vus = new Set(), mots = [];
+    for (const m of t.split(tous ? '+' : '|').map(x => x.trim()).filter(Boolean)) { const n = normaliserMot(m); if (!vus.has(n)) { vus.add(n); mots.push(m); } }
+    return { mots, tous, vide: !mots.length, multiple: mots.length > 1 };
+  }
+  function ecrireRequete(mots, tous){
+    const vus = new Set(), r = [];
+    for (const m of mots.map(x => String(x).trim()).filter(Boolean)) { const n = normaliserMot(m); if (!vus.has(n)) { vus.add(n); r.push(m); } }
+    return r.join(tous ? ' + ' : ' | ');
+  }
+  function libelleRequete(r){
+    const mots = r.mots.map(m => `« ${m} »`);
+    if (!mots.length) return '';
+    if (mots.length === 1) return mots[0];
+    return mots.slice(0, -1).join(', ') + (r.tous ? ' et ' : ' ou ') + mots[mots.length - 1];
+  }
+  const FILS_ROUGES = ["mort", "transmission", "quête spirituelle", "initiation", "gnose", "rêve", "folie", "Mal", "enfance", "nature", "mondes parallèles", "conscience", "mer", "fin du monde", "Dieu"];
+  const BRUIT = new Set(["delcourt", "dargaud", "casterman", "glenat", "sonatine", "actes sud", "gallimard", "vents d'ouest", "humanoides associes", "phebus", "metailie", "gallmeister", "l'atalante", "au diable vauvert", "oriflam", "taschen", "cerf", "paradox press", "dc vertigo", "comics idw", "hard case crime", "seuil", "folio", "pocket", "points", "albin michel", "flammarion", "bragelonne", "j'ai lu", "a suivre", "metal hurlant", "eisner", "hugo", "locus", "nebula", "pulitzer", "goncourt", "renaudot", "femina", "medicis", "noir et blanc", "couleur directe", "lavis", "roman graphique", "manga", "comics", "seinen", "trait rond", "decoupage cinematographique", "dessin net", "realisme graphique", "realisme anatomique"]);
+  const estBruit = m => BRUIT.has(m) || /\d/.test(m) || m.startsWith('prix') || m.startsWith('relecture') || m.startsWith('adaptation') || m.includes('award') || m.startsWith('couleurs de') || m.startsWith('couvertures de');
+  const clePonderation = l => (l.serie && l.serie.trim()) ? 's:' + normaliserMot(l.serie) : 'l:' + l.id;
+  function motsFrequents(lectures, nombre = 12){
+    const portePar = mot => { const m = normaliserMot(mot); return new Set(lectures.filter(l => motsCles(l).some(k => porteMot(k, m))).map(clePonderation)).size; };
+    const fils = FILS_ROUGES.filter(f => portePar(f) >= 2).slice(0, Math.floor(nombre / 2));
+    const auteurs = new Set(lectures.flatMap(l => String(l.auteur || '').split(/[,&]/)).map(a => normaliserMot(a.split('(')[0])).filter(Boolean));
+    const series = new Set(lectures.map(l => l.serie ? normaliserMot(l.serie) : '').filter(Boolean));
+    const dejaPris = fils.map(normaliserMot), parMot = new Map(), forme = new Map();
+    for (const l of lectures) for (const brut of motsCles(l)) {
+      const m = normaliserMot(brut);
+      if (estBruit(m) || auteurs.has(m) || series.has(m)) continue;
+      if (dejaPris.some(d => m.startsWith(d) || d.startsWith(m))) continue;
+      if (!parMot.has(m)) parMot.set(m, new Set()); parMot.get(m).add(clePonderation(l));
+      if (!forme.has(m)) forme.set(m, brut.trim());
     }
-    // 1. étoiles dans leur constellation : place fixe tirée de la clé d'œuvre ; séries en arc
-    for (const k of consts) {
-      const series = new Map(), seuls = [];
-      for (const l of k.livres) { if (l.serie) { const s = norm(l.serie); if (!series.has(s)) series.set(s, []); series.get(s).push(l); } else seuls.push(l); }
-      for (const l of seuls) {
-        const cle = norm(l.titre) + '|' + norm(premierAuteur(l));
-        const a = hash(cle, 1) * Math.PI * 2, f = Math.sqrt(hash(cle, 2)) * k.rc * 0.9;
-        k.etoiles.push({ l, x: Math.cos(a) * f, y: Math.sin(a) * f });
-      }
-      for (const [s, ls] of series) {
-        ls.sort((a, b) => (a.tome ?? 999) - (b.tome ?? 999) || cleTitre(a).localeCompare(cleTitre(b)));
-        if (ls.length === 1) { const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.9; k.etoiles.push({ l: ls[0], x: Math.cos(a) * f, y: Math.sin(a) * f }); continue; }
-        // une série = une seule étoile, qui s'ouvre sur ses tomes
-        const a = hash(s, 1) * Math.PI * 2, f = Math.sqrt(hash(s, 2)) * k.rc * 0.8;
-        const lus = ls.filter(l => l.statut === 'LU');
-        const statut = ls.some(l => l.statut === 'EN_COURS') ? 'EN_COURS' : lus.length ? 'LU' : 'A_LIRE';
-        const ids = new Set(ls.map(l => l.id)), liens = [], vusL = new Set();
-        for (const l of ls) for (const x of l._liens) if (!ids.has(x.id) && !vusL.has(x.id)) { vusL.add(x.id); liens.push(x); }
-        const nomSerie = ls[0].serie.trim();
-        const g = { id: ls[0].id, titre: `${nomSerie} · ${ls.length} tomes`, serie: nomSerie, tome: null, auteur: ls[0].auteur, type: ls[0].type, statut,
-          note: Math.max(0, ...ls.map(l => l.note || 0)), dateFin: Math.max(0, ...lus.map(l => l.dateFin || 0)) || null, dateDebut: Math.max(0, ...ls.map(l => l.dateDebut || 0)) || null,
-          couvertureUrl: (ls.find(l => l.couvertureUrl) || {}).couvertureUrl || null, _liens: liens, _manques: [], _theme: k.theme };
-        k.etoiles.push({ l: g, groupe: ls, x: Math.cos(a) * f, y: Math.sin(a) * f });
-      }
-      // écartement des étoiles trop proches
-      for (let it = 0; it < 40; it++) {
-        for (let i = 0; i < k.etoiles.length; i++) for (let j = i + 1; j < k.etoiles.length; j++) {
-          const A = k.etoiles[i], B = k.etoiles[j]; let dx = B.x - A.x, dy = B.y - A.y; let d = Math.hypot(dx, dy);
-          if (d < 15) { if (d < .01) { dx = hash(A.l.id + 'x') - .5; dy = hash(B.l.id + 'y') - .5; d = Math.hypot(dx, dy); } const p = (15 - d) / 2 / d; A.x -= dx * p; A.y -= dy * p; B.x += dx * p; B.y += dy * p; }
-        }
-      }
-      let rmax = 0; for (const e of k.etoiles) rmax = Math.max(rmax, Math.hypot(e.x, e.y)); k.rc = Math.max(k.rc, rmax + 12);
-      // arbre couvrant minimal (ordre de Prim, pour l'allumage)
-      const E = k.etoiles, dans = new Set([0]);
-      while (dans.size < E.length) {
-        let best = null;
-        for (const i of dans) for (let j = 0; j < E.length; j++) if (!dans.has(j)) { const d = Math.hypot(E[i].x - E[j].x, E[i].y - E[j].y); if (!best || d < best[2]) best = [i, j, d]; }
-        dans.add(best[1]); k.aretes.push([best[0], best[1]]);
-      }
+    const frequents = [...parMot].filter(([, v]) => v.size >= 2).sort((a, b) => b[1].size - a[1].size || (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0)).map(([k]) => forme.get(k));
+    return [...fils, ...frequents].slice(0, nombre);
+  }
+  const nomConstellation = l => (l.theme && l.theme.trim()) || (l.type === 'BD' ? 'Bande dessinée' : 'Sans thème');
+  function cleOeuvre(l){
+    const titre = lettresChiffres(normaliserMot(l.titre));
+    const a = normaliserMot(String(l.auteur || '').split(/[,;&]/)[0]).split(' ').filter(x => x.trim());
+    const auteur = a.length ? lettresChiffres(a[a.length - 1]) : '';
+    return `${titre}|${auteur}`;
+  }
+  function cleSerie(l){ if (!l.serie) return null; const k = lettresChiffres(normaliserMot(l.serie)); return k && l.tome != null ? k : null; }
+  function tirage(cle){ return [(hashJava(cle + '#a') >>> 0) / 4294967296, (hashJava(cle + '#b') >>> 0) / 4294967296]; }
+  function departSerie(cle, rayon){ const [u, v] = tirage('serie|' + cle), r0 = rayon * .65 * Math.sqrt(u), a0 = v * 2 * Math.PI; return [r0 * Math.cos(a0), r0 * Math.sin(a0)]; }
+  function positionDansDisque(l, rayon, pasTome){
+    const serie = cleSerie(l);
+    if (serie != null) {
+      const [u, v] = tirage('serie|' + serie), r0 = rayon * .65 * Math.sqrt(u), a0 = v * 2 * Math.PI;
+      const bx = r0 * Math.cos(a0), by = r0 * Math.sin(a0), dir = a0 + Math.PI / 2, t = (l.tome ?? 1) - 1, courbe = .06 * t;
+      let x = bx + t * pasTome * Math.cos(dir + courbe), y = by + t * pasTome * Math.sin(dir + courbe);
+      const d = Math.hypot(x, y), limite = rayon * 1.25;
+      if (d > limite) { x *= limite / d; y *= limite / d; }
+      return [x, y];
     }
-    // 2. les constellations se repoussent sans quitter leur quartier ; le Roman reste fixe
-    for (let it = 0; it < 260; it++) {
-      for (let i = 0; i < consts.length; i++) for (let j = i + 1; j < consts.length; j++) {
-        const A = consts[i], B = consts[j]; const dx = B.c[0] - A.c[0], dy = B.c[1] - A.c[1]; const d = Math.hypot(dx, dy) || 1;
-        const min = A.rc + B.rc + 46;
-        if (d < min) {
-          const p = (min - d) / d;
-          let wa = B.rc / (A.rc + B.rc), wb = A.rc / (A.rc + B.rc);
-          if (A.theme === 'Roman') { wa = 0; wb = 1; } if (B.theme === 'Roman') { wb = 0; wa = 1; }
-          A.c[0] -= dx * p * wa * .5; A.c[1] -= dy * p * wa * .5; B.c[0] += dx * p * wb * .5; B.c[1] += dy * p * wb * .5;
-        }
-      }
-      for (const k of consts) if (k.theme !== 'Roman') { k.c[0] += (k.maison[0] - k.c[0]) * .02; k.c[1] += (k.maison[1] - k.c[1]) * .02; }
+    const [u, v] = tirage(cleOeuvre(l)), r = rayon * Math.sqrt(u), a = v * 2 * Math.PI;
+    return [r * Math.cos(a), r * Math.sin(a)];
+  }
+  function arbreCouvrant(e){
+    if (e.length < 2) return [];
+    const dans = new Array(e.length).fill(false), dist = new Array(e.length).fill(Infinity), parent = new Array(e.length).fill(-1), liens = [];
+    dist[0] = 0;
+    for (let n = 0; n < e.length; n++) {
+      let u = -1, m = Infinity; for (let k = 0; k < e.length; k++) if (!dans[k] && dist[k] < m) { m = dist[k]; u = k; }
+      dans[u] = true; if (parent[u] >= 0) liens.push([parent[u], u]);
+      for (let v = 0; v < e.length; v++) if (!dans[v]) { const d = Math.hypot(e[u].x - e[v].x, e[u].y - e[v].y); if (d < dist[v]) { dist[v] = d; parent[v] = u; } }
     }
-    const etoiles = [];
-    for (const k of consts) for (const e of k.etoiles) { e.wx = k.c[0] + e.x; e.wy = k.c[1] + e.y; e.k = k; etoiles.push(e); }
+    return liens;
+  }
+  const cmpStr = (a, b) => a < b ? -1 : a > b ? 1 : 0;
+  function evaluerRequete(lectures, requete, seuil, citations){
     const parLivre = new Map();
-    for (const e of etoiles) { if (e.groupe) e.groupe.forEach(t => parLivre.set(t.id, e)); else parLivre.set(e.l.id, e); }
-    // thèmes jamais lus : nom seul, éteint
-    const eteints = THEMES.filter(t => !groupes.has(t)).map(t => ({ theme: t, wx: ATLAS[t][0] * U * fx, wy: ATLAS[t][1] * U * fy }));
-    // en cours la plus récente : anneau scintillant
-    const enCours = livres.filter(l => l.statut === 'EN_COURS').sort((a, b) => (b.dateDebut || b.dateAjout || 0) - (a.dateDebut || a.dateAjout || 0))[0];
-    modele = { consts, etoiles, parLivre, eteints, portrait, scintille: enCours ? parLivre.get(enCours.id) : null, aCompleter: M.lectures.length - livres.length };
-    // résumé
-    const nb = livres.length, ec = livres.filter(l => l.statut === 'EN_COURS').length;
-    $('#ciel-resume').textContent = `${nb} lectures · ${ec} en cours · ${consts.length} constellations`;
-    const b = $('#ciel-banniere');
-    if (modele.aCompleter > 0) { b.hidden = false; b.textContent = `✦ ${modele.aCompleter} fiche${modele.aCompleter > 1 ? 's attendent' : ' attend'} d’être complétée${modele.aCompleter > 1 ? 's' : ''} ›`; } else b.hidden = true;
-  }
-
-  /* ---- Relier par un mot ---- */
-  const aLeMot = (l, cle) => (l._mots || []).some(w => { const n = norm(w); return n === cle || (' ' + n + ' ').includes(' ' + cle + ' '); });
-  function etoilesDuMot(){
-    if (!mot || !modele) return null;
-    if (mot.modele === modele) return mot;
-    const es = modele.etoiles.filter(e => (e.groupe || [e.l]).some(l => aLeMot(l, mot.cle)));
-    const aretes = [], dans = new Set(es.length ? [0] : []);
-    while (dans.size < es.length) { let best = null; for (const i of dans) for (let j = 0; j < es.length; j++) if (!dans.has(j)) { const d = Math.hypot(es[i].wx - es[j].wx, es[i].wy - es[j].wy); if (!best || d < best[2]) best = [i, j, d]; } dans.add(best[1]); aretes.push([best[0], best[1]]); }
-    Object.assign(mot, { modele, etoiles: es, set: new Set(es), aretes });
-    return mot;
-  }
-  function motsFrequents(){
-    const m = new Map();
-    for (const l of M.lectures) if (!l._manques.length) for (const w of new Set(l._mots.map(norm))) { if (!m.has(w)) m.set(w, { cle: w, label: l._mots.find(x => norm(x) === w), n: 0 }); m.get(w).n++; }
-    return [...m.values()].filter(x => x.n >= 2).sort((a, b) => b.n - a.n || a.cle.localeCompare(b.cle, 'fr'));
-  }
-  function choisirMot(label){
-    const cle = norm(label); if (!cle) return;
-    allume = null; choisie = null; fermerBulle(); fermerTerre();
-    mot = { cle, label }; const r = etoilesDuMot(); sale = true;
-    carteMot();
-    if (r.etoiles.length) cadrer(r.etoiles.map(e => ({ c: [e.wx, e.wy], rc: 40 })), 2.6, true, ($('#mot-carte').offsetHeight || 0) + 10);
-  }
-  function quitterMot(){ mot = null; $('#mot-carte').classList.remove('ouverte'); $('#ciel-mot').setAttribute('aria-pressed', 'false'); sale = true; }
-  function carteMot(){
-    const c = $('#mot-carte'), r = etoilesDuMot(), freq = motsFrequents();
-    $('#ciel-mot').setAttribute('aria-pressed', 'true');
-    let h = `<div class="carte"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px"><div class="sur" style="color:var(--or)">Relier par un mot</div><button class="mini-x" id="mot-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
-      <div style="display:flex;gap:8px;margin:8px 0"><input class="inp" id="mot-saisie" list="mot-liste" placeholder="Un mot-clé : mort, quête, bouddhisme…" value="${esc(mot ? mot.label : '')}"><button class="btn or petit" id="mot-ok">Relier</button></div>
-      <datalist id="mot-liste">${freq.slice(0, 200).map(x => `<option value="${esc(x.label)}">`).join('')}</datalist>`;
-    if (r) {
-      const livres = r.etoiles.map(e => e.l);
-      h += r.etoiles.length
-        ? `<p style="margin:4px 0 8px;font-size:14px">« ${esc(mot.label)} » relie <b>${r.etoiles.length}</b> étoile${r.etoiles.length > 1 ? 's' : ''}${r.etoiles.length > 1 ? ', dans ' + new Set(r.etoiles.map(e => e.k.theme)).size + ' constellation(s)' : ''}.</p>
-          <div class="relies" style="margin-top:0">${r.etoiles.map((e, i) => `<button data-mi="${i}">⟡ ${esc(titreCourt(e.l))}</button>`).join('')}</div>
-          ${r.etoiles.length > 1 ? `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn petit" id="mot-garder">＋ Garder ces liens dans les fiches</button></div>` : ''}`
-        : `<p class="doux" style="font-size:13.5px">Aucun livre de ton ciel n’a « ${esc(mot.label)} » dans ses mots-clés.</p>`;
+    for (const l of lectures) parLivre.set(l.id, requete.mots.map(m => [m, evaluerMot(l, m, seuil, citations.get(l.id))]));
+    const idsFocus = new Set(), idsTous = new Set(), details = new Map();
+    for (const [id, v] of parLivre) {
+      const ok = requete.tous ? v.every(x => x[1].relie) : v.some(x => x[1].relie);
+      if (v.every(x => x[1].relie)) idsTous.add(id);
+      if (!ok) continue;
+      idsFocus.add(id);
+      const r = v.filter(x => x[1].relie);
+      const d = !requete.multiple ? (r[0]?.[1].detail || '') : r.map(([m, c]) => `« ${m} » : ${c.detail || 'relié'}`).join('\n');
+      if (d) details.set(id, d);
     }
-    h += `<div class="sur" style="margin:12px 0 6px">Mots qui reviennent</div><div class="choix">${freq.slice(0, r ? 6 : 14).map(x => `<button class="puce mot" data-mot="${esc(x.label)}" aria-pressed="${mot && mot.cle === x.cle}">${esc(x.label)} <span class="doux" style="font-size:11px">${x.n}</span></button>`).join('') || '<span class="doux" style="font-size:13px">Ajoute des mots-clés à tes fiches pour faire apparaître des fils.</span>'}</div></div>`;
-    c.innerHTML = h; c.classList.add('ouverte');
-    $('#mot-fermer').onclick = quitterMot;
-    const go = () => choisirMot($('#mot-saisie').value);
-    $('#mot-ok').onclick = go; $('#mot-saisie').onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); go(); } };
-    $('#mot-saisie').onchange = () => { if (freq.some(x => x.label === $('#mot-saisie').value)) go(); };
-    c.querySelectorAll('[data-mot]').forEach(b => b.onclick = () => choisirMot(b.dataset.mot));
-    c.querySelectorAll('[data-mi]').forEach(b => b.onclick = () => { const e = r.etoiles[+b.dataset.mi]; if (e.groupe) { c.classList.remove('ouverte'); choisir(e); } else Fiche.ouvrir(e.l.id); });
-    const g = $('#mot-garder'); if (g) g.onclick = async () => {
-      const ids = e => e.groupe ? e.groupe[0].id : e.l.id;
-      const n = await Edition.relierLivres(r.aretes.map(([i, j]) => [ids(r.etoiles[i]), ids(r.etoiles[j])]), mot.label);
-      toast(n ? `${n} lien${n > 1 ? 's' : ''} ajouté${n > 1 ? 's' : ''} (raison : « ${mot.label} »)` : 'Ces livres étaient déjà reliés');
-    };
+    return { parLivre, idsFocus, idsTous, details };
   }
-  function cadrer(liste, zmax = 3, anime = false, basEnPlus = 0){
-    if (!liste.length) return;
-    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
-    for (const k of liste) { x0 = Math.min(x0, k.c[0] - k.rc); y0 = Math.min(y0, k.c[1] - k.rc); x1 = Math.max(x1, k.c[0] + k.rc); y1 = Math.max(y1, k.c[1] + k.rc); }
-    const haut = 150, bas = 70 + basEnPlus;
-    const z = Math.min(zmax, (L - 60) / (x1 - x0), (H - haut - bas) / (y1 - y0));
-    const cible = { x: (x0 + x1) / 2, y: (y0 + y1) / 2 - (haut - bas) / 2 / z, z };
-    if (anime && !reduitMouvement) animerVers(cible); else { vue = cible; sale = true; }
+  function calculerCiel(lectures, motFocus, citations, seuil){
+    if (!lectures.length) return { constellations: [], vide: true, minX: 0, minY: 0, maxX: 0, maxY: 0, series: new Map(), idsFocus: new Set(), idsTous: new Set(), details: new Map(), fantomes: [] };
+    const mot = motFocus && motFocus.trim() ? motFocus.trim() : null, requete = lireRequete(mot);
+    let idsFocus = new Set(), idsTous = new Set(), details = new Map();
+    if (!requete.vide) { const e = evaluerRequete(lectures, requete, seuil, citations); idsFocus = e.idsFocus; details = e.details; if (requete.multiple && !requete.tous) idsTous = e.idsTous; }
+    const unite = UNITE_DP, rayon = RAYON_DISQUE * unite, ecartMin = 13;
+    const grp = new Map();
+    for (const l of lectures) { const k = normaliserMot(nomConstellation(l)); if (!grp.has(k)) grp.set(k, []); grp.get(k).push(l); }
+    const groupes = [...grp].map(([k, liste]) => [k, nomConstellation(liste[0]), liste.slice().sort((a, b) => cmpStr(cleOeuvre(a), cleOeuvre(b)) || a.id - b.id)]).sort((a, b) => cmpStr(a[0], b[0])).map(([, n, l]) => [n, l]);
+    const presents = new Set(groupes.map(g => normaliserMot(g[0])));
+    const fantomes = [...ATLAS.keys()].filter(k => !presents.has(k)).map(k => { const [x, y] = placeAtlas(k); return { nom: NOMS_ATLAS.get(k) || k, x: x * unite, y: y * unite }; });
+    const constellations = groupes.map(([nom, liste]) => {
+      const [ux, uy] = placeAtlas(nom), cx = ux * unite, cy = uy * unite;
+      const xs = [], ys = [];
+      liste.forEach((l, j) => { const [x, y] = positionDansDisque(l, rayon, 15); xs[j] = cx + x; ys[j] = cy + y; });
+      for (let it = 0; it < 12; it++) for (let i = 0; i < liste.length; i++) for (let j = i + 1; j < liste.length; j++) {
+        const dx = xs[j] - xs[i], dy = ys[j] - ys[i], d = Math.hypot(dx, dy);
+        if (d < ecartMin) { const [ux0, uy0] = d < .01 ? [Math.cos(j), Math.sin(j)] : [dx / d, dy / d]; const p = (ecartMin - d) / 2; xs[i] -= ux0 * p; ys[i] -= uy0 * p; xs[j] += ux0 * p; ys[j] += uy0 * p; }
+      }
+      const etoiles = liste.map((l, j) => ({ l, x: xs[j], y: ys[j] }));
+      return { nom, cx, cy, rayon, etoiles, liens: arbreCouvrant(etoiles), focus: false };
+    });
+    const series = new Map();
+    for (const [nom, liste] of groupes) {
+      const [ux, uy] = placeAtlas(nom), parS = new Map();
+      for (const l of liste) { const k = cleSerie(l); if (k == null) continue; if (!parS.has(k)) parS.set(k, []); parS.get(k).push(l); }
+      for (const [cle, tomes] of parS) {
+        if (tomes.length < 2) continue;
+        const [bx, by] = departSerie(cle, rayon), tries = tomes.slice().sort((a, b) => (a.tome ?? 0) - (b.tome ?? 0) || a.id - b.id);
+        const s = { cle, nom: (tries[0].serie || '').trim(), x: ux * unite + bx, y: uy * unite + by, ids: tries.map(t => t.id) };
+        s.tete = s.ids[0]; tries.forEach(t => series.set(t.id, s));
+      }
+    }
+    const toutes = constellations.flatMap(c => c.etoiles);
+    const minX = Math.min(...toutes.map(e => e.x)) - 70, maxX = Math.max(...toutes.map(e => e.x)) + 70, minY = Math.min(...toutes.map(e => e.y)) - 44, maxY = Math.max(...toutes.map(e => e.y)) + 30;
+    const bordX = RAYON_COURONNE * PORTRAIT_X * unite + 60, bordY = RAYON_COURONNE * PORTRAIT_Y * unite + 60;
+    return { constellations, minX, minY, maxX, maxY, motFocus: mot, idsFocus, details, idsTous, fantomes,
+      atlasMinX: Math.min(minX, -bordX), atlasMinY: Math.min(minY, -bordY), atlasMaxX: Math.max(maxX, bordX), atlasMaxY: Math.max(maxY, bordY), series, galaxie: false, vide: !constellations.length };
   }
-  function animerVers(cible, duree = 600){
-    const dep = { ...vue }, t0 = performance.now();
-    anim = t => { let p = Math.min(1, (t - t0) / duree); p = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
-      const zl = Math.exp(Math.log(dep.z) + (Math.log(cible.z) - Math.log(dep.z)) * p);
-      vue = { x: dep.x + (cible.x - dep.x) * p, y: dep.y + (cible.y - dep.y) * p, z: zl };
-      if (p >= 1) anim = null; };
+  function calculerGalaxie(lectures, requeteTexte, citations, seuil){
+    const requete = lireRequete(requeteTexte), videP = { constellations: [], vide: true, minX: 0, minY: 0, maxX: 0, maxY: 0, series: new Map(), idsFocus: new Set(), idsTous: new Set(), details: new Map(), fantomes: [], galaxie: true, motFocus: requeteTexte };
+    if (requete.vide || !lectures.length) return videP;
+    const { parLivre, idsFocus, idsTous: tousBrut, details } = evaluerRequete(lectures, requete, seuil, citations);
+    const idsTous = new Set([...tousBrut].filter(id => idsFocus.has(id)));
+    if (!idsFocus.size) return videP;
+    const ordre = (a, b) => (a.statut === 'A_LIRE') - (b.statut === 'A_LIRE') || ((a.dateFin ?? a.dateDebut ?? a.dateAjout) - (b.dateFin ?? b.dateDebut ?? b.dateAjout)) || a.id - b.id;
+    const reliees = lectures.filter(l => idsFocus.has(l.id));
+    const coeur = (requete.multiple ? reliees.filter(l => idsTous.has(l.id)) : reliees).slice().sort(ordre);
+    const bras = !requete.multiple ? [] : requete.mots.map(m => [m, reliees.filter(l => !idsTous.has(l.id) && (parLivre.get(l.id).find(x => x[1].relie) || [])[0] === m).sort(ordre)]);
+    const angleOr = Math.PI * (3 - Math.sqrt(5)), pasCoeur = 24, constellations = [];
+    const etoilesCoeur = coeur.map((l, i) => { const r = pasCoeur * Math.sqrt(i + .6), a = i * angleOr; return { l, x: r * Math.cos(a), y: r * Math.sin(a) }; });
+    const rayonCoeur = (etoilesCoeur.length ? Math.max(...etoilesCoeur.map(e => Math.hypot(e.x, e.y))) : 0) + 18;
+    if (etoilesCoeur.length) constellations.push({ nom: requete.multiple ? 'cœur' : requete.mots[0], cx: 0, cy: 0, rayon: rayonCoeur, etoiles: etoilesCoeur, liens: etoilesCoeur.slice(0, -1).map((_, i) => [i, i + 1]), focus: true });
+    const nbBras = Math.max(1, bras.length);
+    bras.forEach(([mot, livres], j) => {
+      if (!livres.length) return;
+      const depart = 2 * Math.PI * j / nbBras - Math.PI / 2, r0 = rayonCoeur + 26;
+      const etoiles = livres.map((l, i) => { const r = r0 + i * 24, a = depart + i * .32; return { l, x: r * Math.cos(a), y: r * Math.sin(a) }; });
+      const mil = etoiles[Math.floor(etoiles.length / 2)];
+      constellations.push({ nom: mot, cx: mil.x, cy: mil.y, rayon: 40, etoiles, liens: etoiles.slice(0, -1).map((_, i) => [i, i + 1]), focus: true });
+    });
+    const toutes = constellations.flatMap(c => c.etoiles);
+    const minX = Math.min(...toutes.map(e => e.x)) - 80, maxX = Math.max(...toutes.map(e => e.x)) + 80, minY = Math.min(...toutes.map(e => e.y)) - 50, maxY = Math.max(...toutes.map(e => e.y)) + 40;
+    return { constellations, minX, minY, maxX, maxY, atlasMinX: minX, atlasMinY: minY, atlasMaxX: maxX, atlasMaxY: maxY, motFocus: requeteTexte, idsFocus, details, idsTous: requete.multiple ? idsTous : new Set(), fantomes: [], series: new Map(), galaxie: true, vide: false };
+  }
+  const nomGalaxieParDefaut = t => lireRequete(t).mots.map(m => m.charAt(0).toUpperCase() + m.slice(1)).join(' · ');
+  function memeRequete(a, b){
+    const ra = lireRequete(a), rb = lireRequete(b);
+    if (ra.vide || rb.vide) return false;
+    const sa = new Set(ra.mots.map(normaliserMot)), sb = new Set(rb.mots.map(normaliserMot));
+    return sa.size === sb.size && [...sa].every(x => sb.has(x)) && (ra.tous === rb.tous || !ra.multiple);
+  }
+  const cleTitrePorte = t => lettresChiffres(String(t || '').toLowerCase().normalize('NFD').replace(/\p{M}/gu, ''));
+  function portes(theme, biblio){ const deja = new Set(biblio.map(l => cleTitrePorte(l.titre))); return (PORTES_APP[theme] || []).filter(p => !deja.has(cleTitrePorte(p[0]))); }
+  return { normaliserMot, statutA, apparition, lireRequete, ecrireRequete, libelleRequete, motsFrequents, motsCles, nomConstellation, calculerCiel, calculerGalaxie, nomGalaxieParDefaut, memeRequete, portes };
+})();
+
+/* ---------- Écran du ciel (CielScreen.kt) ---------- */
+const Ciel = (() => {
+  const VERSION = '1.8';
+  $('#ciel-entete').innerHTML = enTete('Ton ciel', 'de lectures');
+  const ZOOM_MAX = 24, ZOOM_OUVERTURE_SERIES = 8, SEUIL_PELOTE = 8;
+  const COUL = { nuit: '11,14,26', encre: '20,26,44', ivoire: '243,235,221', ivoireDoux: '201,206,223', brume: '154,163,191', or: '227,182,92', bleu: '135,146,188' };
+  const rgba = (c, a) => `rgba(${COUL[c]},${Math.max(0, Math.min(1, a))})`;
+  const coeurLu = n => n === 0 ? 1.5 : n <= 2 ? 1.0 : n === 3 ? 1.5 : n === 4 ? 2.1 : 2.8;
+  const rayonVisible = (s, n) => s === 'LU' ? coeurLu(n) : s === 'EN_COURS' ? 3 : 2;
+  const eclatAnciennete = (l, ref) => { const annees = (ref - (l.dateFin ?? l.dateAjout)) / 31557600000; return 1 - .4 * Math.min(1, Math.max(0, (annees - 1) / 4)); };
+  const ordreLecture = l => l.dateFin ?? l.dateDebut ?? l.dateAjout;
+  function titreCourtC(l, max = 24){
+    const suf = l.tome != null ? ` · t. ${l.tome}` : '';
+    let t = String(l.titre || '').trim();
+    if (t.length + suf.length > max && t.includes(' : ')) t = t.split(' : ')[0].trim();
+    const place = max - suf.length;
+    if (t.length > place) t = t.slice(0, Math.max(4, place - 1)).trimEnd() + '…';
+    return t + suf;
+  }
+  const melange = (a, b, t) => a + (b - a) * t;
+  const reduit = reduitMouvement;
+
+  /* ---- état (MemoireCiel) ---- */
+  const S = { motActif: '', saisie: '', panneauOuvert: false, seuil: 3, selection: null, themeEteint: null, onglet: null,
+    modeTemps: false, curseur: 1, enLecture: false, nomNouvelle: null, sousTitreNouvelle: '' };
+  let plan = null, planGalaxie = null, cleCache = '';
+
+  /* ---- animations ---- */
+  const anims = new Map();
+  function animer(nom, cible, duree, courbe = 'lin'){
+    const a = anims.get(nom) || { de: cible, vers: cible, t0: 0, d: 0 };
+    const v = valeur(nom);
+    if (a.vers === cible && a.d) return;
+    anims.set(nom, { de: v, vers: cible, t0: performance.now(), d: reduit ? 0 : duree, courbe });
+    demander();
+  }
+  function poser(nom, v){ anims.set(nom, { de: v, vers: v, t0: 0, d: 0 }); }
+  const easeIO = p => p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // proche de FastOutSlowIn
+  function valeur(nom, def = 0){
+    const a = anims.get(nom); if (!a) return def;
+    if (!a.d) return a.vers;
+    let p = Math.min(1, (performance.now() - a.t0) / a.d); if (a.courbe === 'doux') p = easeIO(p);
+    return a.de + (a.vers - a.de) * p;
+  }
+  const enMouvement = () => [...anims.values()].some(a => a.d && performance.now() - a.t0 < a.d);
+
+  /* ---- DOM ---- */
+  const cv = $('#ciel'), ctx = cv.getContext('2d');
+  let W = 0, H = 0, dpr = 1;
+  let echelle = 1, echelleBase = 1, decalage = [0, 0], deplace = false, camera = null, vueAvant = null, bougeEntreTemps = false, premierCadrage = true, signatureAvant = '';
+  let constellationActive = null, derniereAllumee = null;
+  let lampe = null, eclairees = new Set(), extinction = null, utilisationsLampe = 0;
+  try { utilisationsLampe = +(localStorage.getItem('phylactere-lampe') || 0); } catch (e) {}
+  let zonesNoms = [], zonesFantomes = [], zonesConstellations = [], enveloppes = new Map();
+  let derniereSerieOuverte = null, hauteurCartouche = 0, sale = true;
+  const demander = () => { sale = true; };
+
+  /* ---- données ---- */
+  const lecturesCiel = () => M.lectures.filter(l => !l._manques.length);
+  function citationsParLivre(){ const m = new Map(); for (const c of M.citations) m.set(c.lectureId, (m.get(c.lectureId) ? m.get(c.lectureId) + ' ' : '') + c.texte); return m; }
+  const galaxies = () => (M.racine && M.racine.galaxies) || [];
+  function galaxieOuverte(){ return galaxies().find(g => g.id === S.onglet) || null; }
+  function recalculer(){
+    const ls = lecturesCiel(), cle = [M.lectures.length, M.racine && M.racine.modifieLe, M.racine && M.racine.importeLe, S.motActif, S.seuil, S.onglet, galaxies().length, galaxieOuverte()?.requete].join('|');
+    if (cle === cleCache && plan) return;
+    cleCache = cle;
+    const cit = citationsParLivre();
+    plan = CC.calculerCiel(ls, S.motActif || null, cit, S.seuil);
+    const g = galaxieOuverte();
+    planGalaxie = g ? CC.calculerGalaxie(ls, g.requete, cit, S.seuil) : null;
+  }
+  const planActif = () => planGalaxie || plan;
+
+  /* ---- caméra ---- */
+  function ajuster(){
+    const p = planActif(); if (!W || !H || !p || p.vide) return;
+    const s = Math.min(Math.max(Math.min(W / Math.max(1, p.maxX - p.minX), H / Math.max(1, p.maxY - p.minY)) * .92, .3), 2.2);
+    echelle = s; echelleBase = s; decalage = [W / 2 - (p.minX + p.maxX) / 2 * s, H / 2 - (p.minY + p.maxY) / 2 * s]; deplace = false; majMire(); demander();
+  }
+  function glisserVers(e, d, immediat){
+    if (immediat || reduit) { echelle = e; decalage = d; camera = null; demander(); return Promise.resolve(); }
+    return new Promise(ok => { camera = { e0: echelle, d0: decalage.slice(), e, d, t0: performance.now(), ok }; demander(); });
+  }
+  function avancerCamera(t){
+    if (!camera) return;
+    let p = Math.min(1, (t - camera.t0) / 600); const k = easeIO(p);
+    echelle = camera.e0 + (camera.e - camera.e0) * k; decalage = [camera.d0[0] + (camera.d[0] - camera.d0[0]) * k, camera.d0[1] + (camera.d[1] - camera.d0[1]) * k];
+    if (p >= 1) { const ok = camera.ok; camera = null; ok && ok(); }
+  }
+  const palier = () => { const z = echelle / echelleBase; return z >= 5 ? 3 : z >= 2.5 ? 2 : z >= 1.6 ? 1 : 0; };
+  let palierAvant = -1;
+  function suivrePaliers(){
+    const pl = palier(); if (pl === palierAvant) return; palierAvant = pl;
+    animer('f1', pl >= 1 ? 1 : 0, 250); animer('f2', pl >= 2 ? 1 : 0, 250); animer('f3', pl >= 3 ? 1 : 0, 250);
+    const ouvre = echelle >= echelleBase * ZOOM_OUVERTURE_SERIES; animer('serieZoom', ouvre ? 1 : 0, 450, 'doux');
   }
 
-  const ecran = (wx, wy) => [(wx - vue.x) * vue.z + L / 2, (wy - vue.y) * vue.z + H / 2];
-  const monde = (sx, sy) => [(sx - L / 2) / vue.z + vue.x, (sy - H / 2) / vue.z + vue.y];
+  /* ---- séries repliées ---- */
+  const serieOuverte = () => { const p = planActif(); return S.selection != null ? p.series.get(S.selection)?.cle || null : null; };
+  function deplie(s){ const propre = s.cle === (serieOuverte() || derniereSerieOuverte) ? valeur('serie') : 0; return Math.max(propre, valeur('serieZoom')); }
+  function monde(e){ const s = planActif().series.get(e.l.id); if (!s) return [e.x, e.y]; const k = deplie(s); return [s.x + (e.x - s.x) * k, s.y + (e.y - s.y) * k]; }
+  const versEcran = e => { const m = monde(e); return [m[0] * echelle + decalage[0], m[1] * echelle + decalage[1]]; };
+  const repliee = e => { const s = planActif().series.get(e.l.id); return s ? deplie(s) <= .02 : false; };
 
-  function taille(){
-    const r = cv.getBoundingClientRect(); dpr = Math.min(2.5, devicePixelRatio || 1);
-    const nl = r.width, nh = r.height; if (!nl || !nh) return;
-    const changePortrait = modele && ((nh > nl * 1.05) !== modele.portrait);
-    L = nl; H = nh; cv.width = L * dpr; cv.height = H * dpr; sale = true;
-    if (changePortrait) { invalider(); }
-  }
+  /* ---- mesure du texte ---- */
+  const cacheMesure = new Map();
+  function mesurer(texte, font){ const k = font + '|' + texte; let w = cacheMesure.get(k); if (w == null) { ctx.font = font; w = ctx.measureText(texte).width; if (cacheMesure.size > 3000) cacheMesure.clear(); cacheMesure.set(k, w); } return w; }
+  const FNOM = (sz, it = true) => `${it ? 'italic ' : ''}400 ${sz}px Fraunces, Georgia, serif`;
+  const FTIT = sz => `400 ${sz}px Manrope, system-ui, sans-serif`;
+  const chev = (a, b) => a[0] < b[2] && a[2] > b[0] && a[1] < b[3] && a[3] > b[1];
+  const gonfle = (r, m) => [r[0] - m, r[1] - m, r[2] + m, r[3] + m];
+  const dans = (r, p) => p[0] >= r[0] && p[0] <= r[2] && p[1] >= r[1] && p[1] <= r[3];
 
-  let labels = [];   // zones cliquables des noms
+  /* ---- dessin ---- */
   function dessiner(t){
-    if (!modele) { construire(); cadrer(modele.consts); }
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.fillStyle = C.nuitHex; ctx.fillRect(0, 0, L, H);
-    const z = vue.z, occupe = [];
-    labels = [];
-    const annee = new Date().getFullYear();
-    const lumi = allume ? allume.k : null;
-    const relies = new Set(choisie ? choisie.l._liens.map(x => modele.parLivre.get(x.id)).filter(Boolean) : []);
-    const rm = etoilesDuMot();
-    const alpha = k => rm ? .14 : lumi ? (k === lumi ? 1 : .12) : 1;
-    const dejaEcran = e => e._s || (e._s = ecran(e.wx, e.wy));
-    for (const e of modele.etoiles) e._s = null;
+    const p = planActif(); if (!p) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H); ctx.fillStyle = '#0B0E1A'; ctx.fillRect(0, 0, W, H);
+    if (p.vide) return;
+    const instant = (S.onglet == null && S.modeTemps) ? instantTemps() : null;
+    const reference = instant ?? Date.now();
+    const f1 = valeur('f1'), f2 = valeur('f2'), f3 = valeur('f3'), lampeK = valeur('lampe'), pres = valeur('presence'), tracesK = valeur('traces'), refroidiK = valeur('refroidi');
+    const etoiles = p.constellations.flatMap(c => c.etoiles), parId = new Map(etoiles.map(e => [e.l.id, e]));
+    const constellationDe = new Map(); p.constellations.forEach(c => c.etoiles.forEach(e => constellationDe.set(e.l.id, c.nom)));
+    const etats = new Map(etoiles.map(e => [e.l.id, CC.statutA(e.l, instant)]));
+    const modeMot = p.motFocus != null;
+    let idEnCoursRecent = null, meilleur = -Infinity;
+    for (const e of etoiles) if (etats.get(e.l.id) === 'EN_COURS') { const d = e.l.dateDebut ?? e.l.dateAjout; if (d > meilleur) { meilleur = d; idEnCoursRecent = e.l.id; } }
+    const ecr = new Map(etoiles.map(e => [e.l.id, versEcran(e)]));
+    const E = e => ecr.get(e.l.id);
 
-    // traits des constellations
-    for (const k of modele.consts) {
-      const a = alpha(k);
-      let progres = Infinity, fondu = 0;
-      if (k === lumi && allume) {
-        const par = Math.max(120, 600 / Math.max(1, k.aretes.length));
-        const ecoule = reduitMouvement ? 1e9 : t - allume.t0;
-        progres = ecoule / par;
-        const finTrace = k.aretes.length * par; fondu = Math.min(1, Math.max(0, (ecoule - finTrace - 700) / 800));
-      }
-      k.aretes.forEach(([i, j], n) => {
-        if (n >= progres) return;
-        const A = dejaEcran(k.etoiles[i]), B = dejaEcran(k.etoiles[j]);
-        const dx = B[0] - A[0], dy = B[1] - A[1], d = Math.hypot(dx, dy); if (d < 8) return;
-        const part = Math.min(1, progres - n), ux = dx / d, uy = dy / d;
-        const x0 = A[0] + ux * 4, y0 = A[1] + uy * 4, x1 = A[0] + ux * (4 + (d - 8) * part), y1 = A[1] + uy * (4 + (d - 8) * part);
-        ctx.beginPath(); ctx.moveTo(x0, y0); ctx.lineTo(x1, y1);
-        if (k === lumi) { ctx.strokeStyle = `rgba(${C.or},${.7 * (1 - fondu)})`; ctx.lineWidth = 1.3; ctx.stroke(); ctx.strokeStyle = `rgba(${C.brume},${.4 * fondu})`; ctx.stroke(); }
-        else { ctx.strokeStyle = `rgba(${C.brume},${.22 * a})`; ctx.lineWidth = .9; ctx.stroke(); }
-      });
-    }
-    // fils d'or du mot : relie les étoiles qui partagent ce mot-clé
-    if (rm) {
-      ctx.strokeStyle = `rgba(${C.or},.75)`; ctx.lineWidth = 1.3;
-      for (const [i, j] of rm.aretes) { const A = dejaEcran(rm.etoiles[i]), B = dejaEcran(rm.etoiles[j]); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2 - Math.hypot(B[0] - A[0], B[1] - A[1]) * .08; ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.quadraticCurveTo(mx, my, B[0], B[1]); ctx.stroke(); }
-      for (const e of rm.etoiles) { const [x, y] = dejaEcran(e); ctx.beginPath(); ctx.arc(x, y, 7, 0, 7); ctx.strokeStyle = `rgba(${C.or},.55)`; ctx.lineWidth = 1; ctx.stroke(); }
-    }
-    // fils d'or des liens personnels de l'étoile choisie
-    if (choisie) {
-      const A = dejaEcran(choisie);
-      for (const e of relies) { const B = dejaEcran(e);
-        ctx.beginPath(); ctx.moveTo(A[0], A[1]); const mx = (A[0] + B[0]) / 2, my = (A[1] + B[1]) / 2 - Math.hypot(B[0] - A[0], B[1] - A[1]) * .12; ctx.quadraticCurveTo(mx, my, B[0], B[1]);
-        ctx.strokeStyle = `rgba(${C.or},.55)`; ctx.lineWidth = 1; ctx.stroke(); }
-    }
-    // étoiles
-    const k15 = 1.5 * Math.min(1.3, Math.max(.62, Math.sqrt(z)));   // taille web, suit un peu le zoom pour ne pas saturer les petits écrans
-    for (const e of modele.etoiles) {
-      const [x, y] = dejaEcran(e); if (x < -30 || y < -30 || x > L + 30 || y > H + 30) continue;
-      let a = alpha(e.k); if ((choisie && (e === choisie || relies.has(e))) || (rm && rm.set.has(e))) a = 1;
-      const l = e.l;
-      if (l.statut === 'LU') {
-        const fin = l.dateFin ? new Date(l.dateFin).getFullYear() : annee;
-        const eclat = Math.max(.6, 1 - Math.max(0, annee - fin) * .08) * a;
-        const n = l.note || 0, r = (n === 0 || n === 3 ? 1.5 : n <= 2 ? 1.0 : n === 4 ? 2.1 : 2.8) * k15;
-        if (n >= 4) { const hr = (n === 5 ? 9 : 6) * k15; const g = ctx.createRadialGradient(x, y, 0, x, y, hr); g.addColorStop(0, `rgba(${C.ivoire},${(n === 5 ? .18 : .10) * eclat * 2})`); g.addColorStop(1, `rgba(${C.ivoire},0)`); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, hr, 0, 7); ctx.fill(); }
-        if (n === 5) { ctx.beginPath(); ctx.arc(x, y, r + 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${.25 * eclat})`; ctx.lineWidth = 1; ctx.stroke(); }
-        ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fillStyle = `rgba(${C.ivoire},${eclat})`; ctx.fill();
-      } else if (l.statut === 'EN_COURS') {
-        ctx.beginPath(); ctx.arc(x, y, 1.8 * k15, 0, 7); ctx.fillStyle = `rgba(${C.or},${a})`; ctx.fill();
-        if (e === modele.scintille) { const p = reduitMouvement ? .5 : (Math.sin(t / 3200 * Math.PI * 2) + 1) / 2; ctx.beginPath(); ctx.arc(x, y, 5 + p * 3, 0, 7); ctx.strokeStyle = `rgba(${C.or},${(.25 + .35 * (1 - p)) * a})`; ctx.lineWidth = 1; ctx.stroke(); }
-      } else {
-        ctx.beginPath(); ctx.arc(x, y, 2 * k15, 0, 7); ctx.strokeStyle = `rgba(${C.bleu},${.7 * a})`; ctx.lineWidth = 1.2; ctx.stroke();
-      }
-      if (e.groupe && e !== choisie) { ctx.beginPath(); ctx.arc(x, y, 7.5, 0, 7); ctx.strokeStyle = `rgba(${C.brume},${.45 * a})`; ctx.lineWidth = 1; ctx.setLineDash([2, 2.5]); ctx.stroke(); ctx.setLineDash([]); }
-      if (e === choisie && e.groupe) {
-        // la série s'ouvre : ses tomes en couronne autour de l'étoile
-        const n = e.groupe.length, Rg = 30 + n * 2.2;
-        e.groupe.forEach((tl, i) => {
-          const ang = -Math.PI / 2 + i * 2 * Math.PI / n, sx = x + Math.cos(ang) * Rg, sy = y + Math.sin(ang) * Rg;
-          ctx.beginPath(); ctx.moveTo(x + Math.cos(ang) * 6, y + Math.sin(ang) * 6); ctx.lineTo(sx - Math.cos(ang) * 4, sy - Math.sin(ang) * 4); ctx.strokeStyle = `rgba(${C.or},.35)`; ctx.lineWidth = .8; ctx.stroke();
-          ctx.beginPath(); ctx.arc(sx, sy, 2.6, 0, 7);
-          if (tl.statut === 'A_LIRE') { ctx.strokeStyle = `rgba(${C.bleu},.9)`; ctx.lineWidth = 1.1; ctx.stroke(); } else { ctx.fillStyle = tl.statut === 'EN_COURS' ? `rgba(${C.or},1)` : `rgba(${C.ivoire},.95)`; ctx.fill(); }
-          ctx.font = '600 10.5px Manrope, system-ui, sans-serif'; const lab = tl.tome ? 't. ' + tl.tome : String(i + 1); const w = ctx.measureText(lab).width;
-          ctx.fillStyle = `rgba(${C.ivoire},.8)`; ctx.fillText(lab, sx + Math.cos(ang) * 9 - (Math.cos(ang) < -.3 ? w : Math.cos(ang) > .3 ? 0 : w / 2), sy + Math.sin(ang) * 9 + 4);
-          occupe.push([sx - 10, sy - 10, sx + 10, sy + 10]);
+    // 0. lumière de la lampe
+    if (lampe) { const g = ctx.createRadialGradient(lampe[0], lampe[1], 0, lampe[0], lampe[1], 88); g.addColorStop(0, rgba('ivoire', .06)); g.addColorStop(1, rgba('ivoire', 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lampe[0], lampe[1], 88, 0, 7); ctx.fill(); }
+
+    // 1. traits des constellations
+    ctx.lineCap = 'round';
+    const trait = (a, b, ra, rb, coul, ep, fraction = 1, tirets = null) => {
+      const v = [b[0] - a[0], b[1] - a[1]], d = Math.hypot(v[0], v[1]); if (d <= ra + rb) return;
+      const u = [v[0] / d, v[1] / d], s0 = [a[0] + u[0] * ra, a[1] + u[1] * ra], s1 = [b[0] - u[0] * rb, b[1] - u[1] * rb];
+      ctx.strokeStyle = coul; ctx.lineWidth = ep; ctx.setLineDash(tirets || []); ctx.beginPath(); ctx.moveTo(s0[0], s0[1]); ctx.lineTo(s0[0] + (s1[0] - s0[0]) * fraction, s0[1] + (s1[1] - s0[1]) * fraction); ctx.stroke(); ctx.setLineDash([]);
+    };
+    for (const c of p.constellations) {
+      const k = valeur('lampe:' + c.nom);
+      const allumee = !c.focus && c.nom === derniereAllumee && pres > .01;
+      if (allumee) {
+        const ca = [melange(227, 154, refroidiK), melange(182, 163, refroidiK), melange(92, 191, refroidiK), melange(.7, .4, refroidiK)];
+        const coul = `rgba(${Math.round(melange(154, ca[0], pres))},${Math.round(melange(163, ca[1], pres))},${Math.round(melange(191, ca[2], pres))},${melange(.22, ca[3], pres)})`;
+        c.liens.forEach(([a, b], i) => {
+          const fr = Math.min(1, Math.max(0, tracesK - i)); if (fr <= 0) return;
+          const ea = c.etoiles[a], eb = c.etoiles[b], sa = etats.get(ea.l.id), sb = etats.get(eb.l.id); if (!sa || !sb) return;
+          trait(E(ea), E(eb), rayonVisible(sa, ea.l.note) + 3, rayonVisible(sb, eb.l.note) + 3, coul, .9, fr);
         });
+        continue;
       }
-      if (e === choisie) { ctx.beginPath(); ctx.arc(x, y, 9, 0, 7); ctx.strokeStyle = `rgba(${C.or},.9)`; ctx.lineWidth = 1.2; ctx.stroke(); }
-      occupe.push([x - 5, y - 5, x + 5, y + 5]);
-    }
-    // noms des constellations
-    const chevauche = (r) => occupe.some(o => r[0] < o[2] && r[2] > o[0] && r[1] < o[3] && r[3] > o[1]) || r[1] < 70 || r[3] > H - 6 || r[0] < 4 || r[2] > L - 4;
-    const tailleNom = z >= 1.6 ? 15 : 14;
-    // un nom ne doit pas mordre sur une autre constellation (sinon on ne sait plus à qui il appartient)
-    const empiete = (r, propre) => modele.consts.some(k => { if (k === propre) return false; const [cx, cy] = ecran(k.c[0], k.c[1]); const rr = k.rc * z * .85 + 4;
-      const nx = Math.max(r[0], Math.min(cx, r[2])), ny = Math.max(r[1], Math.min(cy, r[3])); return Math.hypot(nx - cx, ny - cy) < rr; });
-    // placement des noms : d'abord les constellations qui ont le moins de places possibles
-    const prep = modele.consts.map(k => {
-      const [cx, cy] = ecran(k.c[0], k.c[1]); const r = k.rc * z; const estLumi = k === lumi;
-      const fs = estLumi ? 17 : (z < .6 ? 12.5 : tailleNom);
-      ctx.font = `italic ${estLumi ? 500 : 400} ${fs}px Fraunces, Georgia, serif`;
-      const w = ctx.measureText(k.theme).width;
-      const cands = [];
-      for (const [dx, dy] of [[0, -1], [0, 1], [1, 0], [-1, 0], [.7, -.7], [-.7, -.7], [.7, .7], [-.7, .7], [0, -1.7], [0, 1.7]]) {
-        let px = cx + dx * (r + 8) - (dx === 0 ? w / 2 : dx < 0 ? w : 0); const py = cy + dy * (r + 8) + (dy > 0 ? fs : dy === 0 ? fs / 3 : 0);
-        if (dx === 0) px = Math.max(6, Math.min(L - w - 6, px));
-        const rect = [px - 2, py - fs, px + w + 2, py + 4];
-        if (!chevauche(rect) && !empiete(rect, k)) cands.push([px, py, rect]);
-      }
-      return { k, cx, cy, r, fs, w, estLumi, cands };
-    }).sort((a, b) => b.estLumi - a.estLumi || a.cands.length - b.cands.length || b.k.livres.length - a.k.livres.length);
-    for (const P of prep) {
-      const { k, estLumi, fs, w } = P;
-      let place = P.cands.find(c => !chevauche(c[2]));
-      if (!place && (k.livres.length >= 2 || estLumi)) { const px = Math.max(6, Math.min(L - w - 6, P.cx - w / 2)), py = P.cy - P.r - 8; place = [px, py, [px, py - fs, px + w, py + 4]]; }
-      if (!place) continue;
-      occupe.push(place[2]); labels.push({ rect: place[2], k });
-      let nom = k.theme;
-      if (estLumi && !reduitMouvement) { const par = Math.max(120, 600 / Math.max(1, k.aretes.length)); const total = k.aretes.length * par; const p = Math.min(1, (t - allume.t0) / Math.max(total, 600)); nom = k.theme.slice(0, Math.ceil(k.theme.length * p)); }
-      ctx.font = `italic ${estLumi ? 500 : 400} ${fs}px Fraunces, Georgia, serif`;
-      ctx.fillStyle = estLumi ? `rgba(${C.ivoire},.92)` : `rgba(${C.brume},${.8 * alpha(k)})`;
-      ctx.fillText(nom, place[0], place[1]);
-    }
-    // titres des livres (zoom sémantique, constellation allumée, liens)
-    ctx.font = `500 ${z >= 2.5 ? 12 : 11.5}px Manrope, system-ui, sans-serif`;
-    for (const e of modele.etoiles) {
-      const montrer = (rm ? rm.set.has(e) : false) || (e.k === lumi) || (choisie && (e === choisie || relies.has(e))) || (!lumi && !rm && (z >= 2.5 || (z >= 1.6 && e.l.note === 5)));
-      if (!montrer) continue;
-      const [x, y] = e._s || ecran(e.wx, e.wy); if (x < 0 || x > L || y < 0 || y > H) continue;
-      const tt = titreCourt(e.l); const w = ctx.measureText(tt).width;
-      for (const [px, py] of [[x + 8, y + 4], [x - 8 - w, y + 4], [x - w / 2, y - 9], [x - w / 2, y + 16]]) {
-        const rect = [px - 1, py - 11, px + w + 1, py + 3];
-        if (!chevauche(rect)) { occupe.push(rect); labels.push({ rect, etoile: e }); ctx.fillStyle = (choisie && relies.has(e)) ? `rgba(${C.or},.95)` : `rgba(${C.ivoire},.85)`; ctx.fillText(tt, px, py); break; }
+      let alpha = c.focus ? .75 : modeMot ? .12 : melange(.22, .12, pres);
+      if (!c.focus) { alpha = melange(alpha, Math.min(alpha, .12), lampeK); alpha = melange(alpha, .6, k); }
+      const coul = c.focus ? rgba('or', alpha) : rgba('brume', alpha), ep = c.focus ? 1.2 : .6 + .3 * k;
+      for (const [a, b] of c.liens) {
+        const ea = c.etoiles[a], eb = c.etoiles[b], sa = etats.get(ea.l.id), sb = etats.get(eb.l.id); if (!sa || !sb) continue;
+        trait(E(ea), E(eb), rayonVisible(sa, ea.l.note) + 3, rayonVisible(sb, eb.l.note) + 3, coul, ep);
       }
     }
-    // thèmes jamais lus
-    ctx.font = `italic 400 13px Fraunces, Georgia, serif`;
-    for (const t of modele.eteints) {
-      const [x, y] = ecran(t.wx, t.wy); const w = ctx.measureText(t.theme).width; const rect = [x - w / 2 - 2, y - 13, x + w / 2 + 2, y + 4];
-      const estTerre = terre === t.theme;
-      if (!estTerre && (lumi || chevauche(rect) || modele.consts.some(k => { const [cx, cy] = ecran(k.c[0], k.c[1]); return Math.hypot(cx - x, cy - y) < k.rc * z + 20; }))) continue;
-      occupe.push(rect); labels.push({ rect, eteint: t.theme });
-      ctx.fillStyle = estTerre ? `rgba(${C.or},.95)` : `rgba(${C.brume},.3)`; ctx.fillText(t.theme, x - w / 2, y);
+    // 1 bis. liens personnels
+    const nomAllume = pres > .01 ? derniereAllumee : null;
+    for (const lien of M.liens) {
+      const a = parId.get(lien.lectureA), b = parId.get(lien.lectureB); if (!a || !b) continue;
+      if (!etats.get(lien.lectureA) || !etats.get(lien.lectureB)) continue;
+      const actif = S.selection === lien.lectureA || S.selection === lien.lectureB;
+      const sortant = nomAllume != null && ((constellationDe.get(lien.lectureA) === nomAllume) !== (constellationDe.get(lien.lectureB) === nomAllume));
+      const A = E(a), B = E(b);
+      if (sortant && !actif) { ctx.strokeStyle = rgba('or', .45 * pres); ctx.lineWidth = .8; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); ctx.setLineDash([]); continue; }
+      if (!actif) continue;
+      ctx.strokeStyle = rgba('or', .9); ctx.lineWidth = 1.2; ctx.setLineDash([10, 10]); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); ctx.setLineDash([]);
     }
-    // lampe de poche : éclaire les constellations et les titres sous le doigt
-    if (lampe) {
-      const fade = lampe.fin ? Math.max(0, 1 - Math.max(0, t - lampe.fin - 1500) / 400) : 1;
-      if (fade <= 0) lampe = null;
+    // 1 ter. fil d'or du mot
+    if (modeMot && !p.galaxie && p.idsFocus.size > 1) {
+      const chemin = etoiles.filter(e => p.idsFocus.has(e.l.id) && etats.get(e.l.id)).sort((a, b) => (etats.get(a.l.id) === 'A_LIRE') - (etats.get(b.l.id) === 'A_LIRE') || ordreLecture(a.l) - ordreLecture(b.l) || a.l.id - b.l.id);
+      const fil = (a, b, coul, ep) => { const A = E(a), B = E(b), v = [B[0] - A[0], B[1] - A[1]], d = Math.hypot(v[0], v[1]), cp = 6; if (d <= 2 * cp) return; const u = [v[0] / d, v[1] / d];
+        ctx.strokeStyle = coul; ctx.lineWidth = ep; ctx.setLineDash(etats.get(b.l.id) === 'A_LIRE' ? [10, 10] : []); ctx.beginPath(); ctx.moveTo(A[0] + u[0] * cp, A[1] + u[1] * cp); ctx.lineTo(B[0] - u[0] * cp, B[1] - u[1] * cp); ctx.stroke(); ctx.setLineDash([]); };
+      if (chemin.length <= SEUIL_PELOTE) { for (let i = 0; i < chemin.length - 1; i++) fil(chemin[i], chemin[i + 1], rgba('or', .65), 1.2); }
       else {
-        const R = 100, lx = lampe.x, ly = lampe.y;
-        const g = ctx.createRadialGradient(lx, ly, 0, lx, ly, R); g.addColorStop(0, `rgba(${C.ivoire},${.10 * fade})`); g.addColorStop(1, `rgba(${C.ivoire},0)`);
-        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(lx, ly, R, 0, 7); ctx.fill();
-        ctx.beginPath(); ctx.arc(lx, ly, R, 0, 7); ctx.strokeStyle = `rgba(${C.or},${.35 * fade})`; ctx.lineWidth = 1; ctx.stroke();
-        const dans = (x, y) => Math.hypot(x - lx, y - ly) < R;
-        for (const k of modele.consts) {
-          if (!k.etoiles.some(e => dans(...(e._s || ecran(e.wx, e.wy))))) continue;
-          ctx.strokeStyle = `rgba(${C.ivoire},${.6 * fade})`; ctx.lineWidth = 1.1;
-          for (const [i, j] of k.aretes) { const A = ecran(k.etoiles[i].wx, k.etoiles[i].wy), B = ecran(k.etoiles[j].wx, k.etoiles[j].wy); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); }
-          ctx.font = 'italic 500 16px Fraunces, Georgia, serif'; const w = ctx.measureText(k.theme).width;
-          const [cx, cy] = ecran(k.c[0], k.c[1]); let ny = cy - k.rc * vue.z - 12;
-          if (Math.abs(ny - ly) < 48 && Math.abs(cx - lx) < w / 2 + 40) ny = ly - 60;   // le doigt cache le nom : on le remonte
-          const nx = Math.max(6, Math.min(L - w - 6, cx - w / 2)); ny = Math.max(84, ny);
-          ctx.fillStyle = `rgba(${C.nuit},${.8 * fade})`; ctx.fillRect(nx - 4, ny - 15, w + 8, 20);
-          ctx.fillStyle = `rgba(${C.ivoire},${.95 * fade})`; ctx.fillText(k.theme, nx, ny);
-        }
-        ctx.font = '500 12px Manrope, system-ui, sans-serif';
-        // titres des étoiles éclairées, les plus proches du doigt d'abord, sans chevauchement
-        const prises = [], proches = modele.etoiles.map(e => { const s2 = e._s || ecran(e.wx, e.wy); return { e, x: s2[0], y: s2[1], d: Math.hypot(s2[0] - lx, s2[1] - ly) }; }).filter(o => o.d < R).sort((a, b) => a.d - b.d);
-        for (const o of proches) {
-          const tt = titreCourt(o.e.l), w = ctx.measureText(tt).width;
-          for (let [px, py] of [[o.x + 8, o.y + 4], [o.x - 8 - w, o.y + 4], [o.x - w / 2, o.y - 9], [o.x - w / 2, o.y + 17]]) {
-            px = Math.max(4, Math.min(L - w - 4, px));
-            const r = [px - 2, py - 11, px + w + 2, py + 3];
-            if (prises.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1])) continue;
-            prises.push(r); ctx.fillStyle = `rgba(${C.nuit},${.7 * fade})`; ctx.fillRect(r[0], r[1], r[2] - r[0], r[3] - r[1]);
-            ctx.fillStyle = `rgba(${C.ivoire},${.92 * fade})`; ctx.fillText(tt, px, py); break;
-          }
-        }
-        ctx.font = 'italic 400 14px Fraunces, Georgia, serif';
-        for (const tt of modele.eteints) { const [x, y] = ecran(tt.wx, tt.wy); if (!dans(x, y)) continue; const w = ctx.measureText(tt.theme).width; ctx.fillStyle = `rgba(${C.brume},${.6 * fade})`; ctx.fillText(tt.theme, x - w / 2, y); }
+        const gm = new Map(); for (const e of chemin) { const k = constellationDe.get(e.l.id); if (!gm.has(k)) gm.set(k, []); gm.get(k).push(e); }
+        const gs = [...gm.values()];
+        gs.forEach(g => { for (let i = 0; i < g.length - 1; i++) fil(g[i], g[i + 1], rgba('or', .65), 1.2); });
+        for (let i = 0; i < gs.length - 1; i++) fil(gs[i][0], gs[i + 1][0], rgba('or', .4), .9);
       }
     }
-  }
+    const pointsVisibles = []; for (const e of etoiles) { const s = etats.get(e.l.id); if (s) pointsVisibles.push([E(e), rayonVisible(s, e.l.note)]); }
+    const touchEtoile = r => pointsVisibles.some(([q, rv]) => q[0] + rv > r[0] && q[0] - rv < r[2] && q[1] + rv > r[1] && q[1] - rv < r[3]);
 
+    // 2. noms des constellations
+    const occupes = [], nomsPlaces = []; enveloppes = new Map(); zonesNoms = []; zonesFantomes = [];
+    const tailleNom = palier() >= 1 ? 15 : 14, H_NOM = tailleNom * 1.3, bordX = 6, margeNom = 4;
+    const trie = p.constellations.slice().sort((a, b) => (b.focus - a.focus) || (b.etoiles.length - a.etoiles.length));
+    for (const c of trie) {
+      const allumees = c.etoiles.filter(e => etats.get(e.l.id)); if (!allumees.length) continue;
+      const sz = c.focus ? 17 : tailleNom, font = FNOM(sz), texte = c.focus ? `« ${c.nom} »` : c.nom;
+      const w = mesurer(texte, font), h = sz * 1.3;
+      const pts = allumees.map(E), g = Math.min(...pts.map(q => q[0])) - 6, d = Math.max(...pts.map(q => q[0])) + 6, haut = Math.min(...pts.map(q => q[1])) - 6, bas = Math.max(...pts.map(q => q[1])) + 6;
+      enveloppes.set(c.nom, [g, haut, d, bas]);
+      if (!pts.some(q => q[0] >= 0 && q[0] <= W && q[1] >= 0 && q[1] <= H)) continue;
+      const mx = (g + d) / 2, my = (haut + bas) / 2, xMax = Math.max(bordX, W - w - bordX);
+      const cl = o => [Math.min(Math.max(o[0], bordX), xMax), o[1]], prox = o => o[0] <= d + 16 && o[0] + w >= g - 16;
+      const candidats = [[mx - w / 2, haut - h], [mx - w / 2, bas], [d, my - h / 2], [g - w, my - h / 2], [d, haut - h], [g - w, haut - h], [d, bas], [g - w, bas]].map(cl).filter(prox);
+      if (!candidats.length) continue;
+      const cadre = o => [o[0] - margeNom, o[1] - margeNom, o[0] + w + margeNom, o[1] + h + margeNom];
+      const sansNom = o => { const r = cadre(o); return r[1] >= 0 && r[3] <= H && !occupes.some(x => chev(x, r)); };
+      const xs = Math.min(Math.max(mx - w / 2, bordX), xMax), secours = [];
+      for (let k = 1; k <= 3; k++) { const pas = k * (h + 4); secours.push([xs, haut - h - pas], [xs, bas + pas]); }
+      const sec = secours.filter(prox), tous = [...candidats, ...sec];
+      let alphaNom = 1, choix = tous.find(o => sansNom(o) && !touchEtoile(cadre(o)));
+      if (!choix && c.etoiles.length >= 5) choix = tous.find(sansNom);
+      if (!choix && (c.focus || c.etoiles.length === 1)) choix = sec.find(o => sansNom(o) && !touchEtoile(cadre(o))) || tous.find(sansNom) || candidats[0];
+      if (!choix && f1 > 0) { choix = tous.find(o => !occupes.some(x => chev(x, cadre(o))) && !touchEtoile(cadre(o))); alphaNom = f1; }
+      if (choix) { occupes.push(cadre(choix)); nomsPlaces.push({ nom: c.nom, texte, font, sz, coul: c.focus ? rgba('or', 1) : modeMot ? rgba('brume', .2) : rgba('brume', .8), coin: choix, alpha: alphaNom }); zonesNoms.push([gonfle(cadre(choix), 6), c.nom]); }
+    }
+    const cAllumee = pres > .01 ? p.constellations.find(c => c.nom === derniereAllumee) : null;
+    const idsAllumes = new Set(cAllumee ? cAllumee.etoiles.map(e => e.l.id) : []);
+    const progressionTitres = cAllumee ? Math.min(1, Math.max(0, (tracesK / Math.max(1, cAllumee.liens.length)) * 1.5 - .5)) : 0;
+    zonesConstellations = [...enveloppes].map(([nom, r]) => [gonfle(r, 12), nom]);
+
+    // 3. étoiles et titres
+    const pulsation = .5 + .5 * Math.sin((t % 3200) / 3200 * 2 * Math.PI);
+    const zoomMaximal = echelle >= echelleBase * ZOOM_MAX * .95;
+    for (const e of etoiles) {
+      const q = E(e), hc = 60;
+      if (q[0] < -hc || q[0] > W + hc || q[1] < -hc || q[1] > H + hc) continue;
+      const serie = p.series.get(e.l.id), serieRepliee = serie != null && repliee(e);
+      if (serieRepliee && e.l.id !== serie.tete) continue;
+      let suiteALire = false, l;
+      if (serieRepliee) {
+        const et = serie.ids.map(id => etats.get(id)).filter(Boolean); if (!et.length) continue;
+        const st = et.includes('EN_COURS') ? 'EN_COURS' : et.includes('LU') ? 'LU' : 'A_LIRE';
+        suiteALire = st === 'LU' && et.includes('A_LIRE');
+        const notes = serie.ids.map(id => parId.get(id)?.l.note).filter(n => n > 0);
+        l = { ...e.l, statut: st, note: notes.length ? Math.round(notes.reduce((a, b) => a + b, 0) / notes.length) : 0, tome: null, titre: `${serie.nom || e.l.titre} · ${et.length} t.` };
+      } else { const st = etats.get(e.l.id); if (!st) continue; l = st === e.l.statut ? e.l : { ...e.l, statut: st }; }
+      const estFocus = serieRepliee ? serie.ids.some(id => p.idsFocus.has(id)) : p.idsFocus.has(l.id);
+      const r = rayonVisible(l.statut, l.note);
+      const cercle = (rr, rempli, coul, ep) => { ctx.beginPath(); ctx.arc(q[0], q[1], rr, 0, 7); if (rempli) { ctx.fillStyle = coul; ctx.fill(); } else { ctx.strokeStyle = coul; ctx.lineWidth = ep; ctx.stroke(); } };
+      if (modeMot && !estFocus) {
+        const pale = rgba('brume', .3);
+        if (l.statut === 'A_LIRE') cercle(r, false, pale, .75); else if (l.statut === 'EN_COURS') cercle(1.8, true, pale); else cercle(r, true, pale);
+        if (l.id === S.selection) cercle(r + 7, false, rgba('ivoire', .8), .8);
+        continue;
+      }
+      if (l.statut === 'LU') {
+        const ec = eclatAnciennete(l, reference);
+        if (l.note >= 4) { const hr = l.note >= 5 ? 9 : 6, gg = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], hr); gg.addColorStop(0, rgba('ivoire', (l.note >= 5 ? .18 : .10) * ec)); gg.addColorStop(1, rgba('ivoire', 0)); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(q[0], q[1], hr, 0, 7); ctx.fill(); }
+        cercle(r, true, rgba('ivoire', ec));
+        if (l.note >= 5) cercle(r + 1.2, false, rgba('or', .25 * ec), .5);
+      } else if (l.statut === 'EN_COURS') {
+        cercle(1.8, true, rgba('or', 1));
+        if (l.id === idEnCoursRecent) cercle(5, false, rgba('or', .4 + .3 * pulsation), .75);
+      } else cercle(r, false, rgba('bleu', .7), .75);
+      if (l.id === S.selection) cercle(r + 7, false, rgba('ivoire', .8), .8);
+      if (suiteALire) cercle(r + 2.5, false, rgba('bleu', .6), .75);
+      if (modeMot && estFocus) cercle(r + 3.5, false, rgba('or', .85), .8);
+      const carrefour = serieRepliee ? serie.ids.some(id => p.idsTous.has(id)) : p.idsTous.has(l.id);
+      if (modeMot && carrefour) cercle(r + 7, false, rgba('or', .55), .8);
+
+      const noteCinq = l.statut === 'LU' && l.note >= 5;
+      const alphaTitre = l.id === S.selection ? 1 : (modeMot && estFocus) ? 1 : idsAllumes.has(l.id) ? Math.max(pres * progressionTitres, noteCinq ? f1 : f2) : etoiles.length <= 12 ? 1 : noteCinq ? f1 : f2;
+      if (alphaTitre <= .01) continue;
+      const coulT = l.statut === 'A_LIRE' ? rgba('brume', 1) : rgba('ivoire', .85);
+      let lignes, mw, mh;
+      if (f3 > .5) {
+        const t1 = titreCourtC(l, 70), aut = String(l.auteur || '').split(',')[0].trim();
+        lignes = [];
+        const motsT = t1.split(' '); let cur = '';
+        for (const m of motsT) { const essai = cur ? cur + ' ' + m : m; if (mesurer(essai, FTIT(11)) > 120 && cur) { lignes.push([cur, FTIT(11), coulT]); cur = m; } else cur = essai; }
+        if (cur) lignes.push([cur, FTIT(11), coulT]);
+        if (lignes.length > 2) { lignes = lignes.slice(0, 2); lignes[1][0] = lignes[1][0].replace(/\s*\S*$/, '') + '…'; }
+        if (aut) lignes.push([aut, FTIT(10), rgba('brume', .85)]);
+        mw = Math.max(...lignes.map(x => mesurer(x[0], x[1]))); mh = lignes.length * 14.5;
+      } else { const tt = titreCourtC(l); lignes = [[tt, FTIT(11), coulT]]; mw = mesurer(tt, FTIT(11)); mh = 15; }
+      const ecart = 4;
+      const places = loin => [[q[0] - mw / 2, q[1] + r + ecart + loin], [q[0] - mw / 2, q[1] - r - ecart - mh - loin], [q[0] + r + 6 + loin, q[1] - mh / 2], [q[0] - r - 6 - mw - loin, q[1] - mh / 2]];
+      const essais = places(0).map(o => [o, false]).concat(zoomMaximal ? [...places(14), ...places(30)].map(o => [o, true]) : []);
+      const libre = o => { const cadre = [o[0], o[1], o[0] + mw, o[1] + mh]; if (occupes.some(x => chev(x, gonfle(cadre, 3)))) return false; return !pointsVisibles.some(([pq, rv]) => (pq[0] !== q[0] || pq[1] !== q[1]) && pq[0] + rv > cadre[0] && pq[0] - rv < cadre[2] && pq[1] + rv > cadre[1] && pq[1] - rv < cadre[3]); };
+      const trouve = essais.find(x => libre(x[0])) || (l.id === S.selection ? essais[0] : null);
+      if (!trouve) continue;
+      const [coin, eloigne] = trouve, cadreT = [coin[0], coin[1], coin[0] + mw, coin[1] + mh];
+      occupes.push(gonfle(cadreT, 3));
+      if (eloigne) { const vers = [Math.min(Math.max(q[0], cadreT[0]), cadreT[2]), Math.min(Math.max(q[1], cadreT[1]), cadreT[3])], v = [vers[0] - q[0], vers[1] - q[1]], dist = Math.hypot(v[0], v[1]);
+        if (dist > r + 4) { ctx.strokeStyle = rgba('brume', .45 * alphaTitre); ctx.lineWidth = .6; ctx.beginPath(); ctx.moveTo(q[0] + v[0] / dist * (r + 2), q[1] + v[1] / dist * (r + 2)); ctx.lineTo(vers[0], vers[1]); ctx.stroke(); } }
+      ctx.fillStyle = rgba('nuit', .75 * alphaTitre); arrondi(coin[0] - 3, coin[1] - 1, mw + 6, mh + 2, 4); ctx.fill();
+      ctx.globalAlpha = alphaTitre; ctx.textBaseline = 'top';
+      lignes.forEach((x, i) => { ctx.font = x[1]; ctx.fillStyle = x[2]; const lw = mesurer(x[0], x[1]); ctx.fillText(x[0], f3 > .5 ? coin[0] + (mw - lw) / 2 : coin[0], coin[1] + i * 14.5 + 1); });
+      ctx.globalAlpha = 1;
+    }
+    // 3 bis. thèmes éteints
+    ctx.textBaseline = 'top';
+    for (const f of p.fantomes || []) {
+      const font = FNOM(tailleNom), w = mesurer(f.nom, font), h = H_NOM, c0 = [f.x * echelle + decalage[0], f.y * echelle + decalage[1]];
+      const choix = [[c0[0] - w / 2, c0[1] - h / 2], [c0[0] - w / 2, c0[1] - h - 6], [c0[0] - w / 2, c0[1] + 6]].find(o => { const r = [o[0] - 3, o[1] - 3, o[0] + w + 3, o[1] + h + 3]; return r[0] >= 0 && r[2] <= W && r[1] >= 0 && r[3] <= H && !occupes.some(x => chev(x, r)) && !touchEtoile(r); });
+      if (!choix) continue;
+      occupes.push([choix[0], choix[1], choix[0] + w, choix[1] + h]); zonesFantomes.push([[choix[0] - 10, choix[1] - 10, choix[0] + w + 10, choix[1] + h + 10], f.nom]);
+      ctx.font = font;
+      if (f.nom === S.themeEteint) { ctx.fillStyle = rgba('or', .9); ctx.fillText(f.nom, choix[0], choix[1]); continue; }
+      let a = modeMot ? .15 : .35;
+      if (lampe && Math.hypot(c0[0] - lampe[0], c0[1] - lampe[1]) <= 88) a = melange(a, .6, lampeK);
+      a *= 1 - .6 * pres;
+      ctx.fillStyle = rgba('brume', a); ctx.fillText(f.nom, choix[0], choix[1]);
+    }
+    // 4. noms des constellations
+    for (const n of nomsPlaces) {
+      const k = valeur('lampe:' + n.nom), allK = n.nom === derniereAllumee ? pres : 0, a = n.alpha * (1 - k) * (1 - allK);
+      if (a <= .01) continue;
+      ctx.globalAlpha = a; ctx.font = n.font; ctx.fillStyle = n.coul; ctx.fillText(n.texte, n.coin[0], n.coin[1]); ctx.globalAlpha = 1;
+    }
+    // 5. noms éclairés par la lampe
+    for (const c of p.constellations) {
+      const k = valeur('lampe:' + c.nom); if (k <= .01) continue;
+      const env = enveloppes.get(c.nom); if (!env) continue;
+      const font = FNOM(17), w = mesurer(c.nom, font), h = 17 * 1.3, xMax = Math.max(bordX, W - w - bordX);
+      let coin = [Math.min(Math.max((env[0] + env[2]) / 2 - w / 2, bordX), xMax), env[1] - h - 2];
+      if (lampe && Math.hypot(coin[0] + w / 2 - lampe[0], coin[1] + h / 2 - lampe[1]) < 48 + h) coin = [coin[0], lampe[1] - 48 - h];
+      ctx.font = font; ctx.fillStyle = rgba('ivoire', .9 * k); ctx.fillText(c.nom, coin[0], coin[1]);
+    }
+    // 6. nom de la constellation allumée, lettre à lettre
+    if (derniereAllumee && pres > .01) {
+      const c = p.constellations.find(x => x.nom === derniereAllumee), env = enveloppes.get(derniereAllumee);
+      if (c && env) {
+        const n = Math.ceil(derniereAllumee.length * Math.min(1, Math.max(0, tracesK / Math.max(1, c.liens.length))));
+        if (n > 0) { const font = FNOM(17), w = mesurer(derniereAllumee, font), h = 17 * 1.3, xMax = Math.max(bordX, W - w - bordX);
+          ctx.font = font; ctx.fillStyle = rgba('ivoire', .9 * pres); ctx.fillText(derniereAllumee.slice(0, n), Math.min(Math.max((env[0] + env[2]) / 2 - w / 2, bordX), xMax), Math.max(0, env[1] - h - 2)); }
+      }
+    }
+    ctx.textBaseline = 'alphabetic';
+  }
+  function arrondi(x, y, w, h, r){ ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+
+  /* ---- boucle ---- */
   function boucle(t){
     if (vueCourante === 'ciel' && M.racine) {
-      if (anim) { anim(t); sale = true; }
-      if (allume || lampe || (modele && modele.scintille && !reduitMouvement)) sale = true;
-      if (sale) { sale = false; dessiner(t); }
+      recalculer();
+      avancerCamera(t); suivrePaliers();
+      const p = planActif();
+      const anime = camera || enMouvement() || lampe || (p && !p.vide && p.constellations.some(c => c.etoiles.some(e => e.l.statut === 'EN_COURS'))) || S.enLecture;
+      if (S.enLecture) { S.curseur = Math.min(1, S.curseur + .0018 * Math.max(1, Math.round((t - (boucle.dernier || t)) / 16))); if (S.curseur >= 1) { S.enLecture = false; } majPanneauTemps(); }
+      boucle.dernier = t;
+      if (sale || anime) { sale = false; dessiner(t); }
     }
     requestAnimationFrame(boucle);
   }
 
-  /* ---- interactions ---- */
-  function viser(sx, sy){
-    if (!modele) return null;
-    let best = null, bd = 16;
-    for (const e of modele.etoiles) { const [x, y] = ecran(e.wx, e.wy); const d = Math.hypot(x - sx, y - sy); if (d < bd && (!allume || e.k === allume.k || d < 8)) { bd = d; best = e; } }
-    if (best) return { etoile: best };
-    for (const lb of labels) if (lb.etoile && sx >= lb.rect[0] - 3 && sx <= lb.rect[2] + 3 && sy >= lb.rect[1] - 3 && sy <= lb.rect[3] + 3) return { etoile: lb.etoile };
-    for (const lb of labels) if (!lb.etoile && sx >= lb.rect[0] - 4 && sx <= lb.rect[2] + 4 && sy >= lb.rect[1] - 4 && sy <= lb.rect[3] + 4) return lb.k ? { k: lb.k } : { eteint: lb.eteint };
-    for (const k of modele.consts) { const [cx, cy] = ecran(k.c[0], k.c[1]); if (Math.hypot(cx - sx, cy - sy) < k.rc * vue.z * .9) return { k }; }
-    return null;
-  }
-  function allumer(k){
-    fermerTerre();
-    if (allume && allume.k === k) { eteindre(); return; }
-    if (!allume) { vueAvantAllumage = { ...vue }; bouge = false; }
-    allume = { k, t0: performance.now() }; choisie = null; fermerBulle();
-    cadrer([k], 3, true); sale = true;
-  }
-  function eteindre(){
-    if (!allume) return;
-    allume = null; if (vueAvantAllumage && !bouge) animerVers(vueAvantAllumage, 500); vueAvantAllumage = null; sale = true;
-  }
-  function choisir(e){
-    fermerCarteMot();
-    fermerTerre();
-    choisie = e; sale = true;
-    const l = e.l, b = $('#bulle-etoile');
-    if (e.groupe) {
-      const relies = l._liens.map(x => M.parId.get(x.id)).filter(Boolean), lus = e.groupe.filter(t => t.statut === 'LU').length;
-      b.innerHTML = `<div class="carte" style="display:block;max-height:min(56vh, calc(100% - 210px));overflow-y:auto"><div style="display:flex;gap:14px;align-items:flex-start">${couverture(l, 52)}<div style="flex:1;min-width:0">
-        <div class="sur">${esc(e.k.theme)} · série</div><h3 style="margin-top:4px">${esc(l.serie)}</h3>
-        <div class="doux" style="font-size:13px;margin-top:3px">${esc(l.auteur)} · ${lus} lu${lus > 1 ? 's' : ''} sur ${e.groupe.length}</div></div><button class="mini-x" id="bulle-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
-        <div style="margin-top:10px">${e.groupe.map(t => `<button class="ligne" data-tome="${t.id}" style="padding:7px 6px">${couverture(t, 34)}<div class="infos"><div class="t" style="font-size:15px">${t.tome ? `<span style="color:var(--or);font-family:var(--sans);font-size:12px;font-weight:700;margin-right:6px">T. ${t.tome}</span>` : ''}${esc(t.titre)}</div><div class="d" style="margin-top:2px">${pastille(t.statut)}${etoilesNote(t.note)}</div></div></button>`).join('')}</div>
-        ${relies.length ? `<div class="relies">${relies.slice(0, 6).map(r => `<button data-id="${r.id}">⟡ ${esc(titreCourt(r))}</button>`).join('')}</div>` : ''}
-        <div style="margin-top:12px"><button class="btn petit" id="bulle-serie">Voir la série dans Chercher ›</button></div></div>`;
-      b.classList.add('ouverte');
-      // l'étoile ouverte reste visible au-dessus de la liste
-      const z2 = Math.max(vue.z, 1.8); animerVers({ x: e.wx, y: e.wy + (H * .5 - Math.max(150, H * .2)) / z2, z: z2 }, 450);
-      b.querySelectorAll('[data-tome]').forEach(x => x.onclick = () => Fiche.ouvrir(+x.dataset.tome));
-      $('#bulle-fermer').onclick = () => { choisie = null; fermerBulle(); sale = true; };
-      $('#bulle-serie').onclick = () => { Chercher.limite = { serie: norm(l.serie), titre: l.serie }; Chercher.mode = 'liste'; Chercher.filtre = 'TOUS'; Chercher.requete = ''; location.hash = 'chercher'; };
-      b.querySelectorAll('.relies button').forEach(x => x.onclick = () => { const e2 = modele.parLivre.get(+x.dataset.id); if (e2) { choisir(e2); animerVers({ x: e2.wx, y: e2.wy, z: Math.max(vue.z, 1.6) }, 500); } });
-      return;
-    }
-    const relies = l._liens.map(x => M.parId.get(x.id)).filter(Boolean);
-    b.innerHTML = `<div class="carte">${couverture(l, 64)}<div style="flex:1;min-width:0">
-      <div class="sur">${esc(e.k.theme)}</div><h3 style="margin-top:4px">${esc(titreCourt(l))}</h3>
-      <div class="doux" style="font-size:13px;margin-top:3px">${esc(l.auteur)}</div>
-      <div style="display:flex;gap:12px;align-items:center;margin-top:8px">${pastille(l.statut)}${etoilesNote(l.note)}</div>
-      ${relies.length ? `<div class="relies">${relies.slice(0, 6).map(r => `<button data-id="${r.id}">⟡ ${esc(titreCourt(r))}</button>`).join('')}${relies.length > 6 ? `<span class="doux" style="font-size:12px;align-self:center">+${relies.length - 6}</span>` : ''}</div>` : ''}
-      <div style="margin-top:12px;display:flex;gap:8px"><button class="btn or petit" id="bulle-ouvrir">Ouvrir la fiche ›</button><button class="btn petit" id="bulle-fermer">Fermer</button></div></div></div>`;
-    b.classList.add('ouverte');
-    $('#bulle-ouvrir').onclick = () => Fiche.ouvrir(l.id);
-    $('#bulle-fermer').onclick = () => { choisie = null; fermerBulle(); sale = true; };
-    b.querySelectorAll('.relies button').forEach(x => x.onclick = () => { const e2 = modele.parLivre.get(+x.dataset.id); if (e2) { choisir(e2); animerVers({ x: e2.wx, y: e2.wy, z: Math.max(vue.z, 1.6) }, 500); } });
-  }
-  function fermerBulle(){ $('#bulle-etoile').classList.remove('ouverte'); }
-  function fermerCarteMot(){ $('#mot-carte').classList.remove('ouverte'); }
-  function fermerTerre(){ terre = null; $('#terre').classList.remove('ouverte'); }
-  function ouvrirTerre(theme){
-    eteindre(); choisie = null; fermerBulle(); terre = theme; sale = true;
-    const t = $('#terre');
-    const deja = new Set(M.lectures.map(l => norm(l.titre).replace(ARTICLES, '')));
-    const portes = (PORTES[theme] || []).filter(([ti]) => !deja.has(norm(ti).replace(ARTICLES, '')));
-    t.innerHTML = `<div class="carte" style="box-shadow:0 12px 40px rgba(0,0,0,.5);max-height:62vh;overflow-y:auto"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="sur" style="color:var(--or)">Terre inconnue</div><h3 style="font-size:20px;margin:6px 0">${esc(theme)}</h3></div><button class="mini-x" id="terre-fermer" aria-label="Fermer" style="font-size:18px">✕</button></div>
-      <p class="doux" style="margin:0 0 8px;font-size:14px;line-height:1.5">Tu n’as encore rien lu ici. ${portes.length ? 'Quelques portes d’entrée :' : 'Toutes les portes proposées sont déjà dans ta bibliothèque.'}</p>
-      ${portes.map(([ti, au, ph], i) => `<div class="porte"><div style="flex:1;min-width:0"><div style="font-family:var(--serif);font-size:16px">${esc(ti)}</div><div class="doux" style="font-size:12.5px">${esc(au)}</div><div style="font-size:13px;color:var(--ivoire-d);margin-top:3px;line-height:1.4">${esc(ph)}</div></div><div style="display:flex;flex-direction:column;gap:6px;flex:none"><button class="btn petit" data-porte="${i}" data-statut="LU">✓ Lu</button><button class="btn petit" data-porte="${i}" data-statut="A_LIRE">+ À lire</button></div></div>`).join('')}</div>`;
-    t.classList.add('ouverte'); $('#terre-fermer').onclick = () => { fermerTerre(); sale = true; };
-    t.querySelectorAll('[data-porte]').forEach(b => b.onclick = async () => {
-      if (b.disabled) return;
-      const grp = t.querySelectorAll(`[data-porte="${b.dataset.porte}"]`); grp.forEach(x => x.disabled = true);
-      const [ti, au] = portes[+b.dataset.porte], statut = b.dataset.statut;
-      await Edition.ajouterSimple({ titre: ti, auteur: au, theme, statut });
-      grp.forEach(x => { if (x !== b) x.style.visibility = 'hidden'; }); b.textContent = statut === 'LU' ? '✓ Lu' : '✓ À lire'; b.classList.add('or'); toast(`« ${ti} » rejoint ton ciel (${theme})`);
-    });
-  }
-
-  const pointeurs = new Map(); let geste = null, deplace = 0;
+  /* ---- gestes ---- */
+  const pointeurs = new Map(); let geste = null, minuterie = null, dernierTap = 0, tapEnAttente = null;
+  function limitesZoom(){ const p = planActif(); const eA = (!W || !H) ? echelleBase : Math.min(W / Math.max(1, p.atlasMaxX - p.atlasMinX), H / Math.max(1, p.atlasMaxY - p.atlasMinY)); return [Math.min(echelleBase * .6, eA * .95), echelleBase * ZOOM_MAX]; }
+  function zoomerEn(facteur, c){ const [mn, mx] = limitesZoom(); const n = Math.min(Math.max(echelle * facteur, mn), mx), f = n / echelle; decalage = [c[0] - (c[0] - decalage[0]) * f, c[1] - (c[1] - decalage[1]) * f]; echelle = n; deplace = true; majMire(); demander(); }
+  function bouge(){ camera = null; if (vueAvant) bougeEntreTemps = true; }
+  cv.addEventListener('contextmenu', e => e.preventDefault());
   cv.addEventListener('pointerdown', e => {
-    cv.setPointerCapture(e.pointerId); pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); deplace = 0;
-    clearTimeout(minuterieLampe);
+    cv.setPointerCapture(e.pointerId); pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]);
+    clearTimeout(minuterie);
     if (pointeurs.size === 1) {
-      geste = { type:'glisse', dep:[e.offsetX, e.offsetY], vue:{ ...vue } };
-      minuterieLampe = setTimeout(() => {
-        if (pointeurs.size !== 1 || deplace > 4 || geste?.type !== 'glisse') return;
-        const [p] = [...pointeurs.values()]; geste = { type:'lampe' }; lampe = { x: p[0], y: p[1], fin: 0 }; sale = true;
-        try { navigator.vibrate && navigator.vibrate(30); } catch (er) {}
-        try { const n = +(localStorage.getItem('phylactere-lampe') || 0) + 1; localStorage.setItem('phylactere-lampe', n); if (n >= 3) $('#ciel-astuce').hidden = true; } catch (er) {}
+      geste = { type: 'glisse', dep: [e.offsetX, e.offsetY], dec: decalage.slice(), d: 0 };
+      minuterie = setTimeout(() => {   // appui long : la lampe
+        if (pointeurs.size !== 1 || !geste || geste.type !== 'glisse' || geste.d > 8) return;
+        const [p] = [...pointeurs.values()]; geste = { type: 'lampe' }; clearTimeout(extinction);
+        lampe = p; eclairer(p);
+        if (utilisationsLampe < 3) { utilisationsLampe++; try { localStorage.setItem('phylactere-lampe', utilisationsLampe); } catch (er) {} majAstuce(); }
+        try { navigator.vibrate && navigator.vibrate(20); } catch (er) {}
+        animer('lampe', 1, 180); demander();
       }, 450);
+    } else if (pointeurs.size === 2) {
+      const [a, b] = [...pointeurs.values()];
+      geste = { type: 'pince', dist: Math.hypot(a[0] - b[0], a[1] - b[1]), mil: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2] };
     }
-    if (pointeurs.size === 2) { const [a, b] = [...pointeurs.values()]; geste = { type:'pince', d: Math.hypot(a[0] - b[0], a[1] - b[1]), m: [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], vue:{ ...vue } }; }
-    cv.classList.add('tire');
   });
   cv.addEventListener('pointermove', e => {
-    if (!pointeurs.has(e.pointerId)) { const v = viser(e.offsetX, e.offsetY); cv.style.cursor = v ? 'pointer' : 'grab'; return; }
-    pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]); anim = null;
-    if (geste?.type === 'lampe') { lampe = { x: e.offsetX, y: e.offsetY, fin: 0 }; sale = true; return; }
-    if (geste?.type === 'glisse' && pointeurs.size === 1) {
-      const dx = e.offsetX - geste.dep[0], dy = e.offsetY - geste.dep[1]; deplace = Math.max(deplace, Math.hypot(dx, dy));
-      if (deplace > 4) { vue = { ...geste.vue, x: geste.vue.x - dx / vue.z, y: geste.vue.y - dy / vue.z }; bouge = true; sale = true; }
-    } else if (geste?.type === 'pince' && pointeurs.size === 2) {
-      const [a, b] = [...pointeurs.values()]; const d = Math.hypot(a[0] - b[0], a[1] - b[1]); const m = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-      const z = Math.min(12, Math.max(.25, geste.vue.z * d / geste.d));
-      const w = [(geste.m[0] - L / 2) / geste.vue.z + geste.vue.x, (geste.m[1] - H / 2) / geste.vue.z + geste.vue.y];
-      vue = { z, x: w[0] - (m[0] - L / 2) / z, y: w[1] - (m[1] - H / 2) / z }; deplace = 99; bouge = true; sale = true;
+    if (!pointeurs.has(e.pointerId)) return;
+    const avant = pointeurs.get(e.pointerId); pointeurs.set(e.pointerId, [e.offsetX, e.offsetY]);
+    if (!geste) return;
+    if (geste.type === 'lampe') { lampe = [e.offsetX, e.offsetY]; eclairer(lampe); demander(); return; }
+    if (geste.type === 'glisse' && pointeurs.size === 1) {
+      const dx = e.offsetX - geste.dep[0], dy = e.offsetY - geste.dep[1]; geste.d = Math.max(geste.d, Math.hypot(dx, dy));
+      if (geste.d > 8) { bouge(); decalage = [geste.dec[0] + dx, geste.dec[1] + dy]; deplace = true; majMire(); demander(); }
+    } else if (geste.type === 'pince' && pointeurs.size === 2) {
+      const [a, b] = [...pointeurs.values()], dist = Math.hypot(a[0] - b[0], a[1] - b[1]), mil = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+      bouge(); decalage = [decalage[0] + mil[0] - geste.mil[0], decalage[1] + mil[1] - geste.mil[1]]; zoomerEn(dist / geste.dist, mil); geste.dist = dist; geste.mil = mil;
     }
   });
-  const fin = e => {
-    clearTimeout(minuterieLampe);
-    if (geste?.type === 'lampe') { if (lampe) lampe.fin = performance.now(); pointeurs.delete(e.pointerId); cv.classList.remove('tire'); geste = null; return; }
-    const etaitSeul = pointeurs.size === 1 && geste?.type === 'glisse';
-    pointeurs.delete(e.pointerId); cv.classList.remove('tire');
-    if (etaitSeul && deplace <= 4 && e.type === 'pointerup') clic(e.offsetX, e.offsetY);
-    if (pointeurs.size === 1) { const [p] = [...pointeurs.values()]; geste = { type:'glisse', dep:p, vue:{ ...vue } }; deplace = 99; } else if (!pointeurs.size) geste = null;
+  const relacher = e => {
+    if (!pointeurs.has(e.pointerId)) return;
+    clearTimeout(minuterie);
+    const etaitTap = geste && geste.type === 'glisse' && geste.d <= 8 && pointeurs.size === 1 && e.type === 'pointerup';
+    if (geste && geste.type === 'lampe') { lampe = null; animer('lampe', eclairees.size ? 1 : 0, 400); extinction = setTimeout(() => { eclairees = new Set(); majEclairees(); animer('lampe', 0, 400); }, 1500); demander(); }
+    pointeurs.delete(e.pointerId);
+    if (etaitTap) toucher([e.offsetX, e.offsetY]);
+    if (pointeurs.size === 1) { const [p] = [...pointeurs.values()]; geste = { type: 'glisse', dep: p, dec: decalage.slice(), d: 99 }; } else if (!pointeurs.size) geste = null;
   };
-  cv.addEventListener('contextmenu', e => e.preventDefault());
-  cv.addEventListener('pointerup', fin); cv.addEventListener('pointercancel', fin);
-  let dernierClic = 0;
-  function clic(x, y){
-    const now = performance.now();
-    if (now - dernierClic < 300) { zoomer(2, x, y); dernierClic = 0; return; }
-    dernierClic = now;
-    const v = viser(x, y);
-    if (v?.etoile) choisir(v.etoile);
-    else if (v?.k) allumer(v.k);
-    else if (v?.eteint) ouvrirTerre(v.eteint);
-    else { if (choisie) { choisie = null; fermerBulle(); } if (terre) fermerTerre(); eteindre(); sale = true; }
+  cv.addEventListener('pointerup', relacher); cv.addEventListener('pointercancel', relacher);
+  cv.addEventListener('wheel', e => { e.preventDefault(); bouge(); zoomerEn(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0018)), [e.offsetX, e.offsetY]); }, { passive: false });
+  function eclairer(pt){
+    const p = planActif(), n = new Set();
+    for (const c of p.constellations) { const mx = c.etoiles.reduce((s, e) => s + e.x, 0) / c.etoiles.length, my = c.etoiles.reduce((s, e) => s + e.y, 0) / c.etoiles.length;
+      if (Math.hypot(mx * echelle + decalage[0] - pt[0], my * echelle + decalage[1] - pt[1]) <= 88) n.add(c.nom); }
+    if ([...n].join('|') !== [...eclairees].join('|')) { eclairees = n; majEclairees(); }
   }
-  function zoomer(f, sx = L / 2, sy = H / 2, anime = true){
-    const z = Math.min(12, Math.max(.25, vue.z * f)); const w = monde(sx, sy);
-    const cible = { z, x: w[0] - (sx - L / 2) / z, y: w[1] - (sy - H / 2) / z }; bouge = true;
-    if (anime && !reduitMouvement) animerVers(cible, 260); else { vue = cible; sale = true; }
-  }
-  cv.addEventListener('wheel', e => { e.preventDefault(); anim = null; zoomer(Math.exp(-e.deltaY * (e.ctrlKey ? .01 : .0018)), e.offsetX, e.offsetY, false); }, { passive:false });
-  $('#zoom-plus').onclick = () => zoomer(1.6); $('#zoom-moins').onclick = () => zoomer(1 / 1.6);
-  $('#recadrer').onclick = () => { allume = null; choisie = null; fermerBulle(); fermerTerre(); cadrer(modele.consts, 3, true); };
-  $('#ciel-mot').onclick = () => { if (mot && !$('#mot-carte').classList.contains('ouverte')) { choisie = null; fermerBulle(); carteMot(); sale = true; return; } if (mot || $('#mot-carte').classList.contains('ouverte')) { quitterMot(); return; } allume = null; choisie = null; fermerBulle(); fermerTerre(); carteMot(); setTimeout(() => $('#mot-saisie')?.focus(), 50); };
-  $('#ciel-banniere').onclick = () => { Chercher.filtre = 'COMPLETER'; Chercher.mode = 'liste'; location.hash = 'chercher'; };
-  addEventListener('keydown', e => { if (vueCourante !== 'ciel' || Fiche.estOuverte()) return; if (e.key === 'Escape') clic(-999, -999); if (e.key === '+' || e.key === '=') zoomer(1.4); if (e.key === '-') zoomer(1 / 1.4); });
-  new ResizeObserver(() => taille()).observe(cv);
-  requestAnimationFrame(boucle);
-  if (document.fonts) document.fonts.ready.then(() => { sale = true; });
+  function majEclairees(){ for (const c of planActif().constellations) { const on = eclairees.has(c.nom); animer('lampe:' + c.nom, on ? 1 : 0, on ? 180 : 400); } }
 
-  return { relierParMot(label){ location.hash = 'ciel'; setTimeout(() => { taille(); choisirMot(label); }, 80); }, invalider, activer(){ taille(); sale = true; }, choisirLivre(id){ if (!modele) return; const e = modele.parLivre.get(id); if (e) { allume = null; if (!e.groupe) animerVers({ x: e.wx, y: e.wy, z: Math.max(vue.z, 2) }, 500); choisir(e); } } };
+  function toucher(pt){
+    const now = performance.now();
+    if (now - dernierTap < 300) { clearTimeout(tapEnAttente); dernierTap = 0; doubleToucher(pt); return; }
+    dernierTap = now;
+    toucherSimple(pt);
+  }
+  function toucherSimple(pt){
+    const p = planActif();
+    const nomTouche = (zonesNoms.find(z => dans(z[0], pt)) || [])[1], fantome = (zonesFantomes.find(z => dans(z[0], pt)) || [])[1];
+    if (fantome && !nomTouche) { allumer(null); choisir(null); choisirFantome(fantome); return; }
+    if (nomTouche) { choisirFantome(null); allumer(constellationActive === nomTouche ? null : nomTouche); return; }
+    const instant = (S.onglet == null && S.modeTemps) ? instantTemps() : null;
+    let proche = null, dmin = Infinity;
+    for (const c of p.constellations) for (const e of c.etoiles) { if (!CC.statutA(e.l, instant)) continue; const q = versEcran(e), d = Math.hypot(q[0] - pt[0], q[1] - pt[1]); if (d < dmin) { dmin = d; proche = e; } }
+    if (proche) { const s = p.series.get(proche.l.id); if (s && repliee(proche)) { const t = p.constellations.flatMap(c => c.etoiles).find(x => x.l.id === s.tete); if (t) proche = t; } }
+    const touchee = proche && dmin <= 30;
+    choisirFantome(null);
+    if (!touchee) { const z = (zonesConstellations.find(x => dans(x[0], pt)) || [])[1]; allumer(z && z !== constellationActive ? z : null); }
+    choisir(touchee ? proche.l.id : null);
+  }
+  function doubleToucher(pt){
+    bouge();
+    if (echelle >= echelleBase * ZOOM_MAX * .95) { const p = planActif(); const s = Math.min(Math.max(Math.min(W / Math.max(1, p.maxX - p.minX), H / Math.max(1, p.maxY - p.minY)) * .92, .3), 2.2);
+      glisserVers(s, [W / 2 - (p.minX + p.maxX) / 2 * s, H / 2 - (p.minY + p.maxY) / 2 * s], false).then(ajuster); return; }
+    const n = Math.min(echelle * 2, echelleBase * ZOOM_MAX), f = n / echelle; deplace = true; majMire();
+    glisserVers(n, [pt[0] - (pt[0] - decalage[0]) * f, pt[1] - (pt[1] - decalage[1]) * f], false);
+  }
+
+  /* ---- allumage d'une constellation ---- */
+  function allumer(nom){
+    if (nom === constellationActive) return;
+    constellationActive = nom;
+    const p = planActif();
+    if (nom == null) {
+      animer('presence', 0, 400);
+      if (vueAvant && !bougeEntreTemps) { const v = vueAvant; glisserVers(v.e, v.d, false).then(() => { deplace = v.dep; majMire(); }); }
+      vueAvant = null; bougeEntreTemps = false; return;
+    }
+    derniereAllumee = nom; animer('presence', 1, 150);
+    const c = p.constellations.find(x => x.nom === nom);
+    if (c && W && H) {
+      const xs = c.etoiles.map(e => e.x), ys = c.etoiles.map(e => e.y), mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
+      const cible = Math.min(Math.max(Math.min((W - 112) / Math.max(1, mxx - mnx), (H - 144) / Math.max(1, mxy - mny)), echelleBase), echelleBase * 3);
+      if (!vueAvant) { vueAvant = { e: echelle, d: decalage.slice(), dep: deplace }; bougeEntreTemps = false; }
+      glisserVers(cible, [W / 2 - (mnx + mxx) / 2 * cible, H / 2 - (mny + mxy) / 2 * cible], false).then(() => { deplace = true; majMire(); });
+    }
+    const n = c ? c.liens.length : 0, total = Math.max(1, n);
+    poser('traces', 0); poser('refroidi', 0);
+    if (reduit) { poser('traces', total); poser('refroidi', 1); return; }
+    animer('traces', total, Math.max(120 * n, 600));
+    setTimeout(() => { if (constellationActive === nom) animer('refroidi', 1, 700); }, Math.max(120 * n, 600) + 250);
+  }
+
+  /* ---- sélection, cartouche, terre inconnue ---- */
+  function choisir(id){
+    S.selection = id;
+    if (id != null) { S.themeEteint = null; const s = planActif().series.get(id); if (s) { derniereSerieOuverte = s.cle; animer('serie', 1, 450, 'doux'); } else animer('serie', 0, 450, 'doux'); }
+    else animer('serie', 0, 450, 'doux');
+    majCartouche(); majTerre(); demander();
+    if (id != null) setTimeout(() => remonterSiCache(id), 350);
+  }
+  function choisirFantome(t){ S.themeEteint = t; if (t) S.selection = null; majCartouche(); majTerre(); demander(); }
+  function remonterSiCache(id){
+    const e = planActif().constellations.flatMap(c => c.etoiles).find(x => x.l.id === id); if (!e || !H || !hauteurCartouche) return;
+    const q = versEcran(e), limite = H - hauteurCartouche - 16;
+    if (q[1] > limite || q[1] < 0 || q[0] < 0 || q[0] > W) {
+      const arr = [Math.min(Math.max(q[0], 48), W - 48), Math.max(36, (H - hauteurCartouche) / 2)];
+      if (vueAvant) bougeEntreTemps = true;
+      glisserVers(echelle, [decalage[0] + arr[0] - q[0], decalage[1] + arr[1] - q[1]], false).then(() => { deplace = true; majMire(); });
+    }
+  }
+  function cibler(id){
+    const e = planActif().constellations.flatMap(c => c.etoiles).find(x => x.l.id === id); if (!e) return;
+    const arr = [W / 2, Math.max(36, (H - hauteurCartouche) / 2)], dep = versEcran(e);
+    if (vueAvant) bougeEntreTemps = true;
+    glisserVers(echelle, [decalage[0] + arr[0] - dep[0], decalage[1] + arr[1] - dep[1]], false).then(() => { deplace = true; majMire(); });
+  }
+  function majCartouche(){
+    const z = $('#ciel-cartouche'), p = planActif();
+    const l = S.selection != null ? M.parId.get(S.selection) : null;
+    if (!l || l._manques.length) { z.classList.remove('ouverte'); hauteurCartouche = 0; $('#ciel-mire').style.bottom = ''; return; }
+    const frac = l.statut === 'EN_COURS' && l.pagesTotal > 0 && l.pageActuelle != null ? Math.min(1, Math.max(0, l.pageActuelle / l.pagesTotal)) : null;
+    const etat = l.statut === 'EN_COURS' ? 'EN COURS' + (frac != null ? ` · ${Math.floor(frac * 100)} %` : '') : l.statut === 'LU' ? 'LU' + (l.dateFin ? ' · ' + new Date(l.dateFin).getFullYear() : '') : 'À LIRE';
+    const detail = p.motFocus != null ? p.details.get(l.id) : null;
+    const lies = M.liens.filter(x => x.lectureA === l.id || x.lectureB === l.id).map(x => M.parId.get(x.lectureA === l.id ? x.lectureB : x.lectureA)).filter(Boolean);
+    const vus = new Map(); for (const x of [...lies, l]) { const k = String(x.titre).trim().toLowerCase(); vus.set(k, (vus.get(k) || 0) + 1); }
+    z.innerHTML = `<div class="cartouche${l.statut === 'EN_COURS' ? ' en-cours' : ''}">
+      <div class="ct-l1"><button class="ct-titre" data-fiche>${esc(l.titre)}</button><button class="ct-x" aria-label="Fermer">✕</button></div>
+      <div class="ct-l2"><span class="ct-aut">${esc([l.auteur, CC.nomConstellation(l)].filter(x => x && String(x).trim()).join(' · '))}</span>${l.note > 0 ? `<span class="ct-note">${'✦'.repeat(l.note)}</span>` : ''}<span class="ct-etat ${l.statut === 'A_LIRE' ? 'bleu' : ''}">${etat}</span></div>
+      ${frac != null ? `<div class="ct-barre"><i style="width:${frac * 100}%"></i></div>` : ''}
+      ${detail ? `<div class="ct-detail">${esc(detail.includes('\n') ? detail : 'Relié : ' + detail).replace(/\n/g, '<br>')}</div>` : ''}
+      <div class="ct-l3"><span class="ct-lies">${lies.length ? 'RELIÉ À · ' + lies.length : ''}</span><button class="ct-fiche" data-fiche>Fiche ›</button></div>
+      ${lies.length ? `<div class="ct-rangee">${lies.map(x => { const h = (vus.get(String(x.titre).trim().toLowerCase()) || 0) > 1 && x.auteur; return `<button data-lie="${x.id}">${esc(titreCourtC(x, 30) + (h ? ' — ' + String(x.auteur).split(',')[0].trim() : ''))}</button>`; }).join('')}</div>` : ''}
+    </div>`;
+    z.classList.add('ouverte');
+    z.querySelectorAll('[data-fiche]').forEach(b => b.onclick = () => Fiche.ouvrir(l.id));
+    z.querySelector('.ct-x').onclick = () => choisir(null);
+    z.querySelectorAll('[data-lie]').forEach(b => b.onclick = () => { const id = +b.dataset.lie; choisir(id); setTimeout(() => cibler(id), 30); });
+    requestAnimationFrame(() => { hauteurCartouche = z.offsetHeight; $('#ciel-mire').style.bottom = (hauteurCartouche + 8) + 'px'; });
+  }
+  function majTerre(){
+    const z = $('#ciel-terre'), theme = S.themeEteint;
+    if (!theme) { z.classList.remove('ouverte'); return; }
+    const toutes = CC.portes(theme, M.lectures), deja = () => false;
+    z.innerHTML = `<div class="terre-carte"><div class="tc-l1"><span class="sur" style="color:var(--or)">TERRE INCONNUE</span><button class="ct-x" aria-label="Fermer">✕</button></div>
+      <h3 class="tc-titre">${esc(theme)}</h3><p class="tc-txt">Tu n’as encore rien lu ici. Quelques portes d’entrée :</p>
+      ${toutes.length ? toutes.map(([t, a, pq], i) => { const aj = deja(t); return `<div class="tc-livre"><div style="flex:1;min-width:0"><div class="tc-t">${esc(t)}</div>${a ? `<div class="tc-a">${esc(a)}</div>` : ''}${pq ? `<div class="tc-p">${esc(pq)}</div>` : ''}</div><button class="tc-aj${aj ? ' fait' : ''}" data-i="${i}" ${aj ? 'disabled' : ''}>${aj ? '✓ À lire' : '+ À lire'}</button></div>`; }).join('') : '<p class="tc-txt" style="font-size:12.5px">Pas de proposition toute faite pour ce thème.</p>'}
+      <p class="tc-txt" style="font-size:12.5px;margin-top:10px">Avec ta clé Claude (Réglages), des propositions choisies d’après tes lectures.</p>
+      <p class="tc-txt" style="font-size:12.5px;opacity:.7">« + À lire » ajoute le livre à ta bibliothèque : sa première étoile allume la constellation.</p></div>`;
+    z.classList.add('ouverte');
+    z.querySelector('.ct-x').onclick = () => choisirFantome(null);
+    z.querySelectorAll('[data-i]').forEach(b => b.onclick = async () => { const [t, a] = toutes[+b.dataset.i]; b.disabled = true; await Edition.ajouterSimple({ titre: t, auteur: a, theme, statut: 'A_LIRE' }); majTerre(); });
+  }
+
+  /* ---- en-tête, onglets, panneaux ---- */
+  function instantTemps(){ const ls = lecturesCiel(); const debut = ls.length ? Math.min(...ls.map(CC.apparition)) : 0, fin = Date.now(); return debut + (fin - debut) * S.curseur; }
+  function majEntete(){
+    const ls = lecturesCiel(), toutes = M.lectures, nbAC = toutes.length - ls.length, g = galaxieOuverte(), gs = galaxies();
+    $('#ciel-banniere-zone').innerHTML = nbAC > 0 ? `<button class="ciel-banniere" id="ciel-banniere">✦  ${nbAC} fiche${nbAC > 1 ? 's attendent' : ' attend'} d’être complétée${nbAC > 1 ? 's' : ''}  ›</button>` : '';
+    const bn = $('#ciel-banniere'); if (bn) bn.onclick = () => { Chercher.filtre = 'COMPLETER'; Chercher.mode = 'liste'; Chercher.limite = null; location.hash = 'chercher'; };
+    const ong = $('#ciel-onglets');
+    if (gs.length && ls.length) {
+      ong.hidden = false;
+      ong.innerHTML = `<button class="onglet-ciel" aria-selected="${!g}" data-g="">Mon ciel</button>` + gs.map(x => `<button class="onglet-ciel" aria-selected="${g && g.id === x.id}" data-g="${x.id}">✦ ${esc(x.nom)}</button>`).join('');
+      ong.querySelectorAll('[data-g]').forEach(b => b.onclick = () => ouvrirOnglet(b.dataset.g ? +b.dataset.g : null));
+      const act = ong.querySelector('[aria-selected="true"]'); if (act) act.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+    } else { ong.hidden = true; ong.innerHTML = ''; }
+    const enCours = toutes.filter(l => l.statut === 'EN_COURS').length, nbC = plan ? plan.constellations.length : 0;
+    $('#ciel-bilan').textContent = !g && ls.length ? `${toutes.length} lecture${toutes.length > 1 ? 's' : ''} · ${enCours} en cours · ${nbC} constellation${nbC > 1 ? 's' : ''}` : '';
+    $('#ciel-legende').hidden = !ls.length;
+    $('#ciel-vide').hidden = !!ls.length;
+    $('#ciel-vide').textContent = nbAC > 0 ? 'Ton ciel est encore noir.\nComplète une fiche (titre, auteur, thème) pour allumer ta première étoile.' : 'Ton ciel est encore noir.\nAjoute ton premier livre avec le bouton doré pour allumer une étoile.';
+    $('#ciel-zone').hidden = !ls.length || !!(g && planGalaxie && planGalaxie.vide);
+    $('#ciel-galaxie-vide').hidden = !(g && planGalaxie && planGalaxie.vide);
+    if (g && planGalaxie && planGalaxie.vide) $('#ciel-galaxie-vide').textContent = `Aucun livre ne porte plus ${CC.libelleRequete(CC.lireRequete(g.requete))}.\nAjoute ces mots aux fiches concernées, et la galaxie se rallumera.`;
+    majPanneau();
+  }
+  function ouvrirOnglet(id){ S.onglet = id; S.selection = null; S.themeEteint = null; S.modeTemps = false; S.enLecture = false; S.curseur = 1; constellationActive = null; derniereAllumee = null; poser('presence', 0); vueAvant = null; cleCache = ''; recalculer(); premierCadrage = true; signatureAvant = ''; cadrerSiBesoin(); majEntete(); majCartouche(); majTerre(); demander(); }
+  function resumeMot(mot, livres){
+    const n = livres.length, r = CC.lireRequete(mot);
+    const base = r.multiple ? `${CC.libelleRequete(r)} relient ${n} livre${n > 1 ? 's' : ''}` : `${CC.libelleRequete(r)} relie ${n} livre${n > 1 ? 's' : ''}`;
+    const nbC = new Set(livres.map(l => CC.normaliserMot(CC.nomConstellation(l)))).size;
+    const an = livres.filter(l => l.statut !== 'A_LIRE').map(l => l.dateFin ?? l.dateDebut).filter(d => d != null).map(d => new Date(d).getUTCFullYear());
+    return base + (nbC > 1 ? `, dans ${nbC} constellations` : '') + (!an.length ? '' : Math.min(...an) === Math.max(...an) ? `, en ${an[0]}` : `, de ${Math.min(...an)} à ${Math.max(...an)}`);
+  }
+  function majPanneau(){
+    const z = $('#ciel-panneau'), g = galaxieOuverte();
+    if (!lecturesCiel().length) { z.innerHTML = ''; return; }
+    if (g) {
+      const r = CC.lireRequete(g.requete), nb = planGalaxie ? planGalaxie.idsFocus.size : 0, nc = planGalaxie ? planGalaxie.idsTous.size : 0;
+      z.innerHTML = `<div class="gal-tete"><div style="flex:1;min-width:0"><div class="gal-nom">${esc(g.nom)}</div><div class="petit-brume">${esc(CC.libelleRequete(r).replace(/^./, c => c.toUpperCase()))} · ${nb} livre${nb > 1 ? 's' : ''}${r.multiple && nc > 0 ? ` · ${nc} au cœur` : ''}</div></div>
+        <div class="menu-wrap"><button class="gal-menu" aria-label="Menu">⋯</button><div class="menu-liste" hidden><button data-a="renommer">Renommer</button><button data-a="supprimer">Supprimer la galaxie</button></div></div></div>`;
+      const mb = z.querySelector('.gal-menu'), ml = z.querySelector('.menu-liste');
+      mb.onclick = e => { e.stopPropagation(); ml.hidden = !ml.hidden; };
+      document.addEventListener('click', () => { ml.hidden = true; }, { once: true });
+      ml.querySelector('[data-a=renommer]').onclick = () => fenetreNom('Renommer la galaxie', null, g.nom, 'Renommer', nom => { g.nom = nom.trim(); sauverGalaxies(); });
+      ml.querySelector('[data-a=supprimer]').onclick = () => confirmer(`Supprimer « ${g.nom} » ?`, 'Seule la galaxie disparaît : tes livres et leurs mots-clés ne changent pas.', 'Supprimer', async () => { M.racine.galaxies = galaxies().filter(x => x.id !== g.id); await sauverGalaxies(); ouvrirOnglet(null); });
+      return;
+    }
+    if (S.modeTemps) { majPanneauTemps(true); return; }
+    const r = CC.lireRequete(S.motActif), p = plan;
+    let h = '';
+    if (!r.vide) {
+      const nb = p.idsFocus.size, nc = p.idsTous.size, gEx = galaxies().find(x => CC.memeRequete(x.requete, S.motActif));
+      h += `<div class="pm-mots">${!S.panneauOuvert ? '<button class="pm-plus" id="pm-plus">+ mot</button>' : ''}${r.mots.map(m => `<button class="pm-mot" data-retirer="${esc(m)}">${esc(m)}<span>  ✕</span></button>`).join('')}<button class="pm-effacer" id="pm-effacer">Effacer</button></div>`;
+      if (r.multiple) h += `<div class="pm-mode">${[[true, 'tous ces mots'], [false, 'l’un d’eux']].map(([t, lib]) => `<button data-mode="${t}" aria-pressed="${r.tous === t}">${lib}</button>`).join('')}</div>`;
+      const ids = [...p.idsFocus];
+      h += `<div class="pm-bilan ${nb ? 'or' : ''}">${esc(nb > 0 ? resumeMot(S.motActif, ids.map(id => M.parId.get(id)).filter(Boolean)) + (nc > 0 ? ` · ${nc} les portent tous` : '') : r.multiple && r.tous ? 'Aucun livre ne les réunit tous : essaie « l’un d’eux »' : 'Aucun livre ne porte ' + CC.libelleRequete(r))}</div>`;
+      if (gEx || nb >= 3) h += `<button class="pm-galaxie" id="pm-galaxie" data-g="${gEx ? gEx.id : ''}">${gEx ? `✦ Ouvrir sa galaxie « ${esc(gEx.nom)} »` : '✦ Créer une galaxie'}</button>`;
+    }
+    if (!S.panneauOuvert && r.vide) h += `<div class="pm-invite"><button id="pm-ouvrir">✦  Relier par un mot</button><button id="pm-temps">⧗  Voyager dans le temps</button></div>`;
+    else if (S.panneauOuvert) {
+      const freq = CC.motsFrequents(lecturesCiel()).filter(f => !r.mots.some(m => CC.normaliserMot(m) === CC.normaliserMot(f)));
+      h += `<div class="pm-saisie"><input class="inp" id="pm-champ" placeholder="${r.vide ? 'Un mot central : voyage, mort, conscience…' : 'Ajouter un mot…'}" value="${esc(S.saisie)}" enterkeyhint="search" autocomplete="off"><button id="pm-ok">${S.saisie.trim() ? (r.vide ? 'Relier' : 'Ajouter') : 'Fermer'}</button></div>
+        <div class="pm-seuil"><span>Au moins</span>${[1, 2, 3].map(n => `<button data-seuil="${n}" aria-pressed="${S.seuil === n}">${n}</button>`).join('')}<span>fois</span></div>
+        ${freq.length ? `<div class="pm-freq">${freq.map(f => `<button data-freq="${esc(f)}">${esc(f)}</button>`).join('')}</div>` : ''}`;
+    }
+    z.innerHTML = h;
+    const relier = m => { const rr = CC.lireRequete(S.motActif); S.motActif = CC.ecrireRequete([...rr.mots, m.trim()], rr.tous); S.saisie = ''; S.panneauOuvert = false; S.selection = null; appliquerMot(); };
+    const on = (sel, fn) => { const el = z.querySelector(sel); if (el) el.onclick = fn; };
+    on('#pm-plus', () => { S.panneauOuvert = true; majPanneau(); setTimeout(() => $('#pm-champ')?.focus(), 30); });
+    on('#pm-ouvrir', () => { S.panneauOuvert = true; majPanneau(); setTimeout(() => $('#pm-champ')?.focus(), 30); });
+    on('#pm-effacer', () => { S.saisie = ''; S.motActif = ''; S.panneauOuvert = false; S.selection = null; appliquerMot(); });
+    on('#pm-temps', () => { S.saisie = ''; S.motActif = ''; S.panneauOuvert = false; S.selection = null; S.modeTemps = true; S.curseur = 0; S.enLecture = true; cleCache = ''; majCartouche(); majPanneau(); demander(); });
+    on('#pm-galaxie', () => { const gid = z.querySelector('#pm-galaxie').dataset.g; if (gid) ouvrirOnglet(+gid); else fenetreNom('Créer une galaxie', CC.libelleRequete(CC.lireRequete(S.motActif)).replace(/^./, c => c.toUpperCase()) + ` : ${plan.idsFocus.size} livres. La galaxie retient la question : un livre ajouté plus tard qui porte ces mots y entrera tout seul.`, CC.nomGalaxieParDefaut(S.motActif), 'Créer', async nom => { const gs = galaxies(); const id = gs.reduce((m, x) => Math.max(m, x.id), 0) + 1; M.racine.galaxies = [...gs, { id, nom: nom.trim(), requete: S.motActif, dateAjout: Date.now() }]; await sauverGalaxies(); ouvrirOnglet(id); }); });
+    z.querySelectorAll('[data-retirer]').forEach(b => b.onclick = () => { const rr = CC.lireRequete(S.motActif); S.motActif = CC.ecrireRequete(rr.mots.filter(m => CC.normaliserMot(m) !== CC.normaliserMot(b.dataset.retirer)), rr.tous); S.selection = null; appliquerMot(); });
+    z.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => { const rr = CC.lireRequete(S.motActif); S.motActif = CC.ecrireRequete(rr.mots, b.dataset.mode === 'true'); S.selection = null; appliquerMot(); });
+    z.querySelectorAll('[data-seuil]').forEach(b => b.onclick = () => { S.seuil = +b.dataset.seuil; appliquerMot(true); });
+    z.querySelectorAll('[data-freq]').forEach(b => b.onclick = () => relier(b.dataset.freq));
+    const ch = $('#pm-champ');
+    if (ch) { ch.oninput = () => { S.saisie = ch.value; $('#pm-ok').textContent = S.saisie.trim() ? (r.vide ? 'Relier' : 'Ajouter') : 'Fermer'; }; ch.onkeydown = e => { if (e.key === 'Enter' && S.saisie.trim()) { e.preventDefault(); relier(S.saisie); } }; }
+    on('#pm-ok', () => { if (S.saisie.trim()) relier(S.saisie); else if (r.vide) { S.saisie = ''; S.motActif = ''; S.panneauOuvert = false; appliquerMot(); } else { S.panneauOuvert = false; majPanneau(); } });
+  }
+  function majPanneauTemps(complet){
+    const z = $('#ciel-panneau'); if (!S.modeTemps || S.onglet != null) return;
+    const inst = instantTemps(), d = new Date(inst), lib = d.toLocaleDateString('fr-FR', { month: 'long', year: 'numeric', timeZone: 'UTC' }).replace(/^./, c => c.toUpperCase());
+    const n = lecturesCiel().filter(l => CC.statutA(l, inst) != null).length;
+    const libL = S.enLecture ? 'Pause' : S.curseur > 0 && S.curseur < 1 ? 'Reprendre' : 'Rejouer le ciel';
+    if (complet || !$('#pt-curseur')) {
+      z.innerHTML = `<div class="pt"><div class="pt-l1"><span class="pt-date" id="pt-date"></span><span class="petit-brume" id="pt-n"></span></div>
+        <input type="range" id="pt-curseur" min="0" max="1000" class="pt-curseur"><div class="pt-l3"><button id="pt-lecture"></button><span style="flex:1"></span><button id="pt-auj" style="color:var(--ivoire-d)">Aujourd’hui</button><button id="pt-x" style="color:var(--brume)">✕</button></div></div>`;
+      $('#pt-curseur').oninput = e => { S.curseur = e.target.value / 1000; S.enLecture = false; majPanneauTemps(); demander(); };
+      $('#pt-lecture').onclick = () => { if (!S.enLecture && S.curseur >= 1) S.curseur = 0; S.enLecture = !S.enLecture; majPanneauTemps(); };
+      $('#pt-auj').onclick = () => { S.curseur = 1; S.enLecture = false; majPanneauTemps(); demander(); };
+      $('#pt-x').onclick = () => { S.modeTemps = false; S.enLecture = false; S.curseur = 1; majPanneau(); demander(); };
+    }
+    $('#pt-date').textContent = lib; $('#pt-n').textContent = `${n} étoile${n > 1 ? 's' : ''} allumée${n > 1 ? 's' : ''}`;
+    $('#pt-curseur').value = Math.round(S.curseur * 1000); $('#pt-lecture').textContent = libL;
+    demander();
+  }
+  function appliquerMot(seuilSeul){
+    cleCache = ''; recalculer(); majPanneau(); majCartouche(); demander();
+    const p = plan; if (S.onglet != null || !W) return;
+    const rel = p.constellations.flatMap(c => c.etoiles).filter(e => p.idsFocus.has(e.l.id));
+    if (p.motFocus == null || !rel.length) { if (p.motFocus == null && deplace && !vueAvant) ajuster(); return; }
+    if (seuilSeul && !rel.length) return;
+    const xs = rel.map(e => e.x), ys = rel.map(e => e.y), mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
+    const cible = Math.min(Math.max(Math.min((W - 112) / Math.max(1, mxx - mnx), (H - 144) / Math.max(1, mxy - mny)), echelleBase * .6), echelleBase * 6);
+    glisserVers(cible, [W / 2 - (mnx + mxx) / 2 * cible, H / 2 - (mny + mxy) / 2 * cible], false).then(() => { deplace = true; majMire(); });
+  }
+  async function sauverGalaxies(){ M.racine.modifieLe = Date.now(); try { await Base.ecrireDonnees(M.racine); } catch (e) {} cleCache = ''; majEntete(); demander(); }
+  function fenetreNom(titre, sousTitre, nomInitial, bouton, valider){
+    const d = $('#dialogue');
+    d.innerHTML = `<div class="carte" style="max-width:420px;width:100%"><h2 style="font-size:19px">${esc(titre)}</h2>${sousTitre ? `<p class="doux" style="font-size:13px;line-height:1.5">${esc(sousTitre)}</p>` : ''}
+      <label class="form" style="margin:12px 0"><span style="font-size:12.5px;color:var(--brume)">Nom de la galaxie</span><input class="inp" id="fn-nom" value="${esc(nomInitial)}"></label>
+      <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn petit" id="fn-non">Annuler</button><button class="btn or petit" id="fn-oui">${esc(bouton)}</button></div></div>`;
+    d.classList.add('ouvert'); const inp = $('#fn-nom'); inp.focus(); inp.select();
+    const ok = () => { const v = inp.value.trim(); if (!v) return; d.classList.remove('ouvert'); valider(v); };
+    $('#fn-oui').onclick = ok; inp.onkeydown = e => { if (e.key === 'Enter') ok(); }; $('#fn-non').onclick = () => d.classList.remove('ouvert');
+  }
+  function majAstuce(){ $('#ciel-astuce').hidden = utilisationsLampe >= 3; }
+  function majMire(){ $('#ciel-mire').hidden = !deplace; }
+  $('#ciel-mire').onclick = () => { bouge(); ajuster(); };
+
+  /* ---- taille et cadrage ---- */
+  function taille(){
+    const r = cv.getBoundingClientRect(); if (!r.width || !r.height) return;
+    dpr = Math.min(2.5, devicePixelRatio || 1);
+    const ancienW = W, ancienH = H; W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr;
+    if (ancienW && ancienH && !premierCadrage && deplace) {
+      const centreMonde = [(ancienW / 2 - decalage[0]) / echelle, (ancienH / 2 - decalage[1]) / echelle], rapport = echelle / echelleBase;
+      ajuster(); echelle = echelleBase * rapport; decalage = [W / 2 - centreMonde[0] * echelle, H / 2 - centreMonde[1] * echelle]; deplace = true; majMire();
+    } else cadrerSiBesoin();
+    demander();
+  }
+  function cadrerSiBesoin(){
+    const p = planActif(); if (!p || !W) return;
+    const sig = [p.minX, p.minY, p.maxX, p.maxY, p.motFocus, S.onglet].join(';');
+    if (premierCadrage || sig !== signatureAvant) { if (premierCadrage || !p.motFocus || S.onglet != null) ajuster(); premierCadrage = false; signatureAvant = sig; }
+  }
+  new ResizeObserver(() => taille()).observe(cv);
+  addEventListener('keydown', e => {
+    if (vueCourante !== 'ciel' || Fiche.estOuverte() || /input|textarea/i.test(document.activeElement?.tagName || '')) return;
+    if (e.key === 'Escape') { if (S.selection != null) choisir(null); else if (S.themeEteint) choisirFantome(null); else if (constellationActive) allumer(null); else if (S.onglet != null) ouvrirOnglet(null); else if (S.modeTemps) { S.modeTemps = false; S.enLecture = false; S.curseur = 1; majPanneau(); demander(); } else if (S.motActif || S.panneauOuvert) { S.saisie = ''; S.motActif = ''; S.panneauOuvert = false; appliquerMot(); } }
+    if (e.key === '+' || e.key === '=') { bouge(); zoomerEn(1.4, [W / 2, H / 2]); }
+    if (e.key === '-') { bouge(); zoomerEn(1 / 1.4, [W / 2, H / 2]); }
+  });
+  requestAnimationFrame(boucle);
+  if (document.fonts) document.fonts.ready.then(() => { cacheMesure.clear(); demander(); });
+  majAstuce();
+
+  return {
+    VERSION,
+    invalider(){ cleCache = ''; if (S.selection != null && !M.parId.has(S.selection)) S.selection = null; if (S.onglet != null && !galaxieOuverte()) S.onglet = null; if (vueCourante === 'ciel') { recalculer(); majEntete(); majCartouche(); } demander(); },
+    activer(){ cleCache = ''; recalculer(); majEntete(); majCartouche(); majTerre(); requestAnimationFrame(() => { taille(); cadrerSiBesoin(); }); demander(); },
+    choisirLivre(id){ if (vueCourante !== 'ciel') return; S.onglet = null; recalculer(); choisir(id); setTimeout(() => cibler(id), 60); },
+    relierParMot(m){ S.onglet = null; S.motActif = m; S.panneauOuvert = false; location.hash = 'ciel'; setTimeout(() => { appliquerMot(); majEntete(); }, 80); }
+  };
 })();
 
 /* =========================================================
@@ -1061,7 +1554,7 @@ const Chercher = {
   reinit(){ this.mode = 'etageres'; this.filtre = 'TOUS'; this.requete = ''; this.limite = null; },
   rendre(){
     const el = $('#chercher');
-    el.innerHTML = `<h1>Chercher</h1>
+    el.innerHTML = `${enTete('Chercher', 'dans tes lectures')}
       <div class="recherche"><label class="champ"><span class="doux">⌕</span><input id="q" type="search" placeholder="Titre, auteur, série, mot-clé…" value="${esc(this.requete)}" autocomplete="off"></label>
       <div class="filtres" style="padding:0"><button class="puce" data-mode="etageres" aria-pressed="${this.mode === 'etageres' && !this.requete}">Étagères</button><button class="puce" data-mode="liste" aria-pressed="${this.mode === 'liste' || !!this.requete}">Liste</button></div></div>
       <div id="resultats"></div>`;
@@ -1308,7 +1801,7 @@ const Fil = {
     const durees = livres.filter(l => l.statut === 'LU' && l.dateDebut && l.dateFin).map(l => Math.max(1, jours(l.dateDebut, l.dateFin)));
     const stats = [`${termines.filter(l => new Date(l.dateFin).getFullYear() === annee).length} terminé${termines.length > 1 ? 's' : ''} cette année`, `${livres.filter(l => l.statut === 'EN_COURS').length} en cours`];
     if (durees.length) stats.push(`${Math.round(durees.reduce((a, b) => a + b, 0) / durees.length)} jours par livre en moyenne`);
-    let h = `<h1>Fil du temps</h1><p class="doux" style="margin:6px 0 0">${stats.join(' · ')}</p>`;
+    let h = `${enTete('Le fil', 'du temps')}<p class="doux" style="margin:6px 0 0">${stats.join(' · ')}</p>`;
     if (sansDates) h += `<p class="doux" style="font-size:13px;margin:6px 0 0">${sansDates} lecture${sansDates > 1 ? 's' : ''} sans date ne figure${sansDates > 1 ? 'nt' : ''} pas sur le fil.</p>`;
     if (!iv.length) { el.innerHTML = h + '<p class="doux" style="margin-top:30px">Aucune lecture datée pour l’instant.</p>'; return; }
     const HAUT = 30, MIN = 78, ESP = 8, LARG = innerWidth < 600 ? 150 : 190, GAUCHE = innerWidth < 600 ? 74 : 84;
@@ -1346,7 +1839,7 @@ const Carnet = {
     const el = $('#carnet');
     const oracle = cs.length ? cs[Math.floor(Math.random() * cs.length)] : null;
     const ligne = c => { const l = M.parId.get(c.lectureId); return `<div class="carte cit-carte"><blockquote class="citation" style="margin:0">« ${esc(c.texte)} »<small>${esc(l ? titreCourt(l) : '')}${l?.auteur ? ' · ' + esc(l.auteur) : ''}${c.page ? ' · p. ' + c.page : ''}</small></blockquote><button data-livre="${c.lectureId}">Ouvrir le livre ›</button></div>`; };
-    el.innerHTML = `<h1>Carnet de pensées</h1><p class="doux" style="margin:6px 0 22px">${cs.length} citation${cs.length > 1 ? 's' : ''} gardée${cs.length > 1 ? 's' : ''}.</p>
+    el.innerHTML = `${enTete('Le carnet', 'de pensées')}<p class="doux" style="margin:6px 0 22px">${cs.length} citation${cs.length > 1 ? 's' : ''} gardée${cs.length > 1 ? 's' : ''}.</p>
       ${oracle ? `<div class="sur" style="margin-bottom:10px">Oracle du jour</div><div class="carte cit-carte" style="border-color:rgba(227,182,92,.4)"><blockquote class="citation" style="margin:0;font-size:19px">« ${esc(oracle.texte)} »<small>${esc(titreCourt(M.parId.get(oracle.lectureId)))}</small></blockquote><div style="display:flex;gap:8px;margin-top:10px"><button class="btn petit" id="autre">↻ Une autre</button><button class="btn petit" data-livre="${oracle.lectureId}">Ouvrir le livre</button></div></div><div class="sur" style="margin:30px 0 10px">Toutes les citations</div>` : ''}
       ${cs.map(ligne).join('') || '<p class="doux">Aucune citation pour l’instant.</p>'}`;
     el.querySelectorAll('[data-livre]').forEach(b => b.onclick = () => Fiche.ouvrir(+b.dataset.livre));
@@ -1360,7 +1853,7 @@ const Carnet = {
 const Reglages = {
   rendre(){
     const r = M.racine; const el = $('#reglages');
-    el.innerHTML = `<h1>Réglages</h1>
+    el.innerHTML = `<button class="btn petit" onclick="history.length > 1 ? history.back() : (location.hash = 'ciel')" style="margin-bottom:12px">‹ Retour</button><h1>Réglages</h1>
       <div class="carte reglage"><h2>Ta bibliothèque</h2>
         ${r ? `<p>${M.lectures.length} lectures, ${M.citations.length} citations, ${M.liens.length} liens, ${M.urlsCouv.size} couvertures photographiées.<br><span class="doux">Sauvegarde du ${date(r.date) || '—'}${r.fichierSource ? ' · ' + esc(r.fichierSource) : ''}, ouverte le ${date(r.importeLe)}.</span></p>` : `<p>Aucune bibliothèque dans ce navigateur.</p>`}
         <div id="depot2" class="depot" style="margin-top:0;padding:18px;text-align:center"><button class="btn or" id="importer">${r ? 'Ouvrir une autre sauvegarde .zip' : 'Ouvrir ma sauvegarde .zip'}</button><p class="doux" style="font-size:12.5px;margin:10px 0 0">ou dépose le fichier ici · ${r ? 'remplace tout ce qui est affiché ici (l’appli Android n’est pas touchée)' : 'faite depuis l’appli Android, Réglages › Sauvegarde'}</p></div>
@@ -1955,7 +2448,7 @@ const Edition = (() => {
       if (blob) { fichiers.push({ nom: 'couvertures/' + nom, data: new Uint8Array(await blob.arrayBuffer()) }); utilises.add(nom); }
     }
     const lectures = M.lectures.map(propre).map(l => ((l.couvertureUrl || '').startsWith('local:') && !utilises.has(l.couvertureUrl.slice(6))) ? { ...l, couvertureUrl: null } : l);
-    const racine = { application: 'Phylactère', version: M.racine.version || 3, date: Date.now(), lectures, citations: M.citations.map(propre), liens: M.liens.map(propre) };
+    const racine = { application: 'Phylactère', version: 4, date: Date.now(), lectures, citations: M.citations.map(propre), liens: M.liens.map(propre), galaxies: (M.racine.galaxies || []).map(g => ({ id: g.id, nom: g.nom, requete: g.requete, dateAjout: g.dateAjout || Date.now() })) };
     fichiers.unshift({ nom: 'donnees.json', data: new TextEncoder().encode(JSON.stringify(racine, null, 2)) });
     return { blob: creerZip(fichiers), nb: lectures.length, couv: utilises.size };
   }
