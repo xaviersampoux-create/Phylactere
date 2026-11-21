@@ -779,6 +779,7 @@ document.querySelectorAll('.nav-b[data-vue]').forEach(b => b.addEventListener('c
 function router(){
   const h = location.hash.slice(1);
   if (h === 'partage') { history.replaceState(null, '', '#ciel'); montrerVue('ciel'); Edition.recevoirPartage().then(ok => { if (!ok) toast('Rien à importer'); }); return; }
+  if (h.startsWith('galaxie=')) { const code = h.slice(8); history.replaceState(null, '', '#ciel'); (async () => { await Edition.assurerRacine(); montrerVue('ciel'); await Ciel.recevoir(code); })(); return; }
   const m = /^fiche-(\d+)$/.exec(h);
   if (m) { if (!document.querySelector('.vue.active')) montrerVue('ciel'); Fiche.ouvrir(+m[1], false); return; }
   Fiche.fermer(false);
@@ -1115,15 +1116,40 @@ const Ciel = (() => {
   const lecturesCiel = () => M.lectures.filter(l => !l._manques.length);
   function citationsParLivre(){ const m = new Map(); for (const c of M.citations) m.set(c.lectureId, (m.get(c.lectureId) ? m.get(c.lectureId) + ' ' : '') + c.texte); return m; }
   const galaxies = () => (M.racine && M.racine.galaxies) || [];
-  function galaxieOuverte(){ return galaxies().find(g => g.id === S.onglet) || null; }
+  /* galaxies partagées : celle reçue par un lien (pas encore gardée), ses livres « d'ami », ceux en commun */
+  let recue = null, versionRecue = 0, amisParId = new Map(), communs = new Set();
+  const ongletsGalaxies = () => [...galaxies(), ...(recue ? [recue] : [])];
+  function galaxieOuverte(){ return S.onglet === 'recue' ? recue : galaxies().find(g => g.id === S.onglet) || null; }
+  function cleLivre(t, a){
+    const tt = CC.normaliserMot(t).replace(/^(l'|l’|le |la |les |un |une |des |the |a )/, '').replace(/[^a-z0-9]/g, '');
+    const m = CC.normaliserMot(String(a || '').split(/[,;&(]/)[0]).split(/\s+/).filter(Boolean);
+    return [tt, (m[m.length - 1] || '').replace(/[^a-z0-9]/g, '')];
+  }
+  const memeLivre = (x, y) => !!x[0] && !!y[0] && (x[0] === y[0] || (Math.min(x[0].length, y[0].length) >= 6 && (x[0].startsWith(y[0]) || y[0].startsWith(x[0])))) && (!x[1] || !y[1] || x[1] === y[1]);
+  function fusion(ls, g){
+    const mots = CC.lireRequete(g.requete).mots, cles = ls.map(l => [l, cleLivre(l.titre, l.auteur)]), pseudo = new Map(), com = new Map(); let n = 0;
+    for (const b of g.ami.livres) {
+      const ses = (b.m || []).map(i => mots[i]).filter(Boolean).join(', ');
+      const mien = cles.find(([, c]) => memeLivre(c, cleLivre(b.t, b.a)));
+      if (mien) { com.set(mien[0].id, ses); continue; }
+      const id = -(++n);
+      pseudo.set(id, { id, titre: b.t, auteur: b.a || '', theme: b.th || null, type: 'LIVRE', statut: b.s === 'A' ? 'A_LIRE' : b.s === 'E' ? 'EN_COURS' : 'LU', note: 0, motsCles: ses, notes: '', resume: '', dateAjout: 0, dateDebut: null, dateFin: null, serie: null, tome: null, _ami: true, _manques: [], _liens: [] });
+    }
+    // un livre en commun entre dans la galaxie même si tes mots-clés ne portent pas ces mots
+    const liste = ls.map(l => com.has(l.id) && com.get(l.id) ? { ...l, motsCles: [l.motsCles, com.get(l.id)].filter(Boolean).join(', ') } : l);
+    return { liste: [...liste, ...pseudo.values()], pseudo, com: new Set(com.keys()) };
+  }
   function recalculer(){
-    const ls = lecturesCiel(), cle = [M.lectures.length, M.racine && M.racine.modifieLe, M.racine && M.racine.importeLe, S.motActif, S.seuil, S.onglet, galaxies().length, galaxieOuverte()?.requete].join('|');
+    const g0 = galaxieOuverte();
+    const ls = lecturesCiel(), cle = [M.lectures.length, M.racine && M.racine.modifieLe, M.racine && M.racine.importeLe, S.motActif, S.seuil, S.onglet, galaxies().length, g0?.requete, versionRecue].join('|');
     if (cle === cleCache && plan) return;
     cleCache = cle;
     const cit = citationsParLivre();
     plan = CC.calculerCiel(ls, S.motActif || null, cit, S.seuil);
     const g = galaxieOuverte();
-    planGalaxie = g ? CC.calculerGalaxie(ls, g.requete, cit, S.seuil) : null;
+    amisParId = new Map(); communs = new Set();
+    if (g && g.ami) { const f = fusion(ls, g); amisParId = f.pseudo; communs = f.com; planGalaxie = CC.calculerGalaxie(f.liste, g.requete, cit, S.seuil); }
+    else planGalaxie = g ? CC.calculerGalaxie(ls, g.requete, cit, S.seuil) : null;
   }
   const planActif = () => planGalaxie || plan;
 
@@ -1299,7 +1325,9 @@ const Ciel = (() => {
         if (l.id === S.selection) cercle(r + 7, false, rgba('ivoire', .8), .8);
         continue;
       }
-      if (l.statut === 'LU') {
+      if (e.l._ami) {   // un livre de la galaxie de ton ami, absent de ta bibliothèque
+        ctx.setLineDash([2, 2]); cercle(3.4, false, rgba('bleu', .95), .9); ctx.setLineDash([]); cercle(1.1, true, rgba('bleu', .9));
+      } else if (l.statut === 'LU') {
         const ec = eclatAnciennete(l, reference);
         if (l.note >= 4) { const hr = l.note >= 5 ? 9 : 6, gg = ctx.createRadialGradient(q[0], q[1], 0, q[0], q[1], hr); gg.addColorStop(0, rgba('ivoire', (l.note >= 5 ? .18 : .10) * ec)); gg.addColorStop(1, rgba('ivoire', 0)); ctx.fillStyle = gg; ctx.beginPath(); ctx.arc(q[0], q[1], hr, 0, 7); ctx.fill(); }
         cercle(r, true, rgba('ivoire', ec));
@@ -1310,7 +1338,8 @@ const Ciel = (() => {
       } else cercle(r, false, rgba('bleu', .7), .75);
       if (l.id === S.selection) cercle(r + 7, false, rgba('ivoire', .8), .8);
       if (suiteALire) cercle(r + 2.5, false, rgba('bleu', .6), .75);
-      if (modeMot && estFocus) cercle(r + 3.5, false, rgba('or', .85), .8);
+      if (modeMot && estFocus && !e.l._ami) cercle(r + 3.5, false, rgba('or', .85), .8);
+      if (communs.has(l.id)) { ctx.setLineDash([3, 3]); cercle(r + 7.5, false, rgba('bleu', .9), .9); ctx.setLineDash([]); }
       const carrefour = serieRepliee ? serie.ids.some(id => p.idsTous.has(id)) : p.idsTous.has(l.id);
       if (modeMot && carrefour) cercle(r + 7, false, rgba('or', .55), .8);
 
@@ -1535,6 +1564,7 @@ const Ciel = (() => {
   }
   function majCartouche(){
     const z = $('#ciel-cartouche'), p = planActif();
+    if (S.selection != null && S.selection < 0) { cartoucheAmi(z, p); return; }
     const l = S.selection != null ? M.parId.get(S.selection) : null;
     if (!l || l._manques.length) { z.classList.remove('ouverte'); hauteurCartouche = 0; $('#ciel-mire').style.bottom = ''; return; }
     const frac = l.statut === 'EN_COURS' && l.pagesTotal > 0 && l.pageActuelle != null ? Math.min(1, Math.max(0, l.pageActuelle / l.pagesTotal)) : null;
@@ -1547,6 +1577,7 @@ const Ciel = (() => {
       <div class="ct-l2"><span class="ct-aut">${esc([l.auteur, CC.nomConstellation(l)].filter(x => x && String(x).trim()).join(' · '))}</span>${l.note > 0 ? `<span class="ct-note">${'✦'.repeat(l.note)}</span>` : ''}<span class="ct-etat ${l.statut === 'A_LIRE' ? 'bleu' : ''}">${etat}</span></div>
       ${frac != null ? `<div class="ct-barre"><i style="width:${frac * 100}%"></i></div>` : ''}
       ${detail ? `<div class="ct-detail">${esc(detail.includes('\n') ? detail : 'Relié : ' + detail).replace(/\n/g, '<br>')}</div>` : ''}
+      ${communs.has(l.id) ? `<div class="ct-detail" style="color:var(--bleu)">✦ En commun avec ${esc(galaxieOuverte()?.ami?.de || 'ton ami')}</div>` : ''}
       <div class="ct-l3"><span class="ct-lies">${lies.length ? 'RELIÉ À · ' + lies.length : ''}</span><button class="ct-fiche" data-fiche>Fiche ›</button></div>
       ${lies.length ? `<div class="ct-rangee">${lies.map(x => { const h = (vus.get(String(x.titre).trim().toLowerCase()) || 0) > 1 && x.auteur; return `<button data-lie="${x.id}">${esc(titreCourtC(x, 30) + (h ? ' — ' + String(x.auteur).split(',')[0].trim() : ''))}</button>`; }).join('')}</div>` : ''}
     </div>`;
@@ -1555,6 +1586,54 @@ const Ciel = (() => {
     z.querySelector('.ct-x').onclick = () => choisir(null);
     z.querySelectorAll('[data-lie]').forEach(b => b.onclick = () => { const id = +b.dataset.lie; choisir(id); setTimeout(() => cibler(id), 30); });
     requestAnimationFrame(() => { hauteurCartouche = z.offsetHeight; $('#ciel-mire').style.bottom = (hauteurCartouche + 8) + 'px'; });
+  }
+  function cartoucheAmi(z, p){
+    const b = amisParId.get(S.selection), g = galaxieOuverte(); if (!b || !g) { z.classList.remove('ouverte'); return; }
+    const de = g.ami.de || 'ton ami', detail = p.details.get(b.id);
+    z.innerHTML = `<div class="cartouche" style="border-color:var(--bleu)"><div class="ct-l1"><span class="ct-titre">${esc(b.titre)}</span><button class="ct-x" aria-label="Fermer">✕</button></div>
+      <div class="ct-l2"><span class="ct-aut">${esc([b.auteur, b.theme].filter(Boolean).join(' · '))}</span><span class="ct-etat bleu">CHEZ ${esc(de.toUpperCase())}</span></div>
+      ${detail ? `<div class="ct-detail">${esc(detail.includes('\n') ? detail : 'Relié : ' + detail).replace(/\n/g, '<br>')}</div>` : ''}
+      <div class="ct-l3"><span class="ct-lies">PAS DANS TA BIBLIOTHÈQUE</span><a class="ct-fiche" href="${esc(Liens.babelio(b.titre, b.auteur))}" target="_blank" rel="noopener" style="text-decoration:none">Babelio ↗</a><button class="ct-fiche" data-ajouter>+ À lire</button></div></div>`;
+    z.classList.add('ouverte');
+    z.querySelector('.ct-x').onclick = () => choisir(null);
+    z.querySelector('[data-ajouter]').onclick = async () => { await Edition.ajouterSimple({ titre: b.titre, auteur: b.auteur, theme: b.theme, statut: 'A_LIRE', motsCles: b.motsCles }); toast(`« ${b.titre} » ajouté à lire : il est maintenant en commun`); choisir(null); cleCache = ''; recalculer(); demander(); majPanneau(); };
+    requestAnimationFrame(() => { hauteurCartouche = z.offsetHeight; $('#ciel-mire').style.bottom = (hauteurCartouche + 8) + 'px'; });
+  }
+  /* partager une galaxie : un lien qui porte la question et, si tu veux, la liste de tes livres */
+  async function encoder(o){ const f = new Blob([JSON.stringify(o)]).stream().pipeThrough(new CompressionStream('deflate-raw')); const u8 = new Uint8Array(await new Response(f).arrayBuffer()); let t = ''; for (const x of u8) t += String.fromCharCode(x); return btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
+  async function decoder(c){ const b = atob(c.replace(/-/g, '+').replace(/_/g, '/')), u8 = Uint8Array.from(b, x => x.charCodeAt(0)); const f = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(f).text()); }
+  function partager(g){
+    const r = CC.lireRequete(g.requete), cit = citationsParLivre(), livres = (planGalaxie ? planGalaxie.constellations.flatMap(c => c.etoiles).map(e => e.l) : []).filter(l => !l._ami);
+    let de = ''; try { de = localStorage.getItem('phylactere-prenom') || ''; } catch (e) {}
+    const d = $('#dialogue');
+    d.innerHTML = `<div class="carte" style="max-width:460px;width:100%"><h2 style="font-size:19px">Partager « ${esc(g.nom)} »</h2>
+      <p class="fc-petit" style="margin:6px 0 12px;line-height:1.5">Un lien vers le site. Celui qui l’ouvre voit la galaxie se dessiner avec <b>ses</b> livres reliés par ${esc(CC.libelleRequete(r))} ; les tiens apparaissent en pointillés bleus, ceux que vous avez tous deux sont cerclés. Rien ne passe par un serveur : tout est dans le lien.</p>
+      <label class="form" style="margin-bottom:10px"><span style="font-size:12.5px;color:var(--brume)">Signé (ton prénom)</span><input class="inp" id="pg-de" value="${esc(de)}" placeholder="Xavier"></label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:6px 0"><input type="checkbox" id="pg-livres" checked style="margin-top:3px"><span>Avec la liste de mes ${livres.length} livres de cette galaxie<br><span class="fc-petit">Titres, auteurs, thèmes et statut seulement : ni notes, ni citations, ni notes en étoiles.</span></span></label>
+      <div id="pg-lien" class="fc-petit" style="word-break:break-all;margin:8px 0"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn petit" id="pg-non">Fermer</button><button class="btn or petit" id="pg-oui">Partager le lien</button></div></div>`;
+    d.classList.add('ouvert');
+    $('#pg-non').onclick = () => d.classList.remove('ouvert');
+    $('#pg-oui').onclick = async () => {
+      const nom = $('#pg-de').value.trim(); try { localStorage.setItem('phylactere-prenom', nom); } catch (e) {}
+      const data = { v: 1, n: g.nom, q: g.requete, de: nom, l: $('#pg-livres').checked ? livres.map(l => ({ t: l.titre, a: l.auteur || '', th: l.theme || '', s: l.statut[0], m: r.mots.map((m, i) => CC.evaluerMot(l, m, S.seuil, cit.get(l.id)).relie ? i : -1).filter(i => i >= 0) })) : [] };
+      const url = location.href.split('#')[0] + '#galaxie=' + await encoder(data);
+      $('#pg-lien').textContent = url;
+      try { if (navigator.share) { await navigator.share({ title: 'Galaxie « ' + g.nom + ' »', text: `Ma galaxie « ${g.nom} » dans Phylactère${nom ? ' (' + nom + ')' : ''} : ouvre-la, elle se dessine avec tes propres livres.`, url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+      try { await navigator.clipboard.writeText(url); toast('Lien copié : colle-le dans un message'); } catch (e) { toast('Copie le lien affiché'); }
+    };
+  }
+  async function recevoir(code){
+    let o; try { o = await decoder(code); } catch (e) { toast('Ce lien de galaxie est illisible ou incomplet'); return; }
+    if (!o || !o.q) { toast('Ce lien ne contient pas de galaxie'); return; }
+    recue = { id: 'recue', nom: o.n || CC.nomGalaxieParDefaut(o.q), requete: o.q, dateAjout: Date.now(), ami: { de: o.de || '', livres: Array.isArray(o.l) ? o.l : [] } };
+    versionRecue++; ouvrirOnglet('recue');
+    toast(`Galaxie « ${recue.nom} »${recue.ami.de ? ' reçue de ' + recue.ami.de : ' reçue'}`);
+  }
+  async function garderRecue(){
+    const gs = galaxies(), id = gs.reduce((m, x) => Math.max(m, x.id), 0) + 1;
+    M.racine.galaxies = [...gs, { id, nom: recue.nom + (recue.ami.de ? ' · ' + recue.ami.de : ''), requete: recue.requete, dateAjout: Date.now(), ami: recue.ami }];
+    recue = null; await sauverGalaxies(); ouvrirOnglet(id); toast('Galaxie gardée dans tes onglets');
   }
   function majTerre(){
     const z = $('#ciel-terre'), theme = S.themeEteint;
@@ -1573,22 +1652,22 @@ const Ciel = (() => {
   /* ---- en-tête, onglets, panneaux ---- */
   function instantTemps(){ const ls = lecturesCiel(); const debut = ls.length ? Math.min(...ls.map(CC.apparition)) : 0, fin = Date.now(); return debut + (fin - debut) * S.curseur; }
   function majEntete(){
-    const ls = lecturesCiel(), toutes = M.lectures, nbAC = toutes.length - ls.length, g = galaxieOuverte(), gs = galaxies();
+    const ls = lecturesCiel(), toutes = M.lectures, nbAC = toutes.length - ls.length, g = galaxieOuverte(), gs = ongletsGalaxies(), voir = ls.length || !!(g && g.ami);
     $('#ciel-banniere-zone').innerHTML = nbAC > 0 ? `<button class="ciel-banniere" id="ciel-banniere">✦  ${nbAC} fiche${nbAC > 1 ? 's attendent' : ' attend'} d’être complétée${nbAC > 1 ? 's' : ''}  ›</button>` : '';
     const bn = $('#ciel-banniere'); if (bn) bn.onclick = () => Chercher.ouvrirACompleter();
     const ong = $('#ciel-onglets');
-    if (gs.length && ls.length) {
+    if (gs.length && voir) {
       ong.hidden = false;
-      ong.innerHTML = `<button class="onglet-ciel" aria-selected="${!g}" data-g="">Mon ciel</button>` + gs.map(x => `<button class="onglet-ciel" aria-selected="${g && g.id === x.id}" data-g="${x.id}">✦ ${esc(x.nom)}</button>`).join('');
-      ong.querySelectorAll('[data-g]').forEach(b => b.onclick = () => ouvrirOnglet(b.dataset.g ? +b.dataset.g : null));
+      ong.innerHTML = `<button class="onglet-ciel" aria-selected="${!g}" data-g="">Mon ciel</button>` + gs.map(x => `<button class="onglet-ciel" aria-selected="${g && g.id === x.id}" data-g="${x.id}">${x.ami ? '✧' : '✦'} ${esc(x.nom)}${x.id === 'recue' ? ' · reçue' : ''}</button>`).join('');
+      ong.querySelectorAll('[data-g]').forEach(b => b.onclick = () => ouvrirOnglet(b.dataset.g === 'recue' ? 'recue' : b.dataset.g ? +b.dataset.g : null));
       const act = ong.querySelector('[aria-selected="true"]'); if (act) act.scrollIntoView({ inline: 'nearest', block: 'nearest' });
     } else { ong.hidden = true; ong.innerHTML = ''; }
     const enCours = toutes.filter(l => l.statut === 'EN_COURS').length, nbC = plan ? plan.constellations.length : 0;
     $('#ciel-bilan').textContent = !g && ls.length ? `${toutes.length} lecture${toutes.length > 1 ? 's' : ''} · ${enCours} en cours · ${nbC} constellation${nbC > 1 ? 's' : ''}` : '';
-    $('#ciel-legende').hidden = !ls.length;
-    $('#ciel-vide').hidden = !!ls.length;
+    $('#ciel-legende').hidden = !voir;
+    $('#ciel-vide').hidden = !!voir;
     $('#ciel-vide').textContent = nbAC > 0 ? 'Ton ciel est encore noir.\nComplète une fiche (titre, auteur, thème) pour allumer ta première étoile.' : 'Ton ciel est encore noir.\nAjoute ton premier livre avec le bouton doré pour allumer une étoile.';
-    $('#ciel-zone').hidden = !ls.length || !!(g && planGalaxie && planGalaxie.vide);
+    $('#ciel-zone').hidden = !voir || !!(g && planGalaxie && planGalaxie.vide);
     $('#ciel-galaxie-vide').hidden = !(g && planGalaxie && planGalaxie.vide);
     if (g && planGalaxie && planGalaxie.vide) $('#ciel-galaxie-vide').textContent = `Aucun livre ne porte plus ${CC.libelleRequete(CC.lireRequete(g.requete))}.\nAjoute ces mots aux fiches concernées, et la galaxie se rallumera.`;
     majPanneau();
@@ -1603,11 +1682,19 @@ const Ciel = (() => {
   }
   function majPanneau(){
     const z = $('#ciel-panneau'), g = galaxieOuverte();
-    if (!lecturesCiel().length) { z.innerHTML = ''; return; }
+    if (!lecturesCiel().length && !(g && g.ami)) { z.innerHTML = ''; return; }
+    if (g && g.ami) {
+      const r = CC.lireRequete(g.requete), de = g.ami.de || 'ton ami', nbAmi = amisParId.size, nbCom = communs.size, nbToi = planGalaxie ? [...planGalaxie.idsFocus].filter(id => id > 0 && !communs.has(id)).length : 0;
+      z.innerHTML = `<div class="gal-tete"><div style="flex:1;min-width:0"><div class="gal-nom">${esc(g.nom)}</div><div class="petit-brume">${esc(CC.libelleRequete(r).replace(/^./, c => c.toUpperCase()))} · galaxie de ${esc(de)}</div>
+          <div class="petit-brume" style="margin-top:2px"><span style="color:var(--bleu)">◌ ${nbAmi} chez ${esc(de)}</span> · <span style="color:var(--bleu)">◎ ${nbCom} en commun</span> · ${nbToi} à toi seul</div></div>
+        ${g.id === 'recue' ? '<button class="fc-txtbtn or" id="gal-garder">Garder</button><button class="gal-menu" id="gal-fermer" aria-label="Fermer">✕</button>' : `<div class="menu-wrap"><button class="gal-menu" aria-label="Menu">⋯</button><div class="menu-liste" hidden><button data-a="renommer">Renommer</button><button data-a="supprimer">Supprimer la galaxie</button></div></div>`}</div>`;
+      const gk = z.querySelector('#gal-garder'); if (gk) { gk.onclick = garderRecue; z.querySelector('#gal-fermer').onclick = () => { recue = null; ouvrirOnglet(null); }; return; }
+    }
     if (g) {
       const r = CC.lireRequete(g.requete), nb = planGalaxie ? planGalaxie.idsFocus.size : 0, nc = planGalaxie ? planGalaxie.idsTous.size : 0;
-      z.innerHTML = `<div class="gal-tete"><div style="flex:1;min-width:0"><div class="gal-nom">${esc(g.nom)}</div><div class="petit-brume">${esc(CC.libelleRequete(r).replace(/^./, c => c.toUpperCase()))} · ${nb} livre${nb > 1 ? 's' : ''}${r.multiple && nc > 0 ? ` · ${nc} au cœur` : ''}</div></div>
-        <div class="menu-wrap"><button class="gal-menu" aria-label="Menu">⋯</button><div class="menu-liste" hidden><button data-a="renommer">Renommer</button><button data-a="supprimer">Supprimer la galaxie</button></div></div></div>`;
+      if (!g.ami) z.innerHTML = `<div class="gal-tete"><div style="flex:1;min-width:0"><div class="gal-nom">${esc(g.nom)}</div><div class="petit-brume">${esc(CC.libelleRequete(r).replace(/^./, c => c.toUpperCase()))} · ${nb} livre${nb > 1 ? 's' : ''}${r.multiple && nc > 0 ? ` · ${nc} au cœur` : ''}</div></div>
+        <button class="fc-txtbtn or" data-partager>Partager</button><div class="menu-wrap"><button class="gal-menu" aria-label="Menu">⋯</button><div class="menu-liste" hidden><button data-a="partager">Partager la galaxie</button><button data-a="renommer">Renommer</button><button data-a="supprimer">Supprimer la galaxie</button></div></div></div>`;
+      z.querySelectorAll('[data-partager],[data-a=partager]').forEach(b => b.onclick = () => partager(g));
       const mb = z.querySelector('.gal-menu'), ml = z.querySelector('.menu-liste');
       mb.onclick = e => { e.stopPropagation(); ml.hidden = !ml.hidden; };
       document.addEventListener('click', () => { ml.hidden = true; }, { once: true });
@@ -1719,9 +1806,10 @@ const Ciel = (() => {
 
   return {
     VERSION,
-    invalider(){ cleCache = ''; if (S.selection != null && !M.parId.has(S.selection)) S.selection = null; if (S.onglet != null && !galaxieOuverte()) S.onglet = null; if (vueCourante === 'ciel') { recalculer(); majEntete(); majCartouche(); } demander(); },
+    invalider(){ cleCache = ''; if (S.selection != null && S.selection > 0 && !M.parId.has(S.selection)) S.selection = null; if (S.onglet != null && !galaxieOuverte()) S.onglet = null; if (vueCourante === 'ciel') { recalculer(); majEntete(); majCartouche(); } demander(); },
     activer(){ $('#ciel-entete').innerHTML = enTete('Ton ciel', 'de lectures'); cleCache = ''; recalculer(); majEntete(); majCartouche(); majTerre(); requestAnimationFrame(() => { taille(); cadrerSiBesoin(); }); demander(); },
-    choisirLivre(id){ if (vueCourante !== 'ciel') return; S.onglet = null; recalculer(); choisir(id); setTimeout(() => cibler(id), 60); },
+    choisirLivre(id){ if (vueCourante !== 'ciel') return; recalculer(); if (!planActif().constellations.some(c => c.etoiles.some(e => e.l.id === id))) { S.onglet = null; cleCache = ''; } recalculer(); choisir(id); setTimeout(() => cibler(id), 60); },
+    recevoir,
     relierParMot(m){ S.onglet = null; S.motActif = m; S.panneauOuvert = false; location.hash = 'ciel'; setTimeout(() => { appliquerMot(); majEntete(); }, 80); }
   };
 })();
@@ -3402,7 +3490,7 @@ const Edition = (() => {
       if (blob) { fichiers.push({ nom: 'couvertures/' + nom, data: new Uint8Array(await blob.arrayBuffer()) }); utilises.add(nom); }
     }
     const lectures = M.lectures.map(propre).map(l => ((l.couvertureUrl || '').startsWith('local:') && !utilises.has(l.couvertureUrl.slice(6))) ? { ...l, couvertureUrl: null } : l);
-    const racine = { application: 'Phylactère', version: 4, date: Date.now(), lectures, citations: M.citations.map(propre), liens: M.liens.map(propre), galaxies: (M.racine.galaxies || []).map(g => ({ id: g.id, nom: g.nom, requete: g.requete, dateAjout: g.dateAjout || Date.now() })) };
+    const racine = { application: 'Phylactère', version: 4, date: Date.now(), lectures, citations: M.citations.map(propre), liens: M.liens.map(propre), galaxies: (M.racine.galaxies || []).map(g => ({ id: g.id, nom: g.nom, requete: g.requete, dateAjout: g.dateAjout || Date.now(), ...(g.ami ? { ami: g.ami } : {}) })) };
     fichiers.unshift({ nom: 'donnees.json', data: new TextEncoder().encode(JSON.stringify(racine, null, 2)) });
     return { blob: creerZip(fichiers), nb: lectures.length, couv: utilises.size };
   }

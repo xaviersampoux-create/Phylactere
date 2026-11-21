@@ -1,5 +1,5 @@
 // Phylactère — fonctionnement hors ligne (page et polices en cache) et réception des images partagées.
-const CACHE = 'phylactere-v14';
+const CACHE = 'phylactere-v15';
 const PARTAGE = 'phylactere-partage';
 const COQUILLE = ['./', './index.html', './manifest.webmanifest', './icons/icone-192.png', './icons/icone-512.png', './icons/apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(COQUILLE)).then(() => self.skipWaiting())); });
