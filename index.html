@@ -7,6 +7,17 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>Phylactère</title>
+<meta name="description" content="Tes lectures en ciel étoilé : une galaxie de livres reliés par les mots, les thèmes, les époques.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Phylactère">
+<meta property="og:url" content="https://xaviersampoux-create.github.io/Phylactere/">
+<meta property="og:title" content="Phylactère — une galaxie de lectures t'attend">
+<meta property="og:description" content="Ouvre le lien : la galaxie se dessine avec tes propres livres, et montre ceux que vous avez en commun.">
+<meta property="og:image" content="https://xaviersampoux-create.github.io/Phylactere/icons/apercu.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Une spirale d'étoiles dorées sur un ciel de nuit">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/favicon.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -1604,6 +1615,50 @@ const Ciel = (() => {
   /* partager une galaxie : un lien qui porte la question et, si tu veux, la liste de tes livres */
   async function encoder(o){ const f = new Blob([JSON.stringify(o)]).stream().pipeThrough(new CompressionStream('deflate-raw')); const u8 = new Uint8Array(await new Response(f).arrayBuffer()); let t = ''; for (const x of u8) t += String.fromCharCode(x); return btoa(t).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); }
   async function decoder(c){ const b = atob(c.replace(/-/g, '+').replace(/_/g, '/')), u8 = Uint8Array.from(b, x => x.charCodeAt(0)); const f = new Blob([u8]).stream().pipeThrough(new DecompressionStream('deflate-raw')); return JSON.parse(await new Response(f).text()); }
+  /* l'image de la galaxie, envoyée avec le lien (1080 × 1350, comme une affiche) */
+  async function imageGalaxie(g, plan, de){
+    try { await Promise.all(['400 72px Fraunces', 'italic 400 34px Fraunces', '500 24px Manrope', '700 24px Manrope'].map(f => document.fonts.load(f))); } catch (e) {}
+    const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const x = c.getContext('2d');
+    x.fillStyle = '#0B0E1A'; x.fillRect(0, 0, W, H);
+    let graine = 7; const hasard = () => ((graine = (graine * 16807) % 2147483647) / 2147483647);
+    for (let i = 0; i < 320; i++) { const a = 60 + hasard() * 110; x.fillStyle = `rgba(${a},${a + 4},${Math.min(255, a + 20)},1)`; x.beginPath(); x.arc(hasard() * W, hasard() * H, .5 + hasard() * .8, 0, 7); x.fill(); }
+    const r = CC.lireRequete(g.requete), etoiles = plan.constellations.flatMap(k => k.etoiles), M0 = 80;
+    x.textBaseline = 'alphabetic';
+    x.font = '700 24px Manrope, sans-serif'; x.fillStyle = '#E3B65C'; try { x.letterSpacing = '6px'; } catch (e) {} x.fillText('PHYLACTÈRE', M0, 120); try { x.letterSpacing = '0px'; } catch (e) {}
+    let tn = 74; x.font = `400 ${tn}px Fraunces, Georgia, serif`; while (x.measureText(g.nom).width > W - 2 * M0 && tn > 40) { tn -= 4; x.font = `400 ${tn}px Fraunces, Georgia, serif`; }
+    x.fillStyle = '#F3EBDD'; x.fillText(g.nom, M0 - 3, 210);
+    x.font = 'italic 400 34px Fraunces, Georgia, serif'; x.fillStyle = '#9AA3BF'; x.fillText(CC.libelleRequete(r), M0, 262);
+    const n = etoiles.length; x.font = '500 24px Manrope, sans-serif'; x.fillText(`${n} livre${n > 1 ? 's' : ''}${de ? ' · galaxie de ' + de : ''}`, M0, 304);
+    // le ciel, cadré dans la zone centrale
+    const zone = { x: M0, y: 360, w: W - 2 * M0, h: 800 };
+    const xs = etoiles.map(e => e.x), ys = etoiles.map(e => e.y), mnx = Math.min(...xs), mxx = Math.max(...xs), mny = Math.min(...ys), mxy = Math.max(...ys);
+    const ech = Math.min((zone.w - 160) / Math.max(1, mxx - mnx), (zone.h - 120) / Math.max(1, mxy - mny), 6);
+    const P = e => [zone.x + zone.w / 2 + (e.x - (mnx + mxx) / 2) * ech, zone.y + zone.h / 2 + (e.y - (mny + mxy) / 2) * ech];
+    for (const k of plan.constellations) for (const e of k.etoiles) { const [px, py] = P(e), gr = x.createRadialGradient(px, py, 0, px, py, 34); gr.addColorStop(0, 'rgba(227,182,92,.16)'); gr.addColorStop(1, 'rgba(227,182,92,0)'); x.fillStyle = gr; x.beginPath(); x.arc(px, py, 34, 0, 7); x.fill(); }
+    x.strokeStyle = 'rgba(227,182,92,.7)'; x.lineWidth = 2.2; x.lineCap = 'round';
+    for (const k of plan.constellations) for (const [i, j] of k.liens) { const a = P(k.etoiles[i]), b = P(k.etoiles[j]); x.beginPath(); x.moveTo(a[0], a[1]); x.lineTo(b[0], b[1]); x.stroke(); }
+    const occupe = [], libre = rr => !occupe.some(o => rr[0] < o[2] && rr[2] > o[0] && rr[1] < o[3] && rr[3] > o[1]) && rr[0] >= 20 && rr[2] <= W - 20 && rr[1] >= 330 && rr[3] <= 1200;
+    for (const e of etoiles) { const [px, py] = P(e); occupe.push([px - 10, py - 10, px + 10, py + 10]);
+      const l = e.l, ami = l._ami;
+      if (ami) { x.setLineDash([4, 4]); x.strokeStyle = '#8792BC'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, 8, 0, 7); x.stroke(); x.setLineDash([]); x.fillStyle = '#8792BC'; x.beginPath(); x.arc(px, py, 2.5, 0, 7); x.fill(); }
+      else if (l.statut === 'A_LIRE') { x.strokeStyle = '#8792BC'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, 6, 0, 7); x.stroke(); }
+      else if (l.statut === 'EN_COURS') { x.fillStyle = '#E3B65C'; x.beginPath(); x.arc(px, py, 5, 0, 7); x.fill(); x.strokeStyle = 'rgba(227,182,92,.6)'; x.lineWidth = 1.5; x.beginPath(); x.arc(px, py, 11, 0, 7); x.stroke(); }
+      else { x.fillStyle = '#F3EBDD'; x.beginPath(); x.arc(px, py, 3.5 + Math.max(0, (l.note || 0) - 2) * 1.2, 0, 7); x.fill(); }
+      if (communs.has(l.id)) { x.setLineDash([5, 5]); x.strokeStyle = '#8792BC'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, 15, 0, 7); x.stroke(); x.setLineDash([]); } }
+    // noms des bras
+    x.font = 'italic 400 30px Fraunces, Georgia, serif'; x.fillStyle = '#E3B65C';
+    for (const k of plan.constellations) { if (k.etoiles.length < 1) continue; const pts = k.etoiles.map(P), cx = pts.reduce((s, q) => s + q[0], 0) / pts.length, haut = Math.min(...pts.map(q => q[1])), t = `« ${k.nom} »`, w = x.measureText(t).width;
+      const rr = [cx - w / 2, haut - 66, cx + w / 2, haut - 30]; if (libre(rr)) { x.fillText(t, rr[0], haut - 38); occupe.push(rr); } }
+    // titres
+    x.font = '500 22px Manrope, sans-serif';
+    for (const e of etoiles) { const [px, py] = P(e); let t = String(e.l.titre || '').split(' : ')[0]; if (t.length > 28) t = t.slice(0, 27).trimEnd() + '…'; const w = x.measureText(t).width;
+      const essais = [[px - w / 2, py + 20], [px - w / 2, py - 46], [px + 18, py - 13], [px - 18 - w, py - 13]];
+      const ok = essais.map(([a, b]) => [a, b, a + w, b + 26]).find(libre); if (!ok) continue; occupe.push(ok);
+      x.shadowColor = '#0B0E1A'; x.shadowBlur = 8; x.fillStyle = e.l._ami ? 'rgba(135,146,188,.95)' : 'rgba(243,235,221,.9)'; x.fillText(t, ok[0], ok[1] + 20); x.fillText(t, ok[0], ok[1] + 20); x.shadowBlur = 0; }
+    x.font = '500 24px Manrope, sans-serif'; x.fillStyle = '#C9CEDF'; x.fillText('Ouvre le lien : elle se dessine avec tes propres livres.', M0, 1262);
+    x.fillStyle = '#9AA3BF'; x.font = '500 21px Manrope, sans-serif'; x.fillText('Phylactère · tes lectures en ciel étoilé', M0, 1300);
+    return new Promise(ok => c.toBlob(ok, 'image/png'));
+  }
   function partager(g){
     const r = CC.lireRequete(g.requete), cit = citationsParLivre(), livres = (planGalaxie ? planGalaxie.constellations.flatMap(c => c.etoiles).map(e => e.l) : []).filter(l => !l._ami);
     let de = ''; try { de = localStorage.getItem('phylactere-prenom') || ''; } catch (e) {}
@@ -1611,17 +1666,33 @@ const Ciel = (() => {
     d.innerHTML = `<div class="carte" style="max-width:460px;width:100%"><h2 style="font-size:19px">Partager « ${esc(g.nom)} »</h2>
       <p class="fc-petit" style="margin:6px 0 12px;line-height:1.5">Un lien vers le site. Celui qui l’ouvre voit la galaxie se dessiner avec <b>ses</b> livres reliés par ${esc(CC.libelleRequete(r))} ; les tiens apparaissent en pointillés bleus, ceux que vous avez tous deux sont cerclés. Rien ne passe par un serveur : tout est dans le lien.</p>
       <label class="form" style="margin-bottom:10px"><span style="font-size:12.5px;color:var(--brume)">Signé (ton prénom)</span><input class="inp" id="pg-de" value="${esc(de)}" placeholder="Xavier"></label>
+      <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:6px 0"><input type="checkbox" id="pg-image" checked style="margin-top:3px"><span>Avec l’image de la galaxie<br><span class="fc-petit">Elle part avec le lien, comme une affiche.</span></span></label>
+      <img id="pg-apercu" alt="Aperçu de l’image" style="display:block;width:150px;border-radius:8px;border:1px solid var(--trait);margin:4px 0 8px 28px">
       <label style="display:flex;gap:10px;align-items:flex-start;font-size:14px;margin:6px 0"><input type="checkbox" id="pg-livres" checked style="margin-top:3px"><span>Avec la liste de mes ${livres.length} livres de cette galaxie<br><span class="fc-petit">Titres, auteurs, thèmes et statut seulement : ni notes, ni citations, ni notes en étoiles.</span></span></label>
       <div id="pg-lien" class="fc-petit" style="word-break:break-all;margin:8px 0"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn petit" id="pg-non">Fermer</button><button class="btn or petit" id="pg-oui">Partager le lien</button></div></div>`;
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:8px"><button class="btn petit" id="pg-non">Fermer</button><button class="btn or petit" id="pg-oui">Partager</button></div></div>`;
     d.classList.add('ouvert');
+    let image = null;
+    const majImage = async () => { image = await imageGalaxie(g, planGalaxie, $('#pg-de')?.value.trim() || ''); const ap = $('#pg-apercu'); if (ap && image) ap.src = URL.createObjectURL(image); };
+    majImage(); $('#pg-de').onchange = majImage;
+    $('#pg-image').onchange = () => { $('#pg-apercu').style.display = $('#pg-image').checked ? 'block' : 'none'; };
     $('#pg-non').onclick = () => d.classList.remove('ouvert');
     $('#pg-oui').onclick = async () => {
       const nom = $('#pg-de').value.trim(); try { localStorage.setItem('phylactere-prenom', nom); } catch (e) {}
       const data = { v: 1, n: g.nom, q: g.requete, de: nom, l: $('#pg-livres').checked ? livres.map(l => ({ t: l.titre, a: l.auteur || '', th: l.theme || '', s: l.statut[0], m: r.mots.map((m, i) => CC.evaluerMot(l, m, S.seuil, cit.get(l.id)).relie ? i : -1).filter(i => i >= 0) })) : [] };
       const url = location.href.split('#')[0] + '#galaxie=' + await encoder(data);
       $('#pg-lien').textContent = url;
-      try { if (navigator.share) { await navigator.share({ title: 'Galaxie « ' + g.nom + ' »', text: `Ma galaxie « ${g.nom} » dans Phylactère${nom ? ' (' + nom + ')' : ''} : ouvre-la, elle se dessine avec tes propres livres.`, url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+      const texte = `Ma galaxie « ${g.nom} » dans Phylactère${nom ? ' (' + nom + ')' : ''} : ouvre-la, elle se dessine avec tes propres livres.`;
+      if ($('#pg-image').checked) {
+        if (!image || nom !== ($('#pg-de').dataset.vu || '')) image = await imageGalaxie(g, planGalaxie, nom);
+        const fichier = new File([image], 'galaxie-' + (g.nom || 'phylactere').replace(/[^\p{L}\p{N}]+/gu, '-').toLowerCase() + '.png', { type: 'image/png' });
+        try { if (navigator.canShare && navigator.canShare({ files: [fichier] })) { await navigator.share({ files: [fichier], title: 'Galaxie « ' + g.nom + ' »', text: texte + '\n' + url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+        // ordinateur : l'image est enregistrée, le lien copié
+        const a = document.createElement('a'); a.href = URL.createObjectURL(fichier); a.download = fichier.name; document.body.appendChild(a); a.click(); a.remove();
+        try { await navigator.clipboard.writeText(texte + '\n' + url); toast('Image enregistrée et message copié : joins l’image et colle le message'); } catch (e) { toast('Image enregistrée ; copie le lien affiché'); }
+        return;
+      }
+      try { if (navigator.share) { await navigator.share({ title: 'Galaxie « ' + g.nom + ' »', text: texte, url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
       try { await navigator.clipboard.writeText(url); toast('Lien copié : colle-le dans un message'); } catch (e) { toast('Copie le lien affiché'); }
     };
   }
