@@ -602,7 +602,7 @@ const U = 150;              // taille d'une case de l'atlas (px du monde)
 /* ---------------- Utilitaires ---------------- */
 const ROUE = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg>';
 function enTete(titre, suite, reglages = true, action = ''){
-  return (typeof bandeauRappel === 'function' ? bandeauRappel() : '') + `<div class="entete"><div class="et-l1"><button class="et-marque" data-apropos>PHYLACTÈRE · 1.8  ⓘ</button><span style="flex:1"></span>${action}${reglages ? `<button class="et-reglages" data-reglages aria-label="Réglages">${ROUE}</button>` : ''}</div><h1>${titre} <em>${suite}</em></h1></div>`;
+  return (typeof bandeauRappel === 'function' ? bandeauRappel() : '') + `<div class="entete"><div class="et-l1"><button class="et-marque" data-apropos>PHYLACTÈRE · 1.9  ⓘ</button><span style="flex:1"></span>${action}${reglages ? `<button class="et-reglages" data-reglages aria-label="Réglages">${ROUE}</button>` : ''}</div><h1>${titre} <em>${suite}</em></h1></div>`;
 }
 document.addEventListener('click', e => {
   if (e.target.closest('[data-reglages]')) location.hash = 'reglages';
@@ -1028,8 +1028,9 @@ const CC = (() => {
     const reliees = lectures.filter(l => idsFocus.has(l.id));
     const coeur = (requete.multiple ? reliees.filter(l => idsTous.has(l.id)) : reliees).slice().sort(ordre);
     const bras = !requete.multiple ? [] : requete.mots.map(m => [m, reliees.filter(l => !idsTous.has(l.id) && (parLivre.get(l.id).find(x => x[1].relie) || [])[0] === m).sort(ordre)]);
-    const angleOr = Math.PI * (3 - Math.sqrt(5)), pasCoeur = 24, constellations = [];
-    const etoilesCoeur = coeur.map((l, i) => { const r = pasCoeur * Math.sqrt(i + .6), a = i * angleOr; return { l, x: r * Math.cos(a), y: r * Math.sin(a) }; });
+    // le cœur : une spirale d'Archimède, un seul fil qui s'enroule depuis le centre dans l'ordre de lecture (sans croisements)
+    const pasCoeur = 24, c = 26 / (2 * Math.PI), constellations = []; let theta = 10 / c;
+    const etoilesCoeur = coeur.map(l => { const r = c * theta, e = { l, x: r * Math.cos(theta), y: r * Math.sin(theta) }; theta += pasCoeur / Math.sqrt(r * r + c * c); return e; });
     const rayonCoeur = (etoilesCoeur.length ? Math.max(...etoilesCoeur.map(e => Math.hypot(e.x, e.y))) : 0) + 18;
     if (etoilesCoeur.length) constellations.push({ nom: nomCoeur || (requete.multiple ? 'cœur' : requete.mots[0]), cx: 0, cy: 0, rayon: rayonCoeur, etoiles: etoilesCoeur, liens: etoilesCoeur.slice(0, -1).map((_, i) => [i, i + 1]), focus: true });
     const nbBras = Math.max(1, bras.length);
@@ -2830,6 +2831,7 @@ document.addEventListener('click', e => {
    ========================================================= */
 const APropos = (() => {
   const H = [
+    ['1.9', ['Partager une galaxie : « Partager » en haut d’une galaxie envoie un lien (messagerie, mail…). Il emporte la question et, si tu veux, la liste de tes livres — jamais tes notes ni tes citations.', 'Ton ami ouvre le lien sur le site ou dans l’appli : la galaxie se dessine avec SES livres ; les tiens apparaissent en pointillés bleus, ceux que vous avez tous deux sont cerclés.', 'Un livre de l’ami se touche : pourquoi il est relié, Babelio, et « + À lire ». « Garder » range la galaxie dans tes onglets.', 'Recevoir : fais « Partager » sur le message et choisis Phylactère, ou colle le lien dans les Réglages de l’appli.', 'Le cœur d’une galaxie porte son nom, et ses livres s’enroulent en spirale, dans l’ordre de lecture, sans traits qui se croisent.']],
     ['1.8', ['Les galaxies : quand une recherche par mots relie au moins trois livres, « ✦ Créer une galaxie » la garde pour toujours.', 'Chaque galaxie a son onglet en haut du ciel (« Mon ciel · Les passeurs · Gnose… ») : fais glisser la rangée et touche un nom pour l’ouvrir.', 'Une galaxie retient la question, pas la liste : un livre ajouté plus tard qui porte ces mots y apparaît tout seul.', 'Au cœur de la galaxie, les livres qui portent tous les mots ; autour, un bras par mot. Renommer ou supprimer : menu ⋯ de l’onglet.', 'Les galaxies sont incluses dans la sauvegarde .zip.']],
     ['1.7', ['Relier par plusieurs mots : ajoute des mots un à un (« + mot ») pour croiser les idées ; chaque mot choisi devient une pastille, un toucher le retire.', '« Tous ces mots » n’allume que les livres qui les portent tous ; « L’un de ces mots » rassemble un territoire entier, et les livres qui portent tous les mots reçoivent un second anneau d’or.', 'Dans la fenêtre d’un livre, chaque mot qui le relie est expliqué sur sa ligne.']],
     ['1.6', ['Proches : « Dans ta bibliothèque » montre tes livres qui partagent des mots-clés ou l’auteur, avec la raison ; « ＋ Relier » en fait un lien de ton ciel d’un toucher.', 'À découvrir : jusqu’à 5 livres proches trouvés en ligne, gardés en mémoire pour ne pas relancer la recherche à chaque ouverture.', 'Quand rien n’est trouvé, la fiche dit pourquoi ; sans réseau, un bouton « Réessayer ».', 'Sur la page d’un livre à lire, si rien n’est trouvé en ligne, ce sont tes livres proches qui s’affichent.']],
@@ -2842,7 +2844,7 @@ const APropos = (() => {
   ];
   function ouvrir(){
     const d = $('#dialogue');
-    d.innerHTML = `<div class="carte" style="max-width:480px;width:100%"><h2 style="font-size:22px">Phylactère 1.8</h2><p class="fc-petit" style="font-size:14px;margin:6px 0 14px">Tes lectures en ciel étoilé. Version web : tout reste dans ce navigateur.</p>
+    d.innerHTML = `<div class="carte" style="max-width:480px;width:100%"><h2 style="font-size:22px">Phylactère 1.9</h2><p class="fc-petit" style="font-size:14px;margin:6px 0 14px">Tes lectures en ciel étoilé. Version web : tout reste dans ce navigateur.</p>
       ${H.map(([v, ns]) => `<div style="margin-bottom:14px"><div class="fc-lab or" style="letter-spacing:1.5px;margin-bottom:4px">VERSION ${v} · NOVEMBRE 2026</div>${ns.map(n => `<div class="fc-petit" style="color:var(--ivoire-d);margin:3px 0">✦  ${esc(n)}</div>`).join('')}</div>`).join('')}
       <div style="display:flex;justify-content:flex-end"><button class="fc-txtbtn or" id="ap-x">Fermer</button></div></div>`;
     d.classList.add('ouvert'); $('#ap-x').onclick = () => d.classList.remove('ouvert');
