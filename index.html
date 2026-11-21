@@ -337,7 +337,8 @@ h2{font-size:20px}
 .entete h1{font-size:30px;margin-top:4px;line-height:1.15}
 .entete h1 em{color:var(--brume)}
 .page .entete{padding:0 0 4px}
-.ciel-col{display:flex;flex-direction:column;height:100%}
+.ciel-col{display:flex;flex-direction:column;height:100%;-webkit-user-select:none;user-select:none}
+.ciel-col input{-webkit-user-select:text;user-select:text}
 .ciel-banniere{margin:6px 0 0 14px;padding:6px 10px;border-radius:12px;color:var(--or);font-size:12.5px}
 .ciel-banniere:hover{background:var(--encre)}
 .onglets-ciel{display:flex;gap:20px;overflow-x:auto;padding:10px 24px 0;scrollbar-width:none;flex:none}
@@ -1017,7 +1018,7 @@ const CC = (() => {
     return { constellations, minX, minY, maxX, maxY, motFocus: mot, idsFocus, details, idsTous, fantomes,
       atlasMinX: Math.min(minX, -bordX), atlasMinY: Math.min(minY, -bordY), atlasMaxX: Math.max(maxX, bordX), atlasMaxY: Math.max(maxY, bordY), series, galaxie: false, vide: !constellations.length };
   }
-  function calculerGalaxie(lectures, requeteTexte, citations, seuil){
+  function calculerGalaxie(lectures, requeteTexte, citations, seuil, nomCoeur){
     const requete = lireRequete(requeteTexte), videP = { constellations: [], vide: true, minX: 0, minY: 0, maxX: 0, maxY: 0, series: new Map(), idsFocus: new Set(), idsTous: new Set(), details: new Map(), fantomes: [], galaxie: true, motFocus: requeteTexte };
     if (requete.vide || !lectures.length) return videP;
     const { parLivre, idsFocus, idsTous: tousBrut, details } = evaluerRequete(lectures, requete, seuil, citations);
@@ -1030,7 +1031,7 @@ const CC = (() => {
     const angleOr = Math.PI * (3 - Math.sqrt(5)), pasCoeur = 24, constellations = [];
     const etoilesCoeur = coeur.map((l, i) => { const r = pasCoeur * Math.sqrt(i + .6), a = i * angleOr; return { l, x: r * Math.cos(a), y: r * Math.sin(a) }; });
     const rayonCoeur = (etoilesCoeur.length ? Math.max(...etoilesCoeur.map(e => Math.hypot(e.x, e.y))) : 0) + 18;
-    if (etoilesCoeur.length) constellations.push({ nom: requete.multiple ? 'cœur' : requete.mots[0], cx: 0, cy: 0, rayon: rayonCoeur, etoiles: etoilesCoeur, liens: etoilesCoeur.slice(0, -1).map((_, i) => [i, i + 1]), focus: true });
+    if (etoilesCoeur.length) constellations.push({ nom: nomCoeur || (requete.multiple ? 'cœur' : requete.mots[0]), cx: 0, cy: 0, rayon: rayonCoeur, etoiles: etoilesCoeur, liens: etoilesCoeur.slice(0, -1).map((_, i) => [i, i + 1]), focus: true });
     const nbBras = Math.max(1, bras.length);
     bras.forEach(([mot, livres], j) => {
       if (!livres.length) return;
@@ -1148,8 +1149,8 @@ const Ciel = (() => {
     plan = CC.calculerCiel(ls, S.motActif || null, cit, S.seuil);
     const g = galaxieOuverte();
     amisParId = new Map(); communs = new Set();
-    if (g && g.ami) { const f = fusion(ls, g); amisParId = f.pseudo; communs = f.com; planGalaxie = CC.calculerGalaxie(f.liste, g.requete, cit, S.seuil); }
-    else planGalaxie = g ? CC.calculerGalaxie(ls, g.requete, cit, S.seuil) : null;
+    if (g && g.ami) { const f = fusion(ls, g); amisParId = f.pseudo; communs = f.com; planGalaxie = CC.calculerGalaxie(f.liste, g.requete, cit, S.seuil, g.nom); }
+    else planGalaxie = g ? CC.calculerGalaxie(ls, g.requete, cit, S.seuil, g.nom) : null;
   }
   const planActif = () => planGalaxie || plan;
 
@@ -1698,7 +1699,7 @@ const Ciel = (() => {
       const mb = z.querySelector('.gal-menu'), ml = z.querySelector('.menu-liste');
       mb.onclick = e => { e.stopPropagation(); ml.hidden = !ml.hidden; };
       document.addEventListener('click', () => { ml.hidden = true; }, { once: true });
-      ml.querySelector('[data-a=renommer]').onclick = () => fenetreNom('Renommer la galaxie', null, g.nom, 'Renommer', nom => { g.nom = nom.trim(); sauverGalaxies(); });
+      ml.querySelector('[data-a=renommer]').onclick = () => fenetreNom('Renommer la galaxie', null, g.nom, 'Renommer', nom => { g.nom = nom.trim(); cleCache = ''; sauverGalaxies(); });
       ml.querySelector('[data-a=supprimer]').onclick = () => confirmer(`Supprimer « ${g.nom} » ?`, 'Seule la galaxie disparaît : tes livres et leurs mots-clés ne changent pas.', 'Supprimer', async () => { M.racine.galaxies = galaxies().filter(x => x.id !== g.id); await sauverGalaxies(); ouvrirOnglet(null); });
       return;
     }
